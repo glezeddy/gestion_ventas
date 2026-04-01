@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 1080" role="img" aria-labelledby="title desc">
+  <title id="title">Diseño en tendencia Y2K Flash</title>
+  <desc id="desc">Camiseta negra con gráfico Y2K de mariposa cromada, estrellas y tipografía glow.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0d0d0f"/>
+      <stop offset="100%" stop-color="#171721"/>
+    </linearGradient>
+    <linearGradient id="chrome" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#f8ffff"/>
+      <stop offset="28%" stop-color="#75f4ff"/>
+      <stop offset="50%" stop-color="#ff47b4"/>
+      <stop offset="72%" stop-color="#a289ff"/>
+      <stop offset="100%" stop-color="#ffffff"/>
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="28" stdDeviation="30" flood-color="#000000" flood-opacity="0.35"/>
+    </filter>
+  </defs>
+  <rect width="900" height="1080" fill="url(#bg)"/>
+  <circle cx="710" cy="170" r="110" fill="#20e0ff" opacity="0.18"/>
+  <circle cx="220" cy="860" r="160" fill="#ff1f96" opacity="0.18"/>
+  <g filter="url(#shadow)">
+    <path d="M302 138c40-26 255-26 295 0l111 89c35 28 68 38 105 47l-50 150c-39-7-67-18-95-37v467c0 33-27 60-60 60H292c-33 0-60-27-60-60V387c-28 19-56 30-95 37l-50-150c37-9 70-19 105-47z" fill="#0d0d10"/>
+    <path d="M350 149c24 43 61 68 100 68s76-25 100-68" fill="none" stroke="#26262f" stroke-width="18" stroke-linecap="round"/>
+    <rect x="232" y="255" width="436" height="430" rx="34" fill="#111117"/>
+    <text x="450" y="360" text-anchor="middle" font-family="Arial, sans-serif" font-size="72" font-weight="700" fill="url(#chrome)" letter-spacing="8">Y2K</text>
+    <text x="450" y="432" text-anchor="middle" font-family="Arial, sans-serif" font-size="44" font-weight="700" fill="#ffffff" letter-spacing="12">FLASH</text>
+    <path d="M310 520c55-58 104-72 140-44 37-28 85-14 140 44-26-8-59 3-99 34-15 12-27 26-41 42-14-16-26-30-41-42-40-31-73-42-99-34z" fill="none" stroke="url(#chrome)" stroke-width="16" stroke-linejoin="round"/>
+    <path d="M360 566c29-32 60-47 90-47s61 15 90 47" fill="none" stroke="#ffffff" stroke-opacity="0.7" stroke-width="6" stroke-linecap="round"/>
+    <g fill="#ff47b4">
+      <path d="M292 324l14 28 31 4-22 21 5 30-28-15-28 15 5-30-22-21 31-4z"/>
+      <path d="M608 466l14 28 31 4-22 21 5 30-28-15-28 15 5-30-22-21 31-4z"/>
+    </g>
+    <g fill="#20e0ff">
+      <circle cx="330" cy="616" r="9"/>
+      <circle cx="570" cy="598" r="9"/>
+      <circle cx="608" cy="338" r="9"/>
+    </g>
+  </g>
+</svg>

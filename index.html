@@ -1,0 +1,1780 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Prin Epic | Catálogo Streetwear</title>
+  <link rel="icon" type="image/png" href="./prinepic-logo.png">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Syne:wght@700;800&display=swap');
+
+    :root {
+      --bg: #f5f3ef;
+      --surface: rgba(255, 255, 255, 0.82);
+      --text: #121212;
+      --muted: #686868;
+      --line: rgba(18, 18, 18, 0.09);
+      --accent: #ff3b30;
+      --accent-alt: #0f62fe;
+      --shadow: 0 24px 60px rgba(18, 18, 18, 0.12);
+      --radius-lg: 24px;
+      --container: min(1180px, calc(100% - 32px));
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      font-family: "Space Grotesk", "Segoe UI", sans-serif;
+      background:
+        radial-gradient(circle at top left, rgba(15, 98, 254, 0.10), transparent 26%),
+        radial-gradient(circle at top right, rgba(255, 59, 48, 0.12), transparent 28%),
+        linear-gradient(180deg, #faf8f4 0%, #f1efeb 100%);
+      color: var(--text);
+    }
+
+    img { max-width: 100%; display: block; }
+    a { color: inherit; text-decoration: none; }
+
+    .page-shell::before,
+    .page-shell::after {
+      content: "";
+      position: fixed;
+      width: 220px;
+      height: 220px;
+      border-radius: 50%;
+      filter: blur(20px);
+      pointer-events: none;
+      z-index: -1;
+      opacity: 0.6;
+    }
+
+    .page-shell::before {
+      top: 8%;
+      right: -60px;
+      background: rgba(255, 59, 48, 0.16);
+    }
+
+    .page-shell::after {
+      bottom: 10%;
+      left: -80px;
+      background: rgba(15, 98, 254, 0.14);
+    }
+
+    .container {
+      width: var(--container);
+      margin: 0 auto;
+    }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      backdrop-filter: blur(18px);
+      background: rgba(245, 243, 239, 0.76);
+      border-bottom: 1px solid rgba(18, 18, 18, 0.06);
+    }
+
+    .topbar-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 16px 0;
+      position: relative;
+    }
+
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 14px;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+    }
+
+    .brand-mark {
+      width: 44px;
+      height: 44px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, #101010, #2d2d2d);
+      color: #fff;
+      display: grid;
+      place-items: center;
+      overflow: hidden;
+      box-shadow: 0 16px 30px rgba(0, 0, 0, 0.18);
+    }
+
+    .brand-mark img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .brand-text small {
+      display: block;
+      color: var(--muted);
+      font-size: 0.74rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.18em;
+      margin-bottom: 2px;
+    }
+
+    .brand-text strong { font-size: 1.08rem; }
+
+    .menu-toggle {
+      appearance: none;
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.65);
+      color: var(--text);
+      width: 46px;
+      height: 46px;
+      border-radius: 14px;
+      display: inline-grid;
+      place-items: center;
+      cursor: pointer;
+    }
+
+    .menu-toggle span,
+    .menu-toggle span::before,
+    .menu-toggle span::after {
+      display: block;
+      width: 18px;
+      height: 2px;
+      background: currentColor;
+      border-radius: 999px;
+      position: relative;
+      transition: transform 0.25s ease, opacity 0.25s ease;
+    }
+
+    .menu-toggle span::before,
+    .menu-toggle span::after {
+      content: "";
+      position: absolute;
+      left: 0;
+    }
+
+    .menu-toggle span::before { top: -6px; }
+    .menu-toggle span::after { top: 6px; }
+    .menu-toggle[aria-expanded="true"] span { background: transparent; }
+    .menu-toggle[aria-expanded="true"] span::before { transform: translateY(6px) rotate(45deg); }
+    .menu-toggle[aria-expanded="true"] span::after { transform: translateY(-6px) rotate(-45deg); }
+
+    .nav {
+      position: absolute;
+      top: calc(100% + 8px);
+      left: 16px;
+      right: 16px;
+      background: rgba(255, 255, 255, 0.96);
+      border: 1px solid rgba(18, 18, 18, 0.08);
+      border-radius: 24px;
+      padding: 10px;
+      box-shadow: var(--shadow);
+      display: none;
+    }
+
+    .nav.open {
+      display: grid;
+      gap: 4px;
+    }
+
+    .nav a {
+      padding: 14px 16px;
+      border-radius: 16px;
+      font-weight: 500;
+      transition: background 0.25s ease, color 0.25s ease, transform 0.25s ease;
+    }
+
+    .nav a:hover {
+      background: #111;
+      color: #fff;
+      transform: translateX(4px);
+    }
+
+    .hero { padding: 34px 0 22px; }
+
+    .hero-panel {
+      background:
+        linear-gradient(150deg, rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0.66)),
+        linear-gradient(135deg, rgba(15, 98, 254, 0.08), rgba(255, 59, 48, 0.08));
+      border: 1px solid rgba(255, 255, 255, 0.7);
+      border-radius: 34px;
+      overflow: hidden;
+      box-shadow: var(--shadow);
+      position: relative;
+      isolation: isolate;
+    }
+
+    .hero-panel::before {
+      content: "NEW DROP";
+      position: absolute;
+      top: 18px;
+      right: -36px;
+      background: var(--accent);
+      color: #fff;
+      padding: 10px 48px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.2em;
+      transform: rotate(32deg);
+      z-index: 1;
+    }
+
+    .hero-grid {
+      display: grid;
+      gap: 26px;
+      padding: 26px;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      color: var(--muted);
+      margin-bottom: 14px;
+    }
+
+    .eyebrow::before {
+      content: "";
+      width: 34px;
+      height: 1px;
+      background: currentColor;
+    }
+
+    h1, h2, h3 {
+      margin: 0;
+      line-height: 0.95;
+    }
+
+    .hero-copy h1 {
+      font-family: "Syne", sans-serif;
+      font-size: clamp(2.8rem, 8vw, 5.4rem);
+      text-transform: uppercase;
+      margin-bottom: 18px;
+      max-width: 10ch;
+    }
+
+    .hero-copy p {
+      color: var(--muted);
+      font-size: 1rem;
+      line-height: 1.75;
+      max-width: 56ch;
+      margin: 0 0 28px;
+    }
+
+    .hero-actions,
+    .contact-actions,
+    .custom-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      min-height: 52px;
+      padding: 0 22px;
+      border-radius: 999px;
+      border: 1px solid transparent;
+      font-weight: 700;
+      font-size: 0.96rem;
+      transition: transform 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
+      cursor: pointer;
+    }
+
+    .button:hover { transform: translateY(-2px); }
+
+    .button-primary {
+      background: #111;
+      color: #fff;
+      box-shadow: 0 18px 32px rgba(17, 17, 17, 0.24);
+    }
+
+    .button-primary:hover {
+      background: var(--accent);
+      box-shadow: 0 18px 32px rgba(255, 59, 48, 0.24);
+    }
+
+    .button-secondary {
+      background: rgba(255, 255, 255, 0.75);
+      color: var(--text);
+      border-color: rgba(18, 18, 18, 0.08);
+    }
+
+    .hero-notes {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 24px;
+    }
+
+    .hero-note {
+      background: rgba(255, 255, 255, 0.72);
+      border: 1px solid rgba(18, 18, 18, 0.06);
+      border-radius: 20px;
+      padding: 16px;
+    }
+
+    .hero-note strong {
+      display: block;
+      font-size: 1.35rem;
+      margin-bottom: 4px;
+    }
+
+    .hero-note span {
+      color: var(--muted);
+      font-size: 0.92rem;
+      line-height: 1.45;
+    }
+
+    .hero-visual {
+      min-height: 430px;
+      border-radius: 30px;
+      background:
+        linear-gradient(180deg, rgba(18, 18, 18, 0.02), rgba(18, 18, 18, 0.10)),
+        linear-gradient(135deg, #ffffff 0%, #ece9e3 100%);
+      padding: 18px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-visual::before,
+    .hero-visual::after {
+      content: "";
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(10px);
+    }
+
+    .hero-visual::before {
+      width: 170px;
+      height: 170px;
+      top: -30px;
+      right: -20px;
+      background: rgba(15, 98, 254, 0.18);
+    }
+
+    .hero-visual::after {
+      width: 190px;
+      height: 190px;
+      bottom: -40px;
+      left: -40px;
+      background: rgba(255, 59, 48, 0.18);
+    }
+
+    .hero-stack {
+      position: relative;
+      height: 100%;
+      min-height: 390px;
+    }
+
+    .product-float {
+      position: absolute;
+      background: rgba(255, 255, 255, 0.92);
+      border: 1px solid rgba(18, 18, 18, 0.07);
+      border-radius: 22px;
+      box-shadow: 0 22px 40px rgba(17, 17, 17, 0.10);
+      overflow: hidden;
+      animation: float 6s ease-in-out infinite;
+    }
+
+    .product-float.small {
+      width: 154px;
+      bottom: 14px;
+      left: 0;
+      animation-delay: 0.8s;
+    }
+
+    .product-float.large {
+      width: min(360px, 100%);
+      top: 14px;
+      right: 0;
+    }
+
+    .product-float img {
+      width: 100%;
+      aspect-ratio: 4 / 4.7;
+      object-fit: cover;
+      background: #ece9e3;
+    }
+
+    .float-meta {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 14px 16px 16px;
+      font-size: 0.92rem;
+    }
+
+    .float-meta strong {
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    .float-meta span {
+      color: var(--muted);
+      font-size: 0.86rem;
+    }
+
+    .pill {
+      padding: 10px 12px;
+      border-radius: 999px;
+      background: #111;
+      color: #fff;
+      font-weight: 700;
+      font-size: 0.8rem;
+      white-space: nowrap;
+    }
+
+    .section { padding: 30px 0; }
+
+    .section-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: end;
+      gap: 18px;
+      margin-bottom: 24px;
+    }
+
+    .section-head p {
+      margin: 10px 0 0;
+      color: var(--muted);
+      max-width: 56ch;
+      line-height: 1.7;
+    }
+
+    .section-head h2,
+    .custom-panel h2,
+    .contact-panel h2 {
+      font-family: "Syne", sans-serif;
+      font-size: clamp(2rem, 5vw, 3.3rem);
+      text-transform: uppercase;
+    }
+
+    .section-kicker {
+      display: inline-block;
+      margin-bottom: 10px;
+      font-size: 0.8rem;
+      color: var(--accent-alt);
+      text-transform: uppercase;
+      letter-spacing: 0.18em;
+      font-weight: 700;
+    }
+
+    .products-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 18px;
+    }
+
+    .trend-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 18px;
+    }
+
+    .product-card,
+    .custom-panel,
+    .contact-panel,
+    .trend-card {
+      background: var(--surface);
+      backdrop-filter: blur(18px);
+      border: 1px solid rgba(255, 255, 255, 0.76);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow);
+    }
+
+    .product-card {
+      overflow: hidden;
+      transition: transform 0.35s ease, box-shadow 0.35s ease;
+    }
+
+    .product-card:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 28px 56px rgba(17, 17, 17, 0.16);
+    }
+
+    .trend-card {
+      overflow: hidden;
+      transition: transform 0.35s ease, box-shadow 0.35s ease;
+      cursor: zoom-in;
+    }
+
+    .trend-card:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 28px 56px rgba(17, 17, 17, 0.16);
+    }
+
+    .protected-catalog,
+    .protected-catalog * {
+      -webkit-user-select: none;
+      user-select: none;
+      -webkit-touch-callout: none;
+    }
+
+    .product-media {
+      position: relative;
+      overflow: hidden;
+      background-color: #0f0f12;
+      background-image: var(--product-image);
+      background-position: center;
+      background-repeat: no-repeat;
+      background-size: cover;
+      aspect-ratio: 4 / 4.6;
+      transition: transform 0.45s ease, box-shadow 0.35s ease;
+    }
+
+    .trend-media {
+      position: relative;
+      overflow: hidden;
+      background: linear-gradient(135deg, #f5f2eb, #e7e2da);
+      aspect-ratio: 4 / 4.8;
+    }
+
+    .product-media::before,
+    .product-media::after {
+      content: "";
+      position: absolute;
+      inset: -20%;
+      pointer-events: none;
+      transition: opacity 0.3s ease, transform 0.45s ease;
+    }
+
+    .product-media::before {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='360' height='220' viewBox='0 0 360 220'%3E%3Cg transform='rotate(-24 180 110)' fill='%23ffffff' fill-opacity='0.16'%3E%3Ctext x='12' y='78' font-family='Arial, sans-serif' font-size='34' font-weight='700' letter-spacing='6'%3EPRIN EPIC%3C/text%3E%3Ctext x='122' y='138' font-family='Arial, sans-serif' font-size='26' font-weight='700' letter-spacing='5'%3ENO COPY%3C/text%3E%3Ctext x='206' y='198' font-family='Arial, sans-serif' font-size='28' font-weight='700' letter-spacing='6'%3EPRIN EPIC%3C/text%3E%3C/g%3E%3C/svg%3E");
+      background-repeat: repeat;
+      background-size: 300px 190px;
+      opacity: 0.18;
+      mix-blend-mode: screen;
+    }
+
+    .product-media::after {
+      background-image: url('./prinepic-logo.png');
+      background-repeat: repeat;
+      background-position: center;
+      background-size: 135px auto;
+      opacity: 0.12;
+      transform: rotate(-18deg) scale(1.12);
+    }
+
+    .media-shield {
+      position: absolute;
+      inset: 0;
+      z-index: 2;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,0.04), rgba(0,0,0,0.18)),
+        linear-gradient(135deg, rgba(255,59,48,0.12), transparent 38%, rgba(15,98,254,0.12));
+      pointer-events: auto;
+    }
+
+    .media-shield::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: transparent;
+    }
+
+    .devtools-warning {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      z-index: 3;
+      background: rgba(8, 8, 10, 0.88);
+      color: #ffffff;
+      text-transform: uppercase;
+      letter-spacing: 0.22em;
+      font-size: 0.85rem;
+      font-weight: 700;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s ease;
+    }
+
+    .product-card {
+      cursor: zoom-in;
+    }
+
+    .lightbox {
+      position: fixed;
+      inset: 0;
+      z-index: 1200;
+      display: grid;
+      place-items: center;
+      padding: 16px;
+      background: rgba(5, 5, 8, 0.86);
+      backdrop-filter: blur(14px);
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+      transition: opacity 0.35s ease, visibility 0.35s ease;
+      -webkit-user-select: none;
+      user-select: none;
+    }
+
+    .lightbox.is-open {
+      opacity: 1;
+      visibility: visible;
+      pointer-events: auto;
+    }
+
+    .lightbox-dialog {
+      position: relative;
+      width: min(100%, 1180px);
+      min-height: min(86vh, 860px);
+      display: grid;
+      align-items: center;
+      transform: scale(0.92);
+      opacity: 0;
+      transition: transform 0.35s ease, opacity 0.35s ease;
+    }
+
+    .lightbox.is-open .lightbox-dialog {
+      transform: scale(1);
+      opacity: 1;
+    }
+
+    .lightbox-panel {
+      position: relative;
+      min-height: min(86vh, 860px);
+      border-radius: 28px;
+      overflow: hidden;
+      background:
+        radial-gradient(circle at top right, rgba(255, 59, 48, 0.16), transparent 24%),
+        radial-gradient(circle at bottom left, rgba(15, 98, 254, 0.18), transparent 26%),
+        rgba(8, 8, 10, 0.94);
+      box-shadow: 0 36px 80px rgba(0, 0, 0, 0.45);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .lightbox-stage {
+      position: relative;
+      width: 100%;
+      min-height: min(86vh, 860px);
+      background-image: var(--lightbox-image);
+      background-position: center;
+      background-repeat: no-repeat;
+      background-size: contain;
+    }
+
+    .lightbox-stage::before,
+    .lightbox-stage::after {
+      content: "";
+      position: absolute;
+      inset: -12%;
+      pointer-events: none;
+    }
+
+    .lightbox-stage::before {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='420' height='280' viewBox='0 0 420 280'%3E%3Cg transform='rotate(-24 210 140)' fill='%23ffffff' fill-opacity='0.15'%3E%3Ctext x='4' y='84' font-family='Arial, sans-serif' font-size='38' font-weight='700' letter-spacing='8'%3EPRIN EPIC%3C/text%3E%3Ctext x='120' y='152' font-family='Arial, sans-serif' font-size='30' font-weight='700' letter-spacing='7'%3ENO COPY%3C/text%3E%3Ctext x='222' y='220' font-family='Arial, sans-serif' font-size='34' font-weight='700' letter-spacing='8'%3EPRIN EPIC%3C/text%3E%3C/g%3E%3C/svg%3E");
+      background-repeat: repeat;
+      background-size: 340px 220px;
+      opacity: 0.18;
+      mix-blend-mode: screen;
+    }
+
+    .lightbox-stage::after {
+      background-image: url('./prinepic-logo.png');
+      background-repeat: repeat;
+      background-size: 170px auto;
+      transform: rotate(-18deg) scale(1.08);
+      opacity: 0.11;
+    }
+
+    .lightbox-shield {
+      position: absolute;
+      inset: 0;
+      z-index: 2;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,0.03), rgba(0,0,0,0.10)),
+        linear-gradient(135deg, rgba(255,59,48,0.08), transparent 40%, rgba(15,98,254,0.08));
+    }
+
+    .lightbox-topbar {
+      position: absolute;
+      top: 18px;
+      left: 18px;
+      right: 18px;
+      z-index: 4;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .lightbox-meta {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 16px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.10);
+      border: 1px solid rgba(255, 255, 255, 0.10);
+      color: #ffffff;
+      backdrop-filter: blur(14px);
+      font-size: 0.85rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      font-weight: 700;
+    }
+
+    .lightbox-close,
+    .lightbox-nav {
+      appearance: none;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: rgba(255, 255, 255, 0.10);
+      color: #ffffff;
+      backdrop-filter: blur(12px);
+      cursor: pointer;
+      transition: transform 0.25s ease, background 0.25s ease, opacity 0.25s ease;
+    }
+
+    .lightbox-close {
+      width: 52px;
+      height: 52px;
+      border-radius: 18px;
+      font-size: 1.4rem;
+      font-weight: 700;
+    }
+
+    .lightbox-close:hover,
+    .lightbox-nav:hover {
+      background: rgba(255, 59, 48, 0.24);
+      transform: translateY(-2px);
+    }
+
+    .lightbox-nav {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 4;
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      font-size: 1.35rem;
+      font-weight: 700;
+    }
+
+    .lightbox-nav:hover {
+      transform: translateY(calc(-50% - 2px));
+    }
+
+    .lightbox-prev { left: 18px; }
+    .lightbox-next { right: 18px; }
+
+    .lightbox-caption {
+      position: absolute;
+      left: 18px;
+      right: 18px;
+      bottom: 18px;
+      z-index: 4;
+      display: flex;
+      justify-content: space-between;
+      align-items: end;
+      gap: 16px;
+      padding: 18px;
+      border-radius: 22px;
+      color: #ffffff;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(14px);
+    }
+
+    .lightbox-caption strong {
+      display: block;
+      font-size: 1.1rem;
+      margin-bottom: 6px;
+    }
+
+    .lightbox-caption span {
+      display: block;
+      color: rgba(255, 255, 255, 0.74);
+      line-height: 1.6;
+      max-width: 52ch;
+      font-size: 0.95rem;
+    }
+
+    .lightbox-counter {
+      white-space: nowrap;
+      font-size: 0.86rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: rgba(255, 255, 255, 0.72);
+      font-weight: 700;
+    }
+
+    .product-card:hover .product-media {
+      transform: scale(1.035);
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.12);
+    }
+
+    .product-card:hover .product-media::before {
+      opacity: 0.22;
+    }
+
+    .product-card:hover .product-media::after {
+      opacity: 0.16;
+      transform: rotate(-18deg) scale(1.16);
+    }
+
+    .trend-card:hover .trend-media img { transform: scale(1.05); }
+
+    .product-tag {
+      position: absolute;
+      top: 14px;
+      left: 14px;
+      padding: 9px 12px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.92);
+      font-size: 0.76rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+    }
+
+    .product-info { padding: 18px; }
+    .trend-info { padding: 18px; }
+    .product-info h3 { font-size: 1.25rem; margin-bottom: 8px; line-height: 1.15; }
+    .trend-info h3 { font-size: 1.2rem; margin-bottom: 8px; line-height: 1.15; }
+
+    .product-info p {
+      color: var(--muted);
+      line-height: 1.6;
+      font-size: 0.93rem;
+      margin: 0 0 16px;
+    }
+
+    .trend-info p {
+      color: var(--muted);
+      line-height: 1.6;
+      font-size: 0.92rem;
+      margin: 0 0 16px;
+    }
+
+    .product-meta {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .price {
+      font-size: 1.35rem;
+      font-weight: 700;
+    }
+
+    .product-note {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 9px 12px;
+      border-radius: 999px;
+      background: rgba(17, 17, 17, 0.06);
+      color: #2a2a2a;
+      font-size: 0.8rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+    }
+
+    .trend-note {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 14px;
+      border-radius: 999px;
+      background: rgba(17, 17, 17, 0.06);
+      color: #2a2a2a;
+      font-size: 0.82rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+    }
+
+    .custom-grid,
+    .contact-grid {
+      display: grid;
+      gap: 18px;
+    }
+
+    .custom-panel,
+    .contact-panel {
+      padding: 24px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .custom-panel::after,
+    .contact-panel::after {
+      content: "";
+      position: absolute;
+      inset: auto -60px -60px auto;
+      width: 180px;
+      height: 180px;
+      border-radius: 50%;
+      background: rgba(15, 98, 254, 0.08);
+      filter: blur(4px);
+    }
+
+    .custom-panel p,
+    .contact-panel p {
+      color: var(--muted);
+      line-height: 1.75;
+      margin: 16px 0 22px;
+      max-width: 60ch;
+      position: relative;
+      z-index: 1;
+    }
+
+    .custom-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 12px;
+      margin-bottom: 22px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .custom-item {
+      background: rgba(255, 255, 255, 0.72);
+      border: 1px solid rgba(18, 18, 18, 0.06);
+      border-radius: 18px;
+      padding: 16px;
+    }
+
+    .custom-item strong {
+      display: block;
+      font-size: 1rem;
+      margin-bottom: 6px;
+    }
+
+    .custom-item span {
+      color: var(--muted);
+      font-size: 0.92rem;
+      line-height: 1.5;
+    }
+
+    .contact-grid { grid-template-columns: 1fr; }
+
+    .contact-card-row {
+      display: grid;
+      gap: 12px;
+      margin-top: 18px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .contact-chip {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: rgba(255, 255, 255, 0.72);
+      border: 1px solid rgba(18, 18, 18, 0.06);
+      border-radius: 18px;
+      padding: 14px 16px;
+    }
+
+    .contact-chip b {
+      display: block;
+      margin-bottom: 2px;
+    }
+
+    .contact-chip span {
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    .chip-icon {
+      width: 42px;
+      height: 42px;
+      border-radius: 14px;
+      background: #111;
+      color: #fff;
+      display: grid;
+      place-items: center;
+      flex-shrink: 0;
+      font-size: 1rem;
+    }
+
+    .footer { padding: 20px 0 42px; }
+
+    .footer-panel {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      background: #111;
+      color: #fff;
+      border-radius: 28px;
+      padding: 24px;
+      box-shadow: 0 24px 60px rgba(17, 17, 17, 0.22);
+    }
+
+    .footer-panel p {
+      margin: 0;
+      color: rgba(255, 255, 255, 0.72);
+      line-height: 1.7;
+    }
+
+    .socials {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .socials a {
+      padding: 11px 16px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.08);
+      font-weight: 600;
+      transition: background 0.25s ease, transform 0.25s ease;
+    }
+
+    .socials a:hover {
+      background: var(--accent);
+      transform: translateY(-2px);
+    }
+
+    .reveal {
+      opacity: 0;
+      transform: translateY(24px);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+
+    .reveal.is-visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .devtools-active .product-media {
+      background-image: none !important;
+      background-color: #08080a !important;
+    }
+
+    .devtools-active .product-media::before,
+    .devtools-active .product-media::after {
+      opacity: 0 !important;
+    }
+
+    .devtools-active .devtools-warning {
+      opacity: 1;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+
+    @media (max-width: 719px) {
+      .hero-notes { grid-template-columns: 1fr; }
+      .product-float.large { width: 100%; position: relative; top: 0; }
+      .product-float.small { width: 55%; left: auto; right: 0; bottom: 6px; }
+
+      .lightbox {
+        padding: 0;
+      }
+
+      .lightbox-dialog,
+      .lightbox-panel,
+      .lightbox-stage {
+        width: 100%;
+        min-height: 100vh;
+        border-radius: 0;
+      }
+
+      .lightbox-nav {
+        bottom: 98px;
+        top: auto;
+        transform: none;
+      }
+
+      .lightbox-nav:hover {
+        transform: translateY(-2px);
+      }
+
+      .lightbox-prev { left: 18px; }
+      .lightbox-next { right: 18px; }
+
+      .lightbox-caption {
+        align-items: start;
+        flex-direction: column;
+      }
+    }
+
+    @media (min-width: 720px) {
+      .menu-toggle { display: none; }
+
+      .products-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .nav {
+        position: static;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        padding: 0;
+        box-shadow: none;
+        background: transparent;
+        border: none;
+      }
+
+      .nav a { padding: 12px 14px; }
+      .nav a:hover { transform: translateY(-2px); }
+
+      .hero-grid,
+      .custom-grid,
+      .contact-grid {
+        grid-template-columns: 1.08fr 0.92fr;
+        align-items: center;
+      }
+
+      .footer-panel {
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+      }
+    }
+
+    @media (min-width: 1080px) {
+      .hero-grid {
+        padding: 34px;
+        gap: 34px;
+      }
+
+      .products-grid {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+      }
+
+      .hero { padding-top: 42px; }
+      .section { padding: 42px 0; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page-shell">
+    <header class="topbar">
+      <div class="container topbar-inner">
+        <a class="brand" href="#inicio">
+          <span class="brand-mark">
+            <img src="./prinepic-logo.png" alt="Logotipo de Prin Epic" draggable="false">
+          </span>
+          <span class="brand-text">
+            <small>Streetwear Studio</small>
+            <strong>Prin Epic</strong>
+          </span>
+        </a>
+
+        <button class="menu-toggle" id="menuToggle" aria-label="Abrir menú" aria-expanded="false" aria-controls="siteNav">
+          <span></span>
+        </button>
+
+        <nav class="nav" id="siteNav">
+          <a href="#inicio">Inicio</a>
+          <a href="#catalogo">Catálogo</a>
+          <a href="#tendencias">Tendencias</a>
+          <a href="#personalizacion">Personalización</a>
+          <a href="#contacto">Contacto</a>
+        </nav>
+      </div>
+    </header>
+
+    <main>
+      <section class="hero" id="inicio">
+        <div class="container">
+          <div class="hero-panel reveal">
+            <div class="hero-grid">
+              <div class="hero-copy">
+                <span class="eyebrow">Edición urbana para todos los días</span>
+                <h1>Camisetas personalizadas a tu estilo</h1>
+                <p>
+                  Diseños listos para destacar, acabados limpios y propuestas personalizadas para marcas, eventos,
+                  equipos o pedidos únicos. Prin Epic mezcla minimalismo, actitud streetwear y una presentación que vende.
+                </p>
+
+                <div class="hero-actions">
+                  <a class="button button-primary" href="#catalogo">Ver catálogo</a>
+                  <a class="button button-secondary" href="#contacto">Pedir cotización</a>
+                </div>
+
+                <div class="hero-notes">
+                  <div class="hero-note">
+                    <strong>+40</strong>
+                    <span>Diseños base adaptables a color, talla y estilo de estampado.</span>
+                  </div>
+                  <div class="hero-note">
+                    <strong>24h</strong>
+                    <span>Respuesta rápida para cotizaciones y pedidos personalizados.</span>
+                  </div>
+                  <div class="hero-note">
+                    <strong>Premium</strong>
+                    <span>Mockups limpios, look urbano y presentación profesional de marca.</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="hero-visual">
+                <div class="hero-stack">
+                  <article class="product-float large">
+                    <img alt="Camiseta mockup urbana de Prin Epic" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 700 820'><defs><linearGradient id='bg' x1='0' y1='0' x2='1' y2='1'><stop offset='0%' stop-color='%23f7f4ee'/><stop offset='100%' stop-color='%23ddd7ce'/></linearGradient><filter id='shadow' x='-20%' y='-20%' width='140%' height='140%'><feDropShadow dx='0' dy='28' stdDeviation='28' flood-color='%23000000' flood-opacity='0.16'/></filter></defs><rect width='700' height='820' rx='40' fill='url(%23bg)'/><circle cx='570' cy='130' r='88' fill='%230f62fe' opacity='0.15'/><circle cx='130' cy='680' r='110' fill='%23ff3b30' opacity='0.12'/><g filter='url(%23shadow)'><path d='M245 112c30-20 180-20 210 0l82 66c29 24 58 32 88 38l-42 118c-32-6-53-16-76-31v361c0 25-20 45-45 45H238c-25 0-45-20-45-45V303c-22 15-44 25-76 31L75 216c31-6 60-14 89-38z' fill='%23121212'/><path d='M282 119c18 30 46 49 73 49s56-19 73-49' fill='none' stroke='%23282828' stroke-width='16' stroke-linecap='round'/><rect x='228' y='246' width='244' height='178' rx='20' fill='%23f5f3ef'/><text x='350' y='308' text-anchor='middle' font-family='Arial, sans-serif' font-size='28' font-weight='700' fill='%23111111' letter-spacing='8'>PRIN</text><text x='350' y='350' text-anchor='middle' font-family='Arial, sans-serif' font-size='66' font-weight='700' fill='%23ff3b30'>EPIC</text><text x='350' y='390' text-anchor='middle' font-family='Arial, sans-serif' font-size='18' fill='%235a5a5a' letter-spacing='5'>URBAN DROP</text><path d='M246 466h208' stroke='%23ffffff' stroke-opacity='0.2' stroke-width='8' stroke-linecap='round'/></g></svg>">
+                    <div class="float-meta">
+                      <div>
+                        <strong>Urban Signature</strong>
+                        <span>Best seller</span>
+                      </div>
+                      <div class="pill">$28</div>
+                    </div>
+                  </article>
+
+                  <article class="product-float small">
+                    <img alt="Mockup secundario de camiseta estampada" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 560 700'><defs><linearGradient id='bg2' x1='0' y1='0' x2='1' y2='1'><stop offset='0%' stop-color='%23ffffff'/><stop offset='100%' stop-color='%23ebe7df'/></linearGradient><filter id='shadow2' x='-20%' y='-20%' width='140%' height='140%'><feDropShadow dx='0' dy='24' stdDeviation='26' flood-color='%23000000' flood-opacity='0.15'/></filter></defs><rect width='560' height='700' rx='34' fill='url(%23bg2)'/><g filter='url(%23shadow2)'><path d='M183 100c24-16 170-16 194 0l70 58c22 18 42 24 67 29l-32 96c-24-5-39-11-58-23v303c0 21-17 38-38 38H174c-21 0-38-17-38-38V260c-17 12-33 18-58 23l-32-96c25-5 45-11 67-29z' fill='%23f2f0eb'/><path d='M216 107c16 26 39 42 64 42s48-16 64-42' fill='none' stroke='%23d8d2c9' stroke-width='14' stroke-linecap='round'/><rect x='178' y='220' width='204' height='138' rx='18' fill='%230f62fe'/><text x='280' y='280' text-anchor='middle' font-family='Arial, sans-serif' font-size='56' font-weight='700' fill='%23ffffff'>01</text><text x='280' y='320' text-anchor='middle' font-family='Arial, sans-serif' font-size='18' fill='%23dbe7ff' letter-spacing='4'>LIMITED</text></g></svg>">
+                    <div class="float-meta">
+                      <div>
+                        <strong>Clean Drop</strong>
+                        <span>Minimal</span>
+                      </div>
+                      <div class="pill">$24</div>
+                    </div>
+                  </article>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="catalogo">
+        <div class="container">
+          <div class="section-head reveal">
+            <div>
+              <span class="section-kicker">Catálogo</span>
+              <h2>Diseños que se venden solos</h2>
+            </div>
+            <p>
+              Una selección pensada para mostrar variedad, calidad visual y personalidad de marca. Cada modelo puede adaptarse
+              a otros colores, tallas y tipos de estampado.
+            </p>
+          </div>
+
+          <div class="products-grid protected-catalog" id="protectedCatalog">
+            <article class="product-card reveal" data-lightbox-image="./ChatGPT%20Image%2031%20mar%202026,%2003_09_59%20p.m..png" data-lightbox-title="Urban Pulse" data-lightbox-description="Frente limpio con impacto visual rojo y azul, ideal para colecciones streetwear modernas.">
+              <div class="product-media" style="--product-image: url('./ChatGPT%20Image%2031%20mar%202026,%2003_09_59%20p.m..png');" role="img" aria-label="Camiseta estampada Urban Pulse">
+                <span class="product-tag">Nuevo</span>
+                <div class="media-shield" aria-hidden="true"></div>
+                <div class="devtools-warning" aria-hidden="true">Vista protegida</div>
+              </div>
+              <div class="product-info">
+                <h3>Urban Pulse</h3>
+                <p>Frente limpio con impacto visual rojo y azul, ideal para colecciones streetwear modernas.</p>
+                <div class="product-meta">
+                  <span class="price">$28</span>
+                  <span class="pill">Unisex</span>
+                </div>
+                <span class="product-note">Marca de agua activa</span>
+              </div>
+            </article>
+
+            <article class="product-card reveal" data-lightbox-image="./ChatGPT%20Image%2031%20mar%202026,%2003_12_42%20p.m..png" data-lightbox-title="Mono Grid" data-lightbox-description="Una propuesta minimalista en blanco y negro con textura gráfica de alto contraste.">
+              <div class="product-media" style="--product-image: url('./ChatGPT%20Image%2031%20mar%202026,%2003_12_42%20p.m..png');" role="img" aria-label="Camiseta estampada Mono Grid">
+                <span class="product-tag">Top</span>
+                <div class="media-shield" aria-hidden="true"></div>
+                <div class="devtools-warning" aria-hidden="true">Vista protegida</div>
+              </div>
+              <div class="product-info">
+                <h3>Mono Grid</h3>
+                <p>Una propuesta minimalista en blanco y negro con textura gráfica de alto contraste.</p>
+                <div class="product-meta">
+                  <span class="price">$25</span>
+                  <span class="pill">Oversize</span>
+                </div>
+                <span class="product-note">Protección básica</span>
+              </div>
+            </article>
+
+            <article class="product-card reveal" data-lightbox-image="./ChatGPT%20Image%2031%20mar%202026,%2003_13_45%20p.m..png" data-lightbox-title="Blue Motion" data-lightbox-description="Color vibrante y composición dinámica para marcas que quieren una identidad más atrevida.">
+              <div class="product-media" style="--product-image: url('./ChatGPT%20Image%2031%20mar%202026,%2003_13_45%20p.m..png');" role="img" aria-label="Camiseta estampada Blue Motion">
+                <span class="product-tag">Street</span>
+                <div class="media-shield" aria-hidden="true"></div>
+                <div class="devtools-warning" aria-hidden="true">Vista protegida</div>
+              </div>
+              <div class="product-info">
+                <h3>Blue Motion</h3>
+                <p>Color vibrante y composición dinámica para marcas que quieren una identidad más atrevida.</p>
+                <div class="product-meta">
+                  <span class="price">$27</span>
+                  <span class="pill">Algodón</span>
+                </div>
+                <span class="product-note">Overlay protector</span>
+              </div>
+            </article>
+
+            <article class="product-card reveal" data-lightbox-image="./ChatGPT%20Image%2031%20mar%202026,%2003_14_46%20p.m..png" data-lightbox-title="Raw Club" data-lightbox-description="Estética premium con presencia fuerte, pensada para cápsulas exclusivas y pedidos de marca.">
+              <div class="product-media" style="--product-image: url('./ChatGPT%20Image%2031%20mar%202026,%2003_14_46%20p.m..png');" role="img" aria-label="Camiseta estampada Raw Club">
+                <span class="product-tag">Edición</span>
+                <div class="media-shield" aria-hidden="true"></div>
+                <div class="devtools-warning" aria-hidden="true">Vista protegida</div>
+              </div>
+              <div class="product-info">
+                <h3>Raw Club</h3>
+                <p>Estética premium con presencia fuerte, pensada para cápsulas exclusivas y pedidos de marca.</p>
+                <div class="product-meta">
+                  <span class="price">$29</span>
+                  <span class="pill">Premium</span>
+                </div>
+                <span class="product-note">No drag / no click</span>
+              </div>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="tendencias">
+        <div class="container">
+          <div class="section-head reveal">
+            <div>
+              <span class="section-kicker">Tendencias 2026</span>
+              <h2>Diseños en Tendencia</h2>
+            </div>
+            <p>
+              Inspirados en lo que está ganando fuerza este año: nostalgia Y2K, gráficos llamativos, composiciones
+              monocromáticas limpias y tipografía de alto impacto para streetwear.
+            </p>
+          </div>
+
+          <div class="trend-grid">
+            <article class="trend-card reveal" data-lightbox-image="./trend-y2k-flash.svg" data-lightbox-title="Y2K Flash" data-lightbox-description="Brillos cromados, glow rosa y azul, y símbolos nostálgicos que vuelven con fuerza en 2026.">
+              <div class="trend-media">
+                <img alt="Diseño en tendencia Y2K Flash" src="./trend-y2k-flash.svg">
+              </div>
+              <div class="trend-info">
+                <h3>Y2K Flash</h3>
+                <p>Brillos cromados, glow rosa y azul, y símbolos nostálgicos que vuelven con fuerza en 2026.</p>
+                <span class="trend-note">Nostalgia digital</span>
+              </div>
+            </article>
+
+            <article class="trend-card reveal" data-lightbox-image="./trend-minimal-mono.svg" data-lightbox-title="Minimal Mono" data-lightbox-description="Base limpia, tipografía discreta y estética premium para clientes que prefieren algo sobrio y moderno.">
+              <div class="trend-media">
+                <img alt="Diseño en tendencia Minimal Mono" src="./trend-minimal-mono.svg">
+              </div>
+              <div class="trend-info">
+                <h3>Minimal Mono</h3>
+                <p>Base limpia, tipografía discreta y estética premium para clientes que prefieren algo sobrio y moderno.</p>
+                <span class="trend-note">Minimalismo premium</span>
+              </div>
+            </article>
+
+            <article class="trend-card reveal" data-lightbox-image="./trend-animal-neon.svg" data-lightbox-title="Animal Neon" data-lightbox-description="Motivos animales y gráficos intensos con color neón, muy presentes en drops urbanos y propuestas virales.">
+              <div class="trend-media">
+                <img alt="Diseño en tendencia Animal Neon" src="./trend-animal-neon.svg">
+              </div>
+              <div class="trend-info">
+                <h3>Animal Neon</h3>
+                <p>Motivos animales y gráficos intensos con color neón, muy presentes en drops urbanos y propuestas virales.</p>
+                <span class="trend-note">Gráfico protagonista</span>
+              </div>
+            </article>
+
+            <article class="trend-card reveal" data-lightbox-image="./trend-backprint-type.svg" data-lightbox-title="Backprint Type" data-lightbox-description="Mensajes potentes, letras grandes y composición tipo back print que se siente editorial y streetwear.">
+              <div class="trend-media">
+                <img alt="Diseño en tendencia Backprint Type" src="./trend-backprint-type.svg">
+              </div>
+              <div class="trend-info">
+                <h3>Backprint Type</h3>
+                <p>Mensajes potentes, letras grandes y composición tipo back print que se siente editorial y streetwear.</p>
+                <span class="trend-note">Tipografía bold</span>
+              </div>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="personalizacion">
+        <div class="container custom-grid">
+          <div class="custom-panel reveal">
+            <span class="section-kicker">Personalización</span>
+            <h2>Hacemos tu idea realidad</h2>
+            <p>
+              Desde una sola camiseta hasta producciones para negocios, eventos o equipos. Podemos adaptar tus diseños,
+              crear propuestas desde cero y preparar visuales listos para aprobar antes de imprimir.
+            </p>
+
+            <div class="custom-list">
+              <div class="custom-item">
+                <strong>Diseño propio</strong>
+                <span>Envíanos tu logo, frase o concepto y lo convertimos en una propuesta visual lista para estampar.</span>
+              </div>
+              <div class="custom-item">
+                <strong>Producción flexible</strong>
+                <span>Trabajamos pedidos unitarios, promociones por lote y colecciones pequeñas para emprendimientos.</span>
+              </div>
+              <div class="custom-item">
+                <strong>Asesoría visual</strong>
+                <span>Te ayudamos a elegir color de prenda, ubicación del estampado y estilo final.</span>
+              </div>
+            </div>
+
+            <div class="custom-actions">
+              <a class="button button-primary" href="#contacto">Quiero personalizar</a>
+              <a class="button button-secondary" href="#catalogo">Ver modelos base</a>
+            </div>
+          </div>
+
+          <div class="custom-panel reveal">
+            <span class="section-kicker">Proceso simple</span>
+            <h2>Rápido, claro y visual</h2>
+            <p>
+              Ideal para clientes que quieren decidir rápido: recibes propuesta visual, eliges ajustes y confirmas el pedido
+              sin complicaciones. Todo con una estética moderna que transmite valor desde el primer vistazo.
+            </p>
+
+            <div class="custom-list">
+              <div class="custom-item">
+                <strong>1. Cuéntanos tu idea</strong>
+                <span>Mensaje con referencia, cantidad, tallas y estilo de estampado que estás buscando.</span>
+              </div>
+              <div class="custom-item">
+                <strong>2. Recibe tu mockup</strong>
+                <span>Preparamos una vista previa limpia para aprobar antes de pasar a producción.</span>
+              </div>
+              <div class="custom-item">
+                <strong>3. Confirma tu pedido</strong>
+                <span>Se define precio, tiempos de entrega y detalles finales de personalización.</span>
+              </div>
+            </div>
+
+            <div class="custom-actions">
+              <a class="button button-secondary" href="https://wa.me/5216643460071?text=Hola%20Prin%20Epic,%20quiero%20personalizar%20una%20camiseta" target="_blank" rel="noopener noreferrer">Hablar por WhatsApp</a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="contacto">
+        <div class="container contact-grid">
+          <div class="contact-panel reveal">
+            <span class="section-kicker">Contacto</span>
+            <h2>Haz tu pedido hoy</h2>
+            <p>
+              Si ya viste un diseño que te gustó o quieres cotizar una camiseta totalmente personalizada, escríbenos y te
+              ayudamos a cerrar tu idea con estilo.
+            </p>
+
+            <div class="contact-actions">
+              <a class="button button-primary" href="https://wa.me/5216643460071?text=Hola%20Prin%20Epic,%20quiero%20informaci%C3%B3n%20sobre%20sus%20camisetas" target="_blank" rel="noopener noreferrer">WhatsApp</a>
+              <a class="button button-secondary" href="mailto:prinepic494@gmail.com">prinepic494@gmail.com</a>
+            </div>
+
+            <div class="contact-card-row">
+              <div class="contact-chip">
+                <div class="chip-icon">W</div>
+                <div>
+                  <b>Respuesta directa</b>
+                  <span>Ideal para cotizaciones, pedidos y seguimiento de diseños.</span>
+                </div>
+              </div>
+              <div class="contact-chip">
+                <div class="chip-icon">@</div>
+                <div>
+                  <b>Redes y branding</b>
+                  <span>Perfecto para compartir catálogo, lanzamientos y colecciones nuevas.</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="contact-panel reveal">
+            <span class="section-kicker">Llamado a la acción</span>
+            <h2>Tu marca, tu diseño, tu camiseta</h2>
+            <p>
+              Prin Epic está pensado para vender visualmente: catálogo ordenado, mockups protagonistas y una presentación
+              moderna inspirada en tiendas premium de moda urbana.
+            </p>
+
+            <div class="custom-list">
+              <div class="custom-item">
+                <strong>Instagram</strong>
+                <span>@prinepic</span>
+              </div>
+              <div class="custom-item">
+                <strong>Facebook</strong>
+                <span>/printepic494</span>
+              </div>
+              <div class="custom-item">
+                <strong>TikTok</strong>
+                <span>@prinepic.store</span>
+              </div>
+            </div>
+
+            <div class="contact-actions">
+              <a class="button button-primary" href="#inicio">Volver arriba</a>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <div class="lightbox" id="galleryLightbox" aria-hidden="true">
+      <div class="lightbox-dialog">
+        <div class="lightbox-panel" id="lightboxPanel">
+          <button class="lightbox-nav lightbox-prev" id="lightboxPrev" type="button" aria-label="Imagen anterior">&#8249;</button>
+          <button class="lightbox-nav lightbox-next" id="lightboxNext" type="button" aria-label="Siguiente imagen">&#8250;</button>
+
+          <div class="lightbox-topbar">
+            <div class="lightbox-meta">Vista ampliada</div>
+            <button class="lightbox-close" id="lightboxClose" type="button" aria-label="Cerrar vista ampliada">×</button>
+          </div>
+
+          <div class="lightbox-stage" id="lightboxStage">
+            <div class="lightbox-shield" aria-hidden="true"></div>
+          </div>
+
+          <div class="lightbox-caption">
+            <div>
+              <strong id="lightboxTitle">Diseño</strong>
+              <span id="lightboxDescription">Vista ampliada protegida.</span>
+            </div>
+            <div class="lightbox-counter" id="lightboxCounter">1 / 4</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <footer class="footer">
+      <div class="container">
+        <div class="footer-panel reveal">
+          <div>
+            <strong>Prin Epic</strong>
+            <p>Camisetas estampadas con identidad urbana, acabados limpios y diseños listos para destacar.</p>
+          </div>
+
+          <div class="socials">
+            <a href="mailto:prinepic494@gmail.com">Correo</a>
+            <a href="https://facebook.com/printepic494" target="_blank" rel="noopener noreferrer">Facebook</a>
+            <a href="https://wa.me/5216643460071?text=Hola%20Prin%20Epic,%20vi%20su%20cat%C3%A1logo%20y%20quiero%20m%C3%A1s%20informaci%C3%B3n" target="_blank" rel="noopener noreferrer">WhatsApp</a>
+          </div>
+        </div>
+      </div>
+    </footer>
+  </div>
+
+  <script>
+    const menuToggle = document.getElementById('menuToggle');
+    const siteNav = document.getElementById('siteNav');
+    const protectedCatalog = document.getElementById('protectedCatalog');
+    const lightbox = document.getElementById('galleryLightbox');
+    const lightboxPanel = document.getElementById('lightboxPanel');
+    const lightboxStage = document.getElementById('lightboxStage');
+    const lightboxTitle = document.getElementById('lightboxTitle');
+    const lightboxDescription = document.getElementById('lightboxDescription');
+    const lightboxCounter = document.getElementById('lightboxCounter');
+    const lightboxClose = document.getElementById('lightboxClose');
+    const lightboxPrev = document.getElementById('lightboxPrev');
+    const lightboxNext = document.getElementById('lightboxNext');
+    const galleryItems = Array.from(document.querySelectorAll('[data-lightbox-image]'));
+    let currentLightboxIndex = 0;
+    let touchStartX = 0;
+    let touchEndX = 0;
+
+    if (menuToggle && siteNav) {
+      menuToggle.addEventListener('click', () => {
+        const expanded = menuToggle.getAttribute('aria-expanded') === 'true';
+        menuToggle.setAttribute('aria-expanded', String(!expanded));
+        siteNav.classList.toggle('open');
+      });
+
+      siteNav.querySelectorAll('a').forEach((link) => {
+        link.addEventListener('click', () => {
+          menuToggle.setAttribute('aria-expanded', 'false');
+          siteNav.classList.remove('open');
+        });
+      });
+    }
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('is-visible');
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.16 });
+
+    document.querySelectorAll('.reveal').forEach((element) => observer.observe(element));
+
+    /*
+      Estas medidas solo reducen la copia no autorizada.
+      No bloquean capturas de pantalla ni extracción avanzada desde el navegador.
+    */
+    if (protectedCatalog) {
+      protectedCatalog.addEventListener('contextmenu', (event) => {
+        event.preventDefault();
+      });
+
+      protectedCatalog.addEventListener('dragstart', (event) => {
+        event.preventDefault();
+      });
+
+      protectedCatalog.addEventListener('selectstart', (event) => {
+        event.preventDefault();
+      });
+    }
+
+    const renderLightbox = (index) => {
+      if (!galleryItems.length || !lightboxStage) {
+        return;
+      }
+
+      currentLightboxIndex = (index + galleryItems.length) % galleryItems.length;
+      const item = galleryItems[currentLightboxIndex];
+      const image = item.dataset.lightboxImage;
+      const title = item.dataset.lightboxTitle || 'Diseño';
+      const description = item.dataset.lightboxDescription || 'Vista ampliada protegida.';
+
+      lightboxStage.style.setProperty('--lightbox-image', `url('${image}')`);
+      lightboxTitle.textContent = title;
+      lightboxDescription.textContent = description;
+      lightboxCounter.textContent = `${currentLightboxIndex + 1} / ${galleryItems.length}`;
+    };
+
+    const openLightbox = (index) => {
+      renderLightbox(index);
+      lightbox.classList.add('is-open');
+      lightbox.setAttribute('aria-hidden', 'false');
+      document.body.style.overflow = 'hidden';
+    };
+
+    const closeLightbox = () => {
+      lightbox.classList.remove('is-open');
+      lightbox.setAttribute('aria-hidden', 'true');
+      document.body.style.overflow = '';
+    };
+
+    const goToPrevious = () => renderLightbox(currentLightboxIndex - 1);
+    const goToNext = () => renderLightbox(currentLightboxIndex + 1);
+
+    galleryItems.forEach((item, index) => {
+      item.setAttribute('tabindex', '0');
+      item.setAttribute('role', 'button');
+      item.setAttribute('aria-label', `Abrir ${item.dataset.lightboxTitle || 'diseño'} en pantalla completa`);
+
+      item.addEventListener('click', () => {
+        openLightbox(index);
+      });
+
+      item.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault();
+          openLightbox(index);
+        }
+      });
+    });
+
+    if (lightbox) {
+      lightbox.addEventListener('contextmenu', (event) => {
+        event.preventDefault();
+      });
+
+      lightbox.addEventListener('dragstart', (event) => {
+        event.preventDefault();
+      });
+
+      lightbox.addEventListener('selectstart', (event) => {
+        event.preventDefault();
+      });
+
+      lightbox.addEventListener('click', (event) => {
+        if (event.target === lightbox) {
+          closeLightbox();
+        }
+      });
+
+      lightbox.addEventListener('touchstart', (event) => {
+        touchStartX = event.changedTouches[0].clientX;
+      }, { passive: true });
+
+      lightbox.addEventListener('touchend', (event) => {
+        touchEndX = event.changedTouches[0].clientX;
+        const delta = touchEndX - touchStartX;
+
+        if (Math.abs(delta) > 50) {
+          if (delta > 0) {
+            goToPrevious();
+          } else {
+            goToNext();
+          }
+        }
+      }, { passive: true });
+    }
+
+    if (lightboxPanel) {
+      lightboxPanel.addEventListener('click', (event) => {
+        event.stopPropagation();
+      });
+    }
+
+    if (lightboxClose) {
+      lightboxClose.addEventListener('click', closeLightbox);
+    }
+
+    if (lightboxPrev) {
+      lightboxPrev.addEventListener('click', goToPrevious);
+    }
+
+    if (lightboxNext) {
+      lightboxNext.addEventListener('click', goToNext);
+    }
+
+    document.addEventListener('keydown', (event) => {
+      const key = event.key.toLowerCase();
+      const blockedShortcut =
+        (event.ctrlKey && (key === 's' || key === 'u')) ||
+        (event.ctrlKey && event.shiftKey && (key === 'i' || key === 'j' || key === 'c')) ||
+        key === 'f12';
+
+      if (blockedShortcut) {
+        event.preventDefault();
+        event.stopPropagation();
+      }
+
+      if (!lightbox.classList.contains('is-open')) {
+        return;
+      }
+
+      if (event.key === 'Escape') {
+        closeLightbox();
+      }
+
+      if (event.key === 'ArrowLeft') {
+        goToPrevious();
+      }
+
+      if (event.key === 'ArrowRight') {
+        goToNext();
+      }
+    });
+
+    const toggleDevtoolsMask = (isOpen) => {
+      document.body.classList.toggle('devtools-active', isOpen);
+    };
+
+    const checkDevtools = () => {
+      const widthGap = window.outerWidth - window.innerWidth;
+      const heightGap = window.outerHeight - window.innerHeight;
+      const isOpen = widthGap > 150 || heightGap > 150;
+      toggleDevtoolsMask(isOpen);
+    };
+
+    checkDevtools();
+    window.addEventListener('resize', checkDevtools);
+    window.addEventListener('load', checkDevtools);
+    setInterval(checkDevtools, 1200);
+  </script>
+</body>
+</html>
