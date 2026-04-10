@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 <head>
 <meta charset="UTF-8">
@@ -371,7 +371,11 @@ Descargar Reporte Excel
 <section id="orders" class="section">
 <div class="header">
 <div><h1>Gestión de Pedidos</h1><p>Administra todos los pedidos del negocio</p></div>
+<div class="header-actions">
+<button class="btn btn-secondary" onclick="loadOrdersFromStorage()"><svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>Cargar Pedidos</button>
+<button class="btn btn-info" onclick="saveOrdersToStorage()"><svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/></svg>Guardar Pedidos</button>
 <button class="btn btn-primary" onclick="openNewOrderModal()"><svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg>Nuevo Pedido</button>
+</div>
 </div>
 <div class="tabs">
 <div class="tab active" onclick="filterOrders('all', this)">Todos</div>
@@ -483,6 +487,7 @@ let productCounter = 0;
 let editProductCounter = 0;
 let isDragging = false;
 let dragStartX, dragStartY, startLeft, startTop;
+const STORAGE_KEYS = { orders: 'estampados_orders', customers: 'estampados_customers' };
 
 // Paleta de colores (simplificada para mantener funcionalidad)
 const eurocottonColors = {
@@ -512,15 +517,203 @@ function getUnitPrice(productType, quantity) {
 }
 
 // Persistencia
-function saveData() { 
-    localStorage.setItem('estampados_orders', JSON.stringify(orders)); 
-    localStorage.setItem('estampados_customers', JSON.stringify(customers)); 
+function canUseLocalStorage() {
+    try {
+        const testKey = '__prin_epic_storage_test__';
+        localStorage.setItem(testKey, 'ok');
+        localStorage.removeItem(testKey);
+        return true;
+    } catch (error) {
+        return false;
+    }
 }
-function loadData() {
-    const savedOrders = localStorage.getItem('estampados_orders');
-    const savedCustomers = localStorage.getItem('estampados_customers');
-    try { if (savedOrders) orders = JSON.parse(savedOrders); } catch(e) { orders = []; }
-    try { if (savedCustomers) customers = JSON.parse(savedCustomers); } catch(e) { customers = []; }
+function isQuotaExceededError(error) {
+    return Boolean(error) && (
+        error.name === 'QuotaExceededError' ||
+        error.name === 'NS_ERROR_DOM_QUOTA_REACHED' ||
+        error.code === 22 ||
+        error.code === 1014
+    );
+}
+function sanitizeCustomer(customer) {
+    if (!customer || typeof customer !== 'object') return null;
+    const name = String(customer.name || '').trim();
+    if (!name) return null;
+    return {
+        id: customer.id || Date.now() + Math.floor(Math.random() * 1000),
+        name,
+        email: String(customer.email || '').trim(),
+        date: customer.date || new Date().toISOString().split('T')[0]
+    };
+}
+function sanitizeProduct(product) {
+    if (!product || typeof product !== 'object') return null;
+    const qty = Math.max(0, Number(product.qty) || 0);
+    const price = Math.max(0, Number(product.price) || 0);
+    if (!qty) return null;
+    return {
+        type: product.type || 'Playera Básica',
+        gender: product.gender || 'Caballero',
+        color: product.color || 'Blanco',
+        size: product.size || 'M',
+        qty,
+        price
+    };
+}
+function sanitizeOrder(order) {
+    if (!order || typeof order !== 'object') return null;
+    const id = String(order.id || '').trim();
+    const customerName = String(order.customerName || '').trim();
+    if (!id || !customerName) return null;
+    const products = Array.isArray(order.products) ? order.products.map(sanitizeProduct).filter(Boolean) : [];
+    const totalFromProducts = products.reduce((sum, product) => sum + (product.qty * product.price), 0);
+    const total = Math.max(0, Number(order.total) || totalFromProducts);
+    const totalQty = products.length ? products.reduce((sum, product) => sum + product.qty, 0) : Math.max(0, Number(order.totalQty) || 0);
+    const advance = Math.min(total, Math.max(0, Number(order.advance) || 0));
+    const remaining = Math.max(0, total - advance);
+    const shirtCost = Math.max(0, Number(order.shirtCost) || 0);
+    const dtfCost = Math.max(0, Number(order.dtfCost) || 0);
+    const extraCosts = Math.max(0, Number(order.extraCosts) || Number(order.extraCost) || 0);
+    const costTotal = Math.max(0, Number(order.costTotal) || ((shirtCost * totalQty) + dtfCost + extraCosts));
+    const parsedNetProfit = Number(order.netProfit);
+    return {
+        id,
+        customerName,
+        date: order.date || new Date().toISOString().split('T')[0],
+        products,
+        technique: order.technique || 'Serigrafía',
+        total,
+        totalQty,
+        advance,
+        remaining,
+        status: order.status || 'En espera de Anticipo',
+        paid: Boolean(order.paid || advance >= total),
+        shirtCost,
+        dtfCost,
+        extraCosts,
+        costTotal,
+        netProfit: Number.isFinite(parsedNetProfit) ? parsedNetProfit : Math.max(0, total - costTotal),
+        mockup: order.mockup || null,
+        designImage: order.designImage || null
+    };
+}
+function dedupeOrdersById(orderList) {
+    const seen = new Set();
+    return orderList.filter(order => {
+        if (!order || !order.id || seen.has(order.id)) return false;
+        seen.add(order.id);
+        return true;
+    });
+}
+function dedupeCustomersByName(customerList) {
+    const seen = new Set();
+    return customerList.filter(customer => {
+        if (!customer || !customer.name) return false;
+        const key = customer.name.toLowerCase();
+        if (seen.has(key)) return false;
+        seen.add(key);
+        return true;
+    });
+}
+function syncCustomersFromOrders() {
+    const mergedCustomers = [...customers];
+    const knownNames = new Set(mergedCustomers.map(customer => customer.name.toLowerCase()));
+    orders.forEach(order => {
+        const normalizedName = String(order.customerName || '').trim();
+        const key = normalizedName.toLowerCase();
+        if (!normalizedName || knownNames.has(key)) return;
+        knownNames.add(key);
+        mergedCustomers.push({
+            id: Date.now() + mergedCustomers.length,
+            name: normalizedName,
+            email: '',
+            date: order.date || new Date().toISOString().split('T')[0]
+        });
+    });
+    customers = dedupeCustomersByName(mergedCustomers.map(sanitizeCustomer).filter(Boolean));
+}
+function getStorageSnapshot(includeMedia = true) {
+    const normalizedOrders = dedupeOrdersById((Array.isArray(orders) ? orders : []).map(sanitizeOrder).filter(Boolean)).map(order => (
+        includeMedia ? order : { ...order, mockup: null, designImage: null }
+    ));
+    orders = normalizedOrders;
+    syncCustomersFromOrders();
+    customers = dedupeCustomersByName((Array.isArray(customers) ? customers : []).map(sanitizeCustomer).filter(Boolean));
+    return {
+        orders: normalizedOrders,
+        customers
+    };
+}
+function saveData(options = {}) {
+    const { notify = false } = options;
+    if (!canUseLocalStorage()) {
+        if (notify) showNotification('No fue posible acceder a localStorage en este navegador.', 'warning');
+        return { saved: false, unavailable: true, strippedMedia: false };
+    }
+    const snapshot = getStorageSnapshot(true);
+    try {
+        localStorage.setItem(STORAGE_KEYS.orders, JSON.stringify(snapshot.orders));
+        localStorage.setItem(STORAGE_KEYS.customers, JSON.stringify(snapshot.customers));
+        if (notify) showNotification('Pedidos guardados correctamente en este navegador.', 'success');
+        return { saved: true, unavailable: false, strippedMedia: false };
+    } catch (error) {
+        if (!isQuotaExceededError(error)) throw error;
+        const lightSnapshot = getStorageSnapshot(false);
+        try {
+            localStorage.setItem(STORAGE_KEYS.orders, JSON.stringify(lightSnapshot.orders));
+            localStorage.setItem(STORAGE_KEYS.customers, JSON.stringify(lightSnapshot.customers));
+            orders = lightSnapshot.orders;
+            if (notify) {
+                showNotification('Se guardaron los pedidos, pero sin imágenes pesadas para evitar llenar localStorage.', 'warning');
+            }
+            return { saved: true, unavailable: false, strippedMedia: true };
+        } catch (fallbackError) {
+            if (!isQuotaExceededError(fallbackError)) throw fallbackError;
+            if (notify) showNotification('No se pudieron guardar los pedidos porque localStorage está lleno.', 'error');
+            return { saved: false, unavailable: false, strippedMedia: false };
+        }
+    }
+}
+function loadData(options = {}) {
+    const { notify = false } = options;
+    if (!canUseLocalStorage()) {
+        orders = [];
+        customers = [];
+        if (notify) showNotification('localStorage no está disponible. La página seguirá funcionando sin datos guardados.', 'warning');
+        return { loaded: false, unavailable: true };
+    }
+    const savedOrders = localStorage.getItem(STORAGE_KEYS.orders);
+    const savedCustomers = localStorage.getItem(STORAGE_KEYS.customers);
+    let parsedOrders = [];
+    let parsedCustomers = [];
+    try { parsedOrders = savedOrders ? JSON.parse(savedOrders) : []; } catch (error) { parsedOrders = []; }
+    try { parsedCustomers = savedCustomers ? JSON.parse(savedCustomers) : []; } catch (error) { parsedCustomers = []; }
+    orders = dedupeOrdersById((Array.isArray(parsedOrders) ? parsedOrders : []).map(sanitizeOrder).filter(Boolean));
+    customers = dedupeCustomersByName((Array.isArray(parsedCustomers) ? parsedCustomers : []).map(sanitizeCustomer).filter(Boolean));
+    syncCustomersFromOrders();
+    if (notify) {
+        if (orders.length || customers.length) showNotification('Pedidos cargados desde localStorage.', 'success');
+        else showNotification('No hay pedidos guardados aún. Puedes empezar desde cero.', 'warning');
+    }
+    return { loaded: true, unavailable: false };
+}
+function saveOrdersToStorage() {
+    saveData({ notify: true });
+}
+function loadOrdersFromStorage() {
+    loadData({ notify: true });
+    renderAll();
+}
+function generateOrderId(dateValue = new Date()) {
+    const year = dateValue.getFullYear();
+    const month = String(dateValue.getMonth() + 1).padStart(2, '0');
+    const prefix = `PE-${year}${month}-`;
+    const maxSequence = orders.reduce((max, order) => {
+        if (!order || typeof order.id !== 'string' || !order.id.startsWith(prefix)) return max;
+        const numericPart = parseInt(order.id.slice(prefix.length), 10);
+        return Number.isFinite(numericPart) ? Math.max(max, numericPart) : max;
+    }, 0);
+    return `${prefix}${String(maxSequence + 1).padStart(4, '0')}`;
 }
 
 // Autenticación
@@ -640,11 +833,11 @@ function getProductsFromForm() {
     document.querySelectorAll('#productsList .product-item').forEach(item => {
         const type = item.querySelector('.product-type').value;
         const gender = item.querySelector('.product-gender').value;
-		const color = item.querySelector('.product-color').value;
+        const color = item.querySelector('.product-color').value;
         const size = item.querySelector('.product-size').value;
-        const qty = parseInt(item.querySelector('.product-qty').value) || 0;
-        const price = parseInt(item.querySelector('.product-price').value) || 0;
-        if (qty > 0 && price >= 0) products.push({ type, color, size, qty, price });
+        const qty = parseInt(item.querySelector('.product-qty').value, 10) || 0;
+        const price = parseFloat(item.querySelector('.product-price').value) || 0;
+        if (qty > 0 && price >= 0) products.push({ type, gender, color, size, qty, price });
     });
     return products;
 }
@@ -785,49 +978,46 @@ function handleFileUpload(input) {
 }
 function saveOrder() {
     const customerName = document.getElementById('orderCustomerName').value.trim();
-    if (!customerName) { 
-        showNotification('❌ Por favor ingresa el nombre del cliente', 'error'); 
-        return; 
+    if (!customerName) {
+        showNotification('❌ Por favor ingresa el nombre del cliente', 'error');
+        return;
     }
     const products = getProductsFromForm();
-    if (products.length === 0) { 
-        showNotification('❌ Por favor agrega al menos un producto con cantidad válida', 'error'); 
-        return; 
+    if (products.length === 0) {
+        showNotification('❌ Por favor agrega al menos un producto con cantidad válida', 'error');
+        return;
     }
-    for (let p of products) {
-        if (p.qty <= 0 || p.price < 0) {
+    for (const product of products) {
+        if (product.qty <= 0 || product.price < 0) {
             showNotification('❌ Cantidad debe ser mayor a cero y precio no puede ser negativo', 'error');
             return;
         }
     }
-    const total = products.reduce((sum, p) => sum + (p.qty * p.price), 0);
-    const totalQty = products.reduce((sum, p) => sum + p.qty, 0);
+    const total = products.reduce((sum, product) => sum + (product.qty * product.price), 0);
+    const totalQty = products.reduce((sum, product) => sum + product.qty, 0);
     const shirtCost = parseFloat(document.getElementById('orderShirtCost').value) || 0;
     const dtfCost = parseFloat(document.getElementById('orderDtfCost').value) || 0;
     const extraCost = parseFloat(document.getElementById('orderExtraCost').value) || 0;
     const orderCosts = calculateOrderCosts(totalQty, shirtCost, dtfCost, extraCost);
-    let advance = parseInt(document.getElementById('orderAdvance').value) || 0;
+    let advance = parseFloat(document.getElementById('orderAdvance').value) || 0;
     if (advance > total) advance = total;
-    const year = new Date().getFullYear();
-    const month = String(new Date().getMonth() + 1).padStart(2, '0');
-    const nextNumber = String(orders.length + 1).padStart(4, '0');
-    const orderId = `PE-${year}${month}-${nextNumber}`;
+    const orderId = generateOrderId();
     const technique = document.getElementById('orderTechnique').value;
     const status = document.getElementById('orderStatus').value;
     const newOrder = {
         id: orderId,
-        customerName: customerName,
+        customerName,
         date: new Date().toISOString().split('T')[0],
-        products: products,
-        technique: technique,
-        total: total,
-        totalQty: totalQty,
-        advance: advance,
+        products,
+        technique,
+        total,
+        totalQty,
+        advance,
         remaining: total - advance,
-        status: status,
+        status,
         paid: advance >= total,
-        shirtCost: shirtCost,
-        dtfCost: dtfCost,
+        shirtCost,
+        dtfCost,
         extraCosts: extraCost,
         costTotal: orderCosts.costTotal,
         netProfit: total - orderCosts.costTotal,
@@ -835,19 +1025,19 @@ function saveOrder() {
         designImage: uploadedDesign
     };
     orders.unshift(newOrder);
-    try {
-        saveData();
-    } catch (e) {
-        if (e.name === 'QuotaExceededError') {
-            showNotification('❌ El almacenamiento local está lleno. Elimina pedidos antiguos o reduce el tamaño de las imágenes.', 'error');
-            orders.shift();
-            return;
-        }
-        throw e;
+    const saveResult = saveData();
+    if (!saveResult.saved) {
+        orders.shift();
+        showNotification('❌ No se pudo guardar el pedido en localStorage.', 'error');
+        return;
     }
     closeModal('newOrderModal');
     uploadedDesign = null;
     renderAll();
+    if (saveResult.strippedMedia) {
+        showNotification(`✅ Pedido ${orderId} guardado. Las imágenes pesadas se omitieron para evitar llenar localStorage.`, 'warning');
+        return;
+    }
     showNotification(`✅ Pedido ${orderId} creado exitosamente`, 'success');
 }
 
@@ -892,19 +1082,21 @@ function addEditProductRow(product = null) {
     const colorOptionsHtml = colorOptions.join('');
     productDiv.innerHTML = `
         <div class="form-group"><label>👕 Prenda</label><select class="edit-product-type" onchange="updateEditProductPrice(${editProductCounter})"><option>Playera Básica</option><option>Dry Fit</option><option>Camiseta tipo Polo</option><option>Hoodie</option><option>Sudadera</option></select></div>
+        <div class="form-group"><label>👥 Género</label><select class="edit-product-gender"><option value="Caballero">Caballero</option><option value="Dama">Dama</option><option value="Niño">Niño</option></select></div>
         <div class="form-group"><label>🎨 Color</label><select class="edit-product-color">${colorOptionsHtml}</select></div>
         <div class="form-group"><label>📏 Talla</label><select class="edit-product-size"><option>XS</option><option>S</option><option>M</option><option>L</option><option>XL</option><option>XXL</option><option>XXXL</option></select></div>
         <div class="form-group"><label>🔢 Cantidad</label><input type="number" class="edit-product-qty" value="1" min="1" onchange="updateEditProductPrice(${editProductCounter})"></div>
-        <div class="form-group"><label>💲 Precio</label><input type="number" class="edit-product-price" value="300" min="0" onchange="calculateEditPrices()"></div>
+        <div class="form-group"><label>💲 Precio</label><input type="number" class="edit-product-price" value="300" min="0" step="0.01" onchange="calculateEditPrices()"></div>
         <button type="button" class="btn-remove" onclick="removeEditProductRow(${editProductCounter})">✖</button>
     `;
     container.appendChild(productDiv);
     if (product) {
-        productDiv.querySelector('.edit-product-type').value = product.type;
-        productDiv.querySelector('.edit-product-color').value = product.color;
-        productDiv.querySelector('.edit-product-size').value = product.size;
-        productDiv.querySelector('.edit-product-qty').value = product.qty;
-        productDiv.querySelector('.edit-product-price').value = product.price;
+        productDiv.querySelector('.edit-product-type').value = product.type || 'Playera Básica';
+        productDiv.querySelector('.edit-product-gender').value = product.gender || 'Caballero';
+        productDiv.querySelector('.edit-product-color').value = product.color || 'Blanco';
+        productDiv.querySelector('.edit-product-size').value = product.size || 'M';
+        productDiv.querySelector('.edit-product-qty').value = product.qty || 1;
+        productDiv.querySelector('.edit-product-price').value = product.price || 0;
         updateEditProductPrice(editProductCounter);
     } else {
         updateEditProductPrice(editProductCounter);
@@ -929,7 +1121,7 @@ function calculateEditPrices() {
     let total = 0;
     document.querySelectorAll('#editProductsList .product-item').forEach(item => {
         const qty = parseInt(item.querySelector('.edit-product-qty').value) || 0;
-        const price = parseInt(item.querySelector('.edit-product-price').value) || 0;
+        const price = parseFloat(item.querySelector('.edit-product-price').value) || 0;
         if (qty > 0 && price >= 0) total += qty * price;
     });
     const displayTotal = document.getElementById('editDisplayTotal');
@@ -950,12 +1142,13 @@ function saveEditOrder() {
     let valid = true;
     document.querySelectorAll('#editProductsList .product-item').forEach(item => {
         const type = item.querySelector('.edit-product-type').value;
+        const gender = item.querySelector('.edit-product-gender').value;
         const color = item.querySelector('.edit-product-color').value;
         const size = item.querySelector('.edit-product-size').value;
-        const qty = parseInt(item.querySelector('.edit-product-qty').value) || 0;
-        const price = parseInt(item.querySelector('.edit-product-price').value) || 0;
+        const qty = parseInt(item.querySelector('.edit-product-qty').value, 10) || 0;
+        const price = parseFloat(item.querySelector('.edit-product-price').value) || 0;
         if (qty <= 0 || price < 0) valid = false;
-        if (qty > 0) products.push({ type, color, size, qty, price });
+        if (qty > 0) products.push({ type, gender, color, size, qty, price });
     });
     if (!valid) {
         showNotification('❌ Cantidad debe ser mayor a cero y precio no puede ser negativo', 'error');
@@ -965,24 +1158,22 @@ function saveEditOrder() {
         showNotification('Por favor agrega al menos un producto', 'error');
         return;
     }
-    const total = products.reduce((sum, p) => sum + (p.qty * p.price), 0);
-    const totalQty = products.reduce((sum, p) => sum + p.qty, 0);
+    const total = products.reduce((sum, product) => sum + (product.qty * product.price), 0);
+    const totalQty = products.reduce((sum, product) => sum + product.qty, 0);
     const shirtCost = parseFloat(document.getElementById('editShirtCost').value) || 0;
     const dtfCost = parseFloat(document.getElementById('editDtfCost').value) || 0;
     const extraCost = parseFloat(document.getElementById('editExtraCost').value) || 0;
     const orderCosts = calculateOrderCosts(totalQty, shirtCost, dtfCost, extraCost);
-    const orderIndex = orders.findIndex(o => o.id === orderId);
+    const orderIndex = orders.findIndex(order => order.id === orderId);
     if (orderIndex === -1) {
         showNotification('Pedido no encontrado', 'error');
         return;
     }
-    const existingOrder = orders[orderIndex];
-    let advance = existingOrder.advance;
+    const previousOrder = orders[orderIndex];
+    let advance = Number(previousOrder.advance) || 0;
     if (advance > total) advance = total;
-    const paid = advance >= total;
-    const remaining = total - advance;
     const updatedOrder = {
-        ...existingOrder,
+        ...previousOrder,
         customerName,
         date: orderDate,
         technique,
@@ -991,8 +1182,8 @@ function saveEditOrder() {
         total,
         totalQty,
         advance,
-        remaining,
-        paid,
+        remaining: total - advance,
+        paid: advance >= total,
         shirtCost,
         dtfCost,
         extraCosts: extraCost,
@@ -1000,9 +1191,18 @@ function saveEditOrder() {
         netProfit: total - orderCosts.costTotal
     };
     orders[orderIndex] = updatedOrder;
-    saveData();
+    const saveResult = saveData();
+    if (!saveResult.saved) {
+        orders[orderIndex] = previousOrder;
+        showNotification('❌ No se pudieron guardar los cambios del pedido.', 'error');
+        return;
+    }
     closeModal('editOrderModal');
     renderAll();
+    if (saveResult.strippedMedia) {
+        showNotification('✅ Pedido actualizado. Las imágenes pesadas se omitieron para evitar llenar localStorage.', 'warning');
+        return;
+    }
     showNotification('✅ Pedido actualizado exitosamente', 'success');
 }
 
@@ -1589,22 +1789,35 @@ function renderCustomers() {
         tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:40px;">No hay clientes registrados</td></tr>';
     } else {
         tbody.innerHTML = customers.map(customer => {
-            const orderCount = orders.filter(o => o.customerName === customer.name).length;
+            const customerName = String(customer.name || '').trim().toLowerCase();
+            const orderCount = orders.filter(o => String(o.customerName || '').trim().toLowerCase() === customerName).length;
+            const safeCustomerId = String(customer.id).replace(/'/g, "\\'");
             return `
                 <tr>
                     <td><strong>${customer.name}</strong></td>
                     <td>${customer.email || '-'}</td>
                     <td>${customer.date}</td>
                     <td>${orderCount} pedidos</td>
-                    <td><button onclick="deleteCustomer(${customer.id})" class="btn btn-danger btn-sm">Eliminar</button></td>
+                    <td><button onclick="deleteCustomer('${safeCustomerId}')" class="btn btn-danger btn-sm">Eliminar</button></td>
                 </tr>
             `;
         }).join('');
     }
 }
 function deleteCustomer(id) {
+    const customer = customers.find(c => String(c.id) === String(id));
+    if (!customer) {
+        showNotification('Cliente no encontrado', 'error');
+        return;
+    }
+    const normalizedName = String(customer.name || '').trim().toLowerCase();
+    const relatedOrders = orders.filter(o => String(o.customerName || '').trim().toLowerCase() === normalizedName);
+    if (relatedOrders.length > 0) {
+        showNotification('No puedes eliminar este cliente mientras tenga pedidos asociados.', 'warning');
+        return;
+    }
     if (confirm('¿Eliminar este cliente?')) {
-        customers = customers.filter(c => c.id !== id);
+        customers = customers.filter(c => String(c.id) !== String(id));
         saveData();
         renderAll();
         showNotification('Cliente eliminado', 'success');
