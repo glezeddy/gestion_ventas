@@ -1730,12 +1730,14 @@ async function renderTicketCanvas(order) {
         throw new Error('html2canvas no está disponible');
     }
 
+    const exportScale = 4;
     const host = document.createElement('div');
     host.style.position = 'fixed';
     host.style.left = '-9999px';
     host.style.top = '0';
-    host.style.width = '360px';
+    host.style.width = '420px';
     host.style.zIndex = '-1';
+    host.style.background = '#ffffff';
     host.innerHTML = `<style>${getTicketStyles()}</style><main class="ticket-export-page">${buildTicketMarkup(order)}</main>`;
     document.body.appendChild(host);
 
@@ -1748,8 +1750,9 @@ async function renderTicketCanvas(order) {
 
     const canvas = await html2canvas(target, {
         backgroundColor: '#ffffff',
-        scale: Math.min(3, window.devicePixelRatio || 2),
-        useCORS: true
+        scale: exportScale,
+        useCORS: true,
+        logging: false
     });
     host.remove();
     return canvas;
