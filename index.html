@@ -2475,25 +2475,6 @@ if (copyMsg) {
     setCalculatorText('alerta-msg', alertMessage);
     setCalculatorText('alerta-margen-msg', marginMessage);
 
-    const mensajeWhatsApp = [
-        '🧾 *Cotización de pedido*',
-        '',
-        '👕 Prenda: ' + getGarmentLabel(tipo),
-        '📦 Cantidad: ' + cantidad + ' pieza(s)',
-        '',
-        '💰 Total: ' + formatCurrency(totalPedido),
-        '💵 Anticipo (' + anticipoRecomendado + '%): ' + formatCurrency(anticipoTotal),
-        '💳 Restante: ' + formatCurrency(restante),
-        '',
-        '✅ Para iniciar el pedido se requiere el anticipo.'
-    ].join('\n');
-
-    const copyMsg = getCalculatorElement('copy-msg');
-    if (copyMsg) {
-        copyMsg.textContent = mensajeWhatsApp;
-        copyMsg.dataset.copy = mensajeWhatsApp;
-    }
-
     syncDatosPedido();
 }
 
