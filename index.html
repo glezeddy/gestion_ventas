@@ -2270,11 +2270,7 @@ function updateCalculatorVisualState(state) {
 }
 
 function calculateIntegratedCalculator() {
-    const tipoElement = getCalculatorElement('tipo');
-    const precioElement = getCalculatorElement('precio');
-    const cantidadElement = getCalculatorElement('cantidad');
-    if (!tipoElement || !precioElement || !cantidadElement) return;
-
+    
 	const productGrids = document.querySelectorAll('#calc-products-container .form-grid');
 
 let totalPedido = 0;
