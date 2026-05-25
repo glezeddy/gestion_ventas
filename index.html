@@ -191,21 +191,6 @@ tr:hover { background: linear-gradient(90deg, #f8fafc, #fafafa); }
 .history-order-grid strong { display: block; color: var(--dark); margin-bottom: 4px; }
 .history-products { margin-top: 14px; padding-top: 14px; border-top: 1px solid #e2e8f0; color: var(--dark); font-size: 14px; line-height: 1.6; }
 @media (max-width: 768px) { .calc-grid { grid-template-columns: 1fr; } .calc-summary-row { align-items: flex-start; flex-direction: column; } }
-
-.multi-product-card{
-border:2px solid #e2e8f0;
-border-radius:16px;
-padding:18px;
-margin-bottom:18px;
-background:#f8fafc;
-}
-.multi-product-title{
-font-size:16px;
-font-weight:700;
-margin-bottom:15px;
-color:#6366f1;
-}
-
 </style>
 </head>
 <body>
@@ -1654,22 +1639,7 @@ function printTicket() {
                     body { background: white; padding: 0; margin: 0; }
                     .ticket { box-shadow: none; border: none; padding: 10px; max-width: 100%; }
                 }
-            
-.multi-product-card{
-border:2px solid #e2e8f0;
-border-radius:16px;
-padding:18px;
-margin-bottom:18px;
-background:#f8fafc;
-}
-.multi-product-title{
-font-size:16px;
-font-weight:700;
-margin-bottom:15px;
-color:#6366f1;
-}
-
-</style>
+            </style>
         </head>
         <body>
             <div class="ticket">
@@ -1708,73 +1678,7 @@ color:#6366f1;
                     ${new Date().toLocaleString('es-ES')}
                 </div>
             </div>
-        
-<script>
-
-function addSafeProduct(){
-
-const container=document.getElementById('productsContainer');
-
-if(!container){return;}
-
-const count=document.querySelectorAll('.multi-product-card').length+1;
-
-const div=document.createElement('div');
-
-div.className='multi-product-card';
-
-div.innerHTML=`
-<div class="multi-product-title">Producto #${count}</div>
-
-<div class="form-grid">
-
-<div class="form-group">
-<label>Tipo de prenda</label>
-<select>
-<option>Playera básica</option>
-<option>Polo</option>
-<option>Dry Fit</option>
-<option>Hoodie</option>
-<option>Playera niño</option>
-<option>Polo niño</option>
-</select>
-</div>
-
-<div class="form-group">
-<label>Cantidad</label>
-<input type="number" value="1">
-</div>
-
-<div class="form-group">
-<label>Precio por pieza</label>
-<input type="number" value="0">
-</div>
-
-<div class="form-group">
-<label>Costo DTF</label>
-<input type="number" value="0">
-</div>
-
-<div class="form-group">
-<label>Costo camiseta</label>
-<input type="number" value="0">
-</div>
-
-<div class="form-group">
-<label>Otros gastos</label>
-<input type="number" value="0">
-</div>
-
-</div>
-`;
-
-container.appendChild(div);
-
-}
-
-</script>
-
-</body>
+        </body>
         </html>
     `;
 
@@ -2560,71 +2464,6 @@ document.addEventListener('DOMContentLoaded', function() {
     calculateIntegratedCalculator();
 });
 
-
-</script>
-
-<script>
-
-function addSafeProduct(){
-
-const container=document.getElementById('productsContainer');
-
-if(!container){return;}
-
-const count=document.querySelectorAll('.multi-product-card').length+1;
-
-const div=document.createElement('div');
-
-div.className='multi-product-card';
-
-div.innerHTML=`
-<div class="multi-product-title">Producto #${count}</div>
-
-<div class="form-grid">
-
-<div class="form-group">
-<label>Tipo de prenda</label>
-<select>
-<option>Playera básica</option>
-<option>Polo</option>
-<option>Dry Fit</option>
-<option>Hoodie</option>
-<option>Playera niño</option>
-<option>Polo niño</option>
-</select>
-</div>
-
-<div class="form-group">
-<label>Cantidad</label>
-<input type="number" value="1">
-</div>
-
-<div class="form-group">
-<label>Precio por pieza</label>
-<input type="number" value="0">
-</div>
-
-<div class="form-group">
-<label>Costo DTF</label>
-<input type="number" value="0">
-</div>
-
-<div class="form-group">
-<label>Costo camiseta</label>
-<input type="number" value="0">
-</div>
-
-<div class="form-group">
-<label>Otros gastos</label>
-<input type="number" value="0">
-</div>
-
-</div>
-`;
-
-container.appendChild(div);
-
-}
 
 </script>
 </body>
