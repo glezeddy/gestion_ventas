@@ -293,14 +293,35 @@ Limpiar datos
 <svg width="22" height="22" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
 Datos del pedido
 </h3>
+<div id="productsContainer">
+
+<div class="product-card" style="border:1px solid #e2e8f0;border-radius:16px;padding:18px;margin-bottom:20px;">
+
+<h4 style="margin-bottom:18px;color:#764ba2;">Producto 1</h4>
+
 <div class="form-grid">
-<div class="form-group"><label for="tipo">Tipo de prenda</label><select id="tipo"><option value="basica">Playera b&aacute;sica</option><option value="polo">Polo</option><option value="dryfit">Dry Fit</option><option value="hoodie">Hoodie</option></select></div>
-<div class="form-group"><label for="cantidad">Cantidad de piezas</label><input type="number" id="cantidad" min="1" step="1" value="1" placeholder="1"></div>
-<div class="form-group"><label for="precio">Precio de venta por pieza</label><input type="number" id="precio" min="0" step="0.01" placeholder="0.00"></div>
-<div class="form-group"><label for="dtf">Costo DTF total</label><input type="number" id="dtf" min="0" step="0.01" placeholder="0.00"></div>
-<div class="form-group"><label for="camiseta">Costo de camiseta</label><input type="number" id="camiseta" min="0" step="0.01" placeholder="0.00"></div>
-<div class="form-group"><label for="otros">Otros gastos</label><input type="number" id="otros" min="0" step="0.01" placeholder="0.00"></div>
+
+<div class="form-group"><label>Tipo de prenda</label><select class="calc-tipo"><option value="basica">Playera básica</option><option value="nino">Playera niño</option><option value="polo">Polo</option><option value="polo_nino">Polo niño</option><option value="dryfit">Dry Fit</option><option value="dryfit_nino">Dry Fit niño</option><option value="hoodie">Hoodie</option><option value="hoodie_nino">Hoodie niño</option></select></div>
+
+<div class="form-group"><label>Cantidad de piezas</label><input type="number" class="calc-cantidad" min="1" step="1" value="1" placeholder="1"></div>
+
+<div class="form-group"><label>Precio de venta por pieza</label><input type="number" class="calc-precio" min="0" step="0.01" placeholder="0.00"></div>
+
+<div class="form-group"><label>Costo DTF total</label><input type="number" class="calc-dtf" min="0" step="0.01" placeholder="0.00"></div>
+
+<div class="form-group"><label>Costo de camiseta</label><input type="number" class="calc-camiseta" min="0" step="0.01" placeholder="0.00"></div>
+
+<div class="form-group"><label>Otros gastos</label><input type="number" class="calc-otros" min="0" step="0.01" placeholder="0.00"></div>
+
 </div>
+
+</div>
+
+</div>
+
+<button type="button" id="addProductBtn" class="btn btn-primary" style="width:100%;margin-top:10px;">
++ Agregar producto
+</button>
 <div class="price-display"><div><div class="label">Precio sugerido por tabulador</div><div class="value" id="calc-precio-auto">$0.00</div></div><div><div class="label">Precio m&iacute;nimo al 30% de margen</div><div class="value" id="r-precio-min">$0.00</div></div></div>
 <div class="calc-note" id="r-precio-min-sub">Con tus costos actuales.</div>
 </div>
@@ -1678,7 +1699,61 @@ function printTicket() {
                     ${new Date().toLocaleString('es-ES')}
                 </div>
             </div>
-        </body>
+        
+<script>
+
+document.addEventListener('DOMContentLoaded', () => {
+
+const addBtn = document.getElementById('addProductBtn');
+
+if(addBtn){
+
+addBtn.addEventListener('click', () => {
+
+const container = document.getElementById('productsContainer');
+
+const total = document.querySelectorAll('.product-card').length + 1;
+
+const div = document.createElement('div');
+
+div.className = 'product-card';
+
+div.style.border = '1px solid #e2e8f0';
+div.style.borderRadius = '16px';
+div.style.padding = '18px';
+div.style.marginBottom = '20px';
+
+div.innerHTML = `
+<h4 style="margin-bottom:18px;color:#764ba2;">Producto ${total}</h4>
+
+<div class="form-grid">
+
+<div class="form-group"><label>Tipo de prenda</label><select class="calc-tipo"><option value="basica">Playera básica</option><option value="nino">Playera niño</option><option value="polo">Polo</option><option value="polo_nino">Polo niño</option><option value="dryfit">Dry Fit</option><option value="dryfit_nino">Dry Fit niño</option><option value="hoodie">Hoodie</option><option value="hoodie_nino">Hoodie niño</option></select></div>
+
+<div class="form-group"><label>Cantidad de piezas</label><input type="number" class="calc-cantidad" min="1" step="1" value="1"></div>
+
+<div class="form-group"><label>Precio de venta por pieza</label><input type="number" class="calc-precio" min="0" step="0.01"></div>
+
+<div class="form-group"><label>Costo DTF total</label><input type="number" class="calc-dtf" min="0" step="0.01"></div>
+
+<div class="form-group"><label>Costo de camiseta</label><input type="number" class="calc-camiseta" min="0" step="0.01"></div>
+
+<div class="form-group"><label>Otros gastos</label><input type="number" class="calc-otros" min="0" step="0.01"></div>
+
+</div>
+`;
+
+container.appendChild(div);
+
+});
+
+}
+
+});
+
+</script>
+
+</body>
         </html>
     `;
 
@@ -2465,97 +2540,61 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 
+</script>
 
+<script>
 
-/* ========= CALCULADORA MULTI PRODUCTO ========= */
+document.addEventListener('DOMContentLoaded', () => {
 
-function addCalculatorProduct() {
+const addBtn = document.getElementById('addProductBtn');
 
-    const container = document.getElementById('productsContainer');
+if(addBtn){
 
-    if (!container) return;
+addBtn.addEventListener('click', () => {
 
-    const product = document.createElement('div');
-    product.className = 'product-item calculator-product';
+const container = document.getElementById('productsContainer');
 
-    product.innerHTML = `
-        <div class="form-group">
-            <label>Tipo de prenda</label>
-            <select class="calc-tipo">
-                <option value="basica">Playera básica</option>
-                <option value="nino">Playera niño</option>
-                <option value="polo">Polo</option>
-                <option value="polo_nino">Polo niño</option>
-                <option value="dryfit">Dry Fit</option>
-                <option value="dryfit_nino">Dry Fit niño</option>
-                <option value="hoodie">Hoodie</option>
-                <option value="hoodie_nino">Hoodie niño</option>
-            </select>
-        </div>
+const total = document.querySelectorAll('.product-card').length + 1;
 
-        <div class="form-group">
-            <label>Cantidad</label>
-            <input type="number" class="calc-cantidad" min="1" value="1">
-        </div>
+const div = document.createElement('div');
 
-        <div class="form-group">
-            <label>Precio por pieza</label>
-            <input type="number" class="calc-precio" min="0" step="0.01">
-        </div>
+div.className = 'product-card';
 
-        <div class="form-group">
-            <label>Costo DTF</label>
-            <input type="number" class="calc-dtf" min="0" step="0.01">
-        </div>
+div.style.border = '1px solid #e2e8f0';
+div.style.borderRadius = '16px';
+div.style.padding = '18px';
+div.style.marginBottom = '20px';
 
-        <div class="form-group">
-            <label>Costo camiseta</label>
-            <input type="number" class="calc-camiseta" min="0" step="0.01">
-        </div>
+div.innerHTML = `
+<h4 style="margin-bottom:18px;color:#764ba2;">Producto ${total}</h4>
 
-        <div class="form-group">
-            <label>Otros gastos</label>
-            <input type="number" class="calc-otros" min="0" step="0.01">
-        </div>
+<div class="form-grid">
 
-        <button type="button" class="btn-remove" onclick="removeProduct(this)">×</button>
-    `;
+<div class="form-group"><label>Tipo de prenda</label><select class="calc-tipo"><option value="basica">Playera básica</option><option value="nino">Playera niño</option><option value="polo">Polo</option><option value="polo_nino">Polo niño</option><option value="dryfit">Dry Fit</option><option value="dryfit_nino">Dry Fit niño</option><option value="hoodie">Hoodie</option><option value="hoodie_nino">Hoodie niño</option></select></div>
 
-    container.appendChild(product);
+<div class="form-group"><label>Cantidad de piezas</label><input type="number" class="calc-cantidad" min="1" step="1" value="1"></div>
+
+<div class="form-group"><label>Precio de venta por pieza</label><input type="number" class="calc-precio" min="0" step="0.01"></div>
+
+<div class="form-group"><label>Costo DTF total</label><input type="number" class="calc-dtf" min="0" step="0.01"></div>
+
+<div class="form-group"><label>Costo de camiseta</label><input type="number" class="calc-camiseta" min="0" step="0.01"></div>
+
+<div class="form-group"><label>Otros gastos</label><input type="number" class="calc-otros" min="0" step="0.01"></div>
+
+</div>
+`;
+
+container.appendChild(div);
+
+});
+
 }
 
-function removeProduct(button) {
-
-    const products = document.querySelectorAll('.calculator-product');
-
-    if (products.length <= 1) {
-        alert('Debe existir al menos un producto');
-        return;
-    }
-
-    button.parentElement.remove();
-}
-
-function getProductLabel(type) {
-
-    const labels = {
-        basica: 'Playera básica',
-        nino: 'Playera niño',
-        polo: 'Polo',
-        polo_nino: 'Polo niño',
-        dryfit: 'Dry Fit',
-        dryfit_nino: 'Dry Fit niño',
-        hoodie: 'Hoodie',
-        hoodie_nino: 'Hoodie niño'
-    };
-
-    return labels[type] || 'Producto';
-}
-
-/* ========= FIN CALCULADORA MULTI PRODUCTO ========= */
-
+});
 
 </script>
+
 </body>
 </html>
 
