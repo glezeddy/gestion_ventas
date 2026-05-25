@@ -4,15 +4,18 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Sistema de Gestión - Prin Epic</title>
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%236366f1'/%3E%3Cstop offset='100%25' stop-color='%23ec4899'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='14' fill='url(%23g)'/%3E%3Ctext x='32' y='40' text-anchor='middle' font-family='Arial,sans-serif' font-size='24' font-weight='700' fill='white'%3EPE%3C/text%3E%3C/svg%3E">
+<link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png">
+<link rel="icon" type="image/png" sizes="192x192" href="assets/favicon-192.png">
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 /* ========== ESTILOS COMPLETOS (idénticos a la versión estable) ========== */
 * { margin: 0; padding: 0; box-sizing: border-box; }
 :root { --primary: #6366f1; --primary-dark: #4f46e5; --secondary: #ec4899; --success: #10b981; --warning: #f59e0b; --danger: #ef4444; --dark: #1e293b; --light: #f8fafc; --gray: #64748b; }
-body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; }
-.app { display: flex; min-height: 100vh; }
+html { width: 100%; overflow-x: hidden; }
+body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; overflow-x: hidden; }
+.app { display: flex; min-height: 100vh; width: 100%; min-width: 0; }
 .sidebar { width: 280px; background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%); padding: 25px; position: fixed; height: 100vh; overflow-y: auto; box-shadow: 4px 0 15px rgba(0,0,0,0.1); z-index: 100; }
 .logo { display: flex; align-items: center; gap: 15px; padding: 20px; margin-bottom: 40px; background: rgba(255,255,255,0.1); border-radius: 15px; backdrop-filter: blur(10px); }
 .logo-icon { width: 55px; height: 55px; background: linear-gradient(135deg, #6366f1, #ec4899); border-radius: 15px; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 28px; box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4); }
@@ -27,7 +30,7 @@ body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background:
 .nav-item:hover { color: white; background: rgba(255,255,255,0.05); }
 .nav-item.active { background: linear-gradient(90deg, #6366f1, #8b5cf6); color: white; box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4); }
 .nav-icon { width: 24px; height: 24px; position: relative; z-index: 1; }
-.main-content { margin-left: 280px; flex: 1; padding: 30px; background: #f1f5f9; }
+.main-content { margin-left: 280px; flex: 1; min-width: 0; width: calc(100% - 280px); padding: 30px; background: #f1f5f9; }
 .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; background: white; padding: 25px 30px; border-radius: 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
 .header h1 { font-size: 28px; font-weight: 700; background: linear-gradient(135deg, #6366f1, #ec4899); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
 .header p { color: var(--gray); margin-top: 5px; }
@@ -52,6 +55,7 @@ body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background:
 .stat-icon.cyan { background: linear-gradient(135deg, #06b6d4, #0891b2); color: white; }
 .table-container { background: white; border-radius: 20px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.08); overflow-x: auto; }
 table { width: 100%; border-collapse: collapse; min-width: 800px; }
+img, svg, video, canvas { max-width: 100%; }
 th { background: linear-gradient(90deg, #f8fafc, #f1f5f9); padding: 18px 25px; text-align: left; font-size: 12px; font-weight: 700; color: var(--dark); text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 2px solid #e2e8f0; }
 td { padding: 20px 25px; border-bottom: 1px solid #f1f5f9; }
 tr:hover { background: linear-gradient(90deg, #f8fafc, #fafafa); }
@@ -153,8 +157,55 @@ tr:hover { background: linear-gradient(90deg, #f8fafc, #fafafa); }
 .empty-state svg { width: 100px; height: 100px; margin: 0 auto 20px; color: #cbd5e1; }
 .empty-state h3 { color: #475569; margin-bottom: 10px; }
 .empty-state p { color: #94a3b8; }
-.mobile-menu-toggle { display: none; position: fixed; top: 15px; left: 15px; z-index: 101; background: white; border: none; padding: 12px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); cursor: pointer; }
-@media (max-width: 768px) { .mobile-menu-toggle { display: flex; } .sidebar { width: 100%; height: auto; position: relative; padding: 15px; } .nav-menu { flex-direction: row; flex-wrap: wrap; justify-content: center; } .nav-item { padding: 12px 16px; } .logo { margin-bottom: 20px; } .main-content { margin-left: 0; padding: 15px; } .form-grid { grid-template-columns: 1fr; } .stats-grid { grid-template-columns: 1fr; } .daily-summary-grid { grid-template-columns: 1fr; } .charts-container { grid-template-columns: 1fr; } .header { flex-direction: column; gap: 20px; } .header-actions { width: 100%; justify-content: center; flex-wrap: wrap; } .modal { width: 95%; max-height: 95vh; } .modal-body { padding: 20px; } .product-item { grid-template-columns: 1fr 1fr; } .product-item .btn-remove { grid-column: 1 / -1; } }
+.mobile-menu-toggle { display: none; position: fixed; top: 15px; left: 15px; z-index: 1200; background: white; border: none; padding: 12px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.18); cursor: pointer; }
+.mobile-menu-overlay { display: none; position: fixed; inset: 0; background: rgba(15,23,42,0.55); backdrop-filter: blur(2px); z-index: 1090; }
+@media (min-width: 1600px) { .main-content { padding: 40px; } .stats-grid { grid-template-columns: repeat(4, minmax(260px, 1fr)); } .modal { max-width: 1040px; } }
+@media (max-width: 1024px) {
+    .mobile-menu-toggle { display: flex; align-items: center; justify-content: center; }
+    .sidebar { width: min(86vw, 320px); height: 100dvh; position: fixed; top: 0; left: 0; padding: 76px 18px 22px; transform: translateX(-105%); transition: transform 0.28s ease; z-index: 1100; }
+    body.mobile-menu-open .sidebar { transform: translateX(0); }
+    body.mobile-menu-open .mobile-menu-overlay { display: block; }
+    body.mobile-menu-open { overflow: hidden; }
+    .logo { margin-bottom: 22px; }
+    .nav-menu { flex-direction: column; gap: 8px; }
+    .nav-item { padding: 13px 15px; }
+    .main-content { width: 100%; margin-left: 0; padding: 76px 18px 22px; }
+    .header { flex-direction: column; align-items: stretch; gap: 18px; padding: 22px; }
+    .header-actions { width: 100%; justify-content: stretch; flex-wrap: wrap; }
+    .header-actions .btn, .search-box { flex: 1 1 220px; justify-content: center; }
+    .search-box input { width: 100%; min-width: 0; }
+    .form-grid { grid-template-columns: 1fr; }
+    .stats-grid, .daily-summary-grid, .charts-container, .calc-grid { grid-template-columns: 1fr; }
+    .chart-card { padding: 20px; }
+    .table-container { border-radius: 14px; }
+    .modal-overlay { align-items: flex-start; padding: 14px; overflow-y: auto; }
+    .modal { width: 100%; max-width: 720px; max-height: none; border-radius: 18px; margin: 0 auto; }
+    .modal-header { padding: 20px; border-radius: 18px 18px 0 0; gap: 12px; }
+    .modal-header h2 { font-size: 21px; }
+    .modal-body { padding: 20px; }
+    .modal-footer { padding: 18px 20px; justify-content: stretch; gap: 10px; }
+    .modal-footer .btn { flex: 1 1 180px; justify-content: center; }
+    .product-item { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; padding: 16px; }
+    .product-item .btn-remove { grid-column: 1 / -1; width: 100%; }
+}
+@media (max-width: 640px) {
+    .main-content { padding: 72px 12px 18px; }
+    .header { padding: 18px; border-radius: 16px; }
+    .header h1 { font-size: 23px; }
+    .stat-card { padding: 20px; border-radius: 16px; }
+    .stat-info h3 { font-size: 26px; }
+    .btn { width: 100%; justify-content: center; padding: 13px 16px; }
+    .price-display { align-items: stretch; }
+    .price-display > div { width: 100%; }
+    .product-item { grid-template-columns: 1fr; }
+    .file-upload { padding: 26px 16px; }
+    .modal-overlay { padding: 8px; }
+    .modal-header, .modal-body, .modal-footer { padding: 16px; }
+    .close-btn { width: 40px; height: 40px; flex: 0 0 40px; }
+    table { min-width: 680px; }
+    th, td { padding: 14px 16px; }
+    .notification { left: 12px; right: 12px; top: 16px; padding: 16px; }
+}
 .notification { position: fixed; top: 30px; right: 30px; padding: 20px 30px; border-radius: 15px; color: white; font-weight: 600; box-shadow: 0 8px 25px rgba(0,0,0,0.2); z-index: 2000; animation: slideIn 0.4s ease; display: none; }
 .notification.success { background: linear-gradient(135deg, #10b981, #059669); }
 .notification.error { background: linear-gradient(135deg, #ef4444, #dc2626); }
@@ -232,9 +283,10 @@ tr:hover { background: linear-gradient(90deg, #f8fafc, #fafafa); }
 </div>
 
 <div class="app" style="display: none;">
-<button class="mobile-menu-toggle" onclick="toggleMobileMenu()">
+<button class="mobile-menu-toggle" onclick="toggleMobileMenu()" aria-label="Abrir menú">
 <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
 </button>
+<div class="mobile-menu-overlay" onclick="closeMobileMenu()" aria-hidden="true"></div>
 <aside class="sidebar" id="sidebar">
 <div class="logo">
     <div class="logo-icon">
@@ -1862,9 +1914,14 @@ function showNotification(message, type) {
     notification.style.display = 'block';
     setTimeout(() => { notification.style.display = 'none'; }, 3000);
 }
-function toggleMobileMenu() { 
-    const sidebar = document.getElementById('sidebar'); 
-    if (sidebar) sidebar.style.display = sidebar.style.display === 'none' ? 'block' : 'none'; 
+function openMobileMenu() {
+    document.body.classList.add('mobile-menu-open');
+}
+function closeMobileMenu() {
+    document.body.classList.remove('mobile-menu-open');
+}
+function toggleMobileMenu() {
+    document.body.classList.toggle('mobile-menu-open');
 }
 function showSection(sectionId, navElement, options = {}) {
     const targetSectionId = document.getElementById(sectionId) ? sectionId : DEFAULT_SECTION_ID;
@@ -1875,12 +1932,12 @@ function showSection(sectionId, navElement, options = {}) {
     const resolvedNav = navElement || Array.from(document.querySelectorAll('.nav-item')).find(item => item.getAttribute('onclick') && item.getAttribute('onclick').includes("showSection('" + targetSectionId + "'"));
     if (resolvedNav) resolvedNav.classList.add('active');
     rememberActiveSection(targetSectionId);
-    if (window.innerWidth <= 768) { 
-        const sidebar = document.getElementById('sidebar');
-        if (sidebar) sidebar.style.display = 'none';
-    }
+    if (window.innerWidth <= 1024) closeMobileMenu();
     if (!options.skipRender) renderAll();
 }
+window.addEventListener('resize', () => {
+    if (window.innerWidth > 1024) closeMobileMenu();
+});
 
 // Renderizado
 function getOrderCostTotal(order) {
@@ -2286,7 +2343,115 @@ function clearAllData() {
         showNotification('Todos los datos han sido eliminados', 'warning');
     }
 }
-function downloadProductList() { showNotification('Descarga de lista de productos - Próximamente', 'info'); }
+function buildProductListDocument(order) {
+    const products = Array.isArray(order.products) && order.products.length > 0
+        ? order.products
+        : [{
+            qty: order.qty || 1,
+            type: order.type || 'Producto personalizado',
+            color: order.color || 'N/A',
+            size: order.size || 'N/A',
+            gender: order.gender || 'N/A',
+            price: order.unitPrice || order.total || 0
+        }];
+
+    const rows = products.map((product, index) => {
+        const qty = Number(product.qty) || 0;
+        const price = Number(product.price) || 0;
+        const lineTotal = qty * price;
+        return `
+            <tr>
+                <td>${index + 1}</td>
+                <td><strong>${ticketEscape(product.type || 'Producto')}</strong></td>
+                <td>${ticketEscape(product.color || 'N/A')}</td>
+                <td>${ticketEscape(product.size || 'N/A')}</td>
+                <td>${ticketEscape(product.gender || 'N/A')}</td>
+                <td>${qty}</td>
+                <td>${formatTicketMoney(price)}</td>
+                <td>${formatTicketMoney(lineTotal)}</td>
+            </tr>
+        `;
+    }).join('');
+
+    return `
+        <!DOCTYPE html>
+        <html lang="es">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Lista de productos - ${ticketEscape(order.id)}</title>
+            <style>
+                * { box-sizing: border-box; }
+                body { margin: 0; padding: 24px; font-family: 'Segoe UI', Arial, sans-serif; color: #0f172a; background: #f8fafc; }
+                .sheet { max-width: 980px; margin: 0 auto; background: #fff; border: 1px solid #e2e8f0; border-radius: 14px; padding: 28px; box-shadow: 0 12px 28px rgba(15,23,42,0.08); }
+                header { display: flex; justify-content: space-between; gap: 18px; border-bottom: 2px solid #e2e8f0; padding-bottom: 18px; margin-bottom: 22px; }
+                h1 { margin: 0 0 6px; font-size: 28px; }
+                p { margin: 4px 0; color: #64748b; }
+                .meta { text-align: right; font-size: 14px; }
+                table { width: 100%; border-collapse: collapse; margin-top: 18px; }
+                th, td { padding: 12px 10px; border-bottom: 1px solid #e2e8f0; text-align: left; font-size: 13px; vertical-align: top; }
+                th { background: #f1f5f9; color: #334155; text-transform: uppercase; font-size: 11px; letter-spacing: 0.4px; }
+                tfoot td { font-weight: 800; background: #f8fafc; }
+                .notes { margin-top: 24px; padding: 16px; border-radius: 12px; background: #f8fafc; color: #475569; font-size: 13px; line-height: 1.5; }
+                @media print {
+                    body { background: #fff; padding: 0; }
+                    .sheet { box-shadow: none; border: 0; border-radius: 0; padding: 0; max-width: none; }
+                }
+                @media (max-width: 700px) {
+                    body { padding: 12px; }
+                    .sheet { padding: 18px; }
+                    header { flex-direction: column; }
+                    .meta { text-align: left; }
+                    table { display: block; overflow-x: auto; white-space: nowrap; }
+                }
+            </style>
+        </head>
+        <body>
+            <main class="sheet">
+                <header>
+                    <div>
+                        <h1>Lista de productos</h1>
+                        <p>Pedido ${ticketEscape(order.id)} - ${ticketEscape(order.customerName || 'Cliente')}</p>
+                    </div>
+                    <div class="meta">
+                        <p><strong>Fecha:</strong> ${ticketEscape(order.date || '')}</p>
+                        <p><strong>Técnica:</strong> ${ticketEscape(order.technique || 'DTF')}</p>
+                        <p><strong>Estado:</strong> ${ticketEscape(order.status || '')}</p>
+                    </div>
+                </header>
+                <table>
+                    <thead>
+                        <tr><th>#</th><th>Producto</th><th>Color</th><th>Talla</th><th>Género</th><th>Cant.</th><th>Precio</th><th>Total</th></tr>
+                    </thead>
+                    <tbody>${rows}</tbody>
+                    <tfoot>
+                        <tr><td colspan="5">Totales</td><td>${products.reduce((sum, product) => sum + (Number(product.qty) || 0), 0)}</td><td></td><td>${formatTicketMoney(order.total)}</td></tr>
+                    </tfoot>
+                </table>
+                <div class="notes">
+                    Usa esta lista para preparar producción, revisar tallas/colores y validar que el pedido esté completo antes de entrega.
+                </div>
+            </main>
+        </body>
+        </html>
+    `;
+}
+
+function downloadProductList() {
+    const order = getCurrentOrderForTicket();
+    if (!order) return;
+
+    const html = buildProductListDocument(order);
+    const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    const fileId = String(order.id || 'pedido').replace(/[^a-z0-9-_]/gi, '-');
+    link.href = url;
+    link.download = `lista-productos-${fileId}.html`;
+    link.click();
+    URL.revokeObjectURL(url);
+    showNotification('Lista de productos descargada', 'success');
+}
 function searchDashboard(q) { renderDashboard(); }
 
 const margenMinimoDeseado = 30;
