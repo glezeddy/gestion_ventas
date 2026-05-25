@@ -2401,6 +2401,47 @@ const restante = totalPedido - anticipoTotal;
     setCalculatorText('alerta-margen-valor', 'Precio sugerido: ' + formatCurrency(precioMinimo));
     setCalculatorText('calc-restante-badge', 'Restante: ' + formatCurrency(restante));
 
+	let productosTexto = '';
+
+productGrids.forEach((grid) => {
+
+    const tipoSelect = grid.querySelector('select[id^="tipo"]');
+    const cantidadInput = grid.querySelector('input[id^="cantidad"]');
+    const precioInput = grid.querySelector('input[id^="precio"]');
+
+    if (!tipoSelect || !cantidadInput || !precioInput) return;
+
+    const tipo = tipoSelect.options[tipoSelect.selectedIndex].text;
+    const cantidad = Number(cantidadInput.value) || 0;
+    const precio = Number(precioInput.value) || 0;
+
+    const subtotal = cantidad * precio;
+
+    productosTexto += `
+👕 Prenda: ${tipo}
+📦 Cantidad: ${cantidad} pieza(s)
+💲 Subtotal: ${formatCurrency(subtotal)}
+
+`;
+});
+
+const mensaje = `
+🧾 *Cotización de pedido*
+
+${productosTexto}
+💰 Total: ${formatCurrency(totalPedido)}
+💵 Anticipo (${anticipoRecomendado}%): ${formatCurrency(anticipoTotal)}
+💳 Restante: ${formatCurrency(restante)}
+
+✅ Para iniciar el pedido se requiere el anticipo.
+`;
+
+const copyMsg = document.getElementById('copy-msg');
+
+if (copyMsg) {
+    copyMsg.textContent = mensaje;
+}
+
     const gaugeFill = getCalculatorElement('gauge-fill');
     if (gaugeFill) gaugeFill.style.width = anticipoRecomendado + '%';
 
