@@ -2472,7 +2472,11 @@ document.addEventListener('DOMContentLoaded', function() {
     calculateIntegratedCalculator();
 });
 
+let calcProductCounter = 1;
+
 function addCalcProduct() {
+    calcProductCounter++;
+
     const container = document.getElementById('calc-products-container');
     if (!container) return;
 
@@ -2480,23 +2484,37 @@ function addCalcProduct() {
     if (!firstGrid) return;
 
     const clone = firstGrid.cloneNode(true);
-	const removeButton = document.createElement('button');
-removeButton.type = 'button';
-removeButton.className = 'btn btn-danger';
-removeButton.style.marginTop = '15px';
-removeButton.innerHTML = 'Eliminar producto';
 
-removeButton.onclick = function () {
-    clone.remove();
-};
+    clone.querySelectorAll('input, select').forEach(element => {
 
-clone.appendChild(removeButton);
-
-    clone.querySelectorAll('input').forEach(input => {
-        if (input.type === 'number') {
-            input.value = input.id === 'cantidad' ? 1 : 0;
+        if (element.id) {
+            element.id = element.id + '-' + calcProductCounter;
         }
+
+        if (element.type === 'number') {
+
+            if (element.id.includes('cantidad')) {
+                element.value = 1;
+            } else {
+                element.value = 0;
+            }
+
+        }
+
     });
+
+    const removeButton = document.createElement('button');
+
+    removeButton.type = 'button';
+    removeButton.className = 'btn btn-danger';
+    removeButton.style.marginTop = '15px';
+    removeButton.innerHTML = 'Eliminar producto';
+
+    removeButton.onclick = function () {
+        clone.remove();
+    };
+
+    clone.appendChild(removeButton);
 
     container.appendChild(clone);
 }
