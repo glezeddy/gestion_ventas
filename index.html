@@ -2273,43 +2273,97 @@ function calculateIntegratedCalculator() {
     const cantidadElement = getCalculatorElement('cantidad');
     if (!tipoElement || !precioElement || !cantidadElement) return;
 
-    const tipo = tipoElement.value;
-    const cantidad = Math.max(1, getCalculatorNumber('cantidad'));
-    if (String(cantidadElement.value).trim() === '' || Number(cantidadElement.value) < 1) {
-        cantidadElement.value = cantidad;
+	const productGrids = document.querySelectorAll('#calc-products-container .form-grid');
+
+let totalPedido = 0;
+let totalCantidad = 0;
+let totalCostoCamisetas = 0;
+let totalDTF = 0;
+let totalOtros = 0;
+
+    productGrids.forEach((grid, index) => {
+
+    const tipoSelect = grid.querySelector('select[id^="tipo"]');
+    const cantidadInput = grid.querySelector('input[id^="cantidad"]');
+    const precioInput = grid.querySelector('input[id^="precio"]');
+    const dtfInput = grid.querySelector('input[id^="dtf"]');
+    const camisetaInput = grid.querySelector('input[id^="camiseta"]');
+    const otrosInput = grid.querySelector('input[id^="otros"]');
+
+    if (!tipoSelect || !cantidadInput || !precioInput) return;
+
+    const tipo = tipoSelect.value;
+
+    const cantidad = Math.max(1, Number(cantidadInput.value) || 1);
+
+    if (String(cantidadInput.value).trim() === '' || Number(cantidadInput.value) < 1) {
+        cantidadInput.value = cantidad;
     }
 
     const precioAuto = obtenerPrecio(tipo, cantidad);
-    const precioManual = getCalculatorNumber('precio');
+
+    const precioManual = Number(precioInput.value) || 0;
+
     const useAutoPrice = precioManual <= 0;
+
     const precio = useAutoPrice ? precioAuto : precioManual;
 
     if (useAutoPrice) {
-        precioElement.value = precioAuto ? precioAuto.toFixed(2) : '';
-        precioElement.dataset.auto = 'true';
+        precioInput.value = precioAuto ? precioAuto.toFixed(2) : '';
+        precioInput.dataset.auto = 'true';
     } else {
-        precioElement.dataset.auto = 'false';
+        precioInput.dataset.auto = 'false';
     }
 
-    const dtf = getCalculatorNumber('dtf');
-    const camiseta = getCalculatorNumber('camiseta');
-    const otros = getCalculatorNumber('otros');
+    const dtf = Number(dtfInput?.value) || 0;
+
+    const camiseta = Number(camisetaInput?.value) || 0;
+
+    const otros = Number(otrosInput?.value) || 0;
+
     const costoCamisetas = camiseta * cantidad;
+
     const costoDTF = dtf;
+
     const otrosGastos = otros;
-    const costoTotalPedido = costoCamisetas + costoDTF + otrosGastos;
-    const costoBaseMargen = cantidad > 0 ? costoTotalPedido / cantidad : 0;
-    const gananciaTotal = (precio * cantidad) - costoTotalPedido;
-    const ganancia = cantidad > 0 ? gananciaTotal / cantidad : 0;
-    const margen = precio > 0 ? (ganancia / precio) * 100 : 0;
-    const totalPedido = precio * cantidad;
-    const precioMinimo = costoBaseMargen > 0 ? costoBaseMargen / (1 - margenMinimoDeseado / 100) : 0;
-    const anticipoMinimo = totalPedido > 0 ? Math.min(Math.ceil((costoTotalPedido / totalPedido) * 100), 100) : 0;
-    const anticipoRecomendado = precio > 0 ? Math.max(ANTICIPO_BASE, Math.min(anticipoMinimo + 5, 100)) : 0;
-    const anticipoPorPieza = precio * (anticipoRecomendado / 100);
-    const anticipoTotal = totalPedido * (anticipoRecomendado / 100);
-    const gastoCubiertoConAnticipo = Math.min(anticipoTotal, costoTotalPedido);
-    const restante = totalPedido - anticipoTotal;
+
+    const subtotal = precio * cantidad;
+
+    totalCantidad += cantidad;
+
+    totalPedido += subtotal;
+
+    totalCostoCamisetas += costoCamisetas;
+
+    totalDTF += costoDTF;
+
+    totalOtros += otrosGastos;
+
+});
+
+const costoTotalPedido = totalCostoCamisetas + totalDTF + totalOtros;
+
+const costoBaseMargen = totalCantidad > 0 ? costoTotalPedido / totalCantidad : 0;
+
+const gananciaTotal = totalPedido - costoTotalPedido;
+
+const ganancia = totalCantidad > 0 ? gananciaTotal / totalCantidad : 0;
+
+const margen = totalPedido > 0 ? (gananciaTotal / totalPedido) * 100 : 0;
+
+const precioMinimo = costoBaseMargen > 0 ? costoBaseMargen / (1 - margenMinimoDeseado / 100) : 0;
+
+const anticipoMinimo = totalPedido > 0 ? Math.min(Math.ceil((costoTotalPedido / totalPedido) * 100), 100) : 0;
+
+const anticipoRecomendado = totalPedido > 0 ? Math.max(ANTICIPO_BASE, Math.min(anticipoMinimo + 5, 100)) : 0;
+
+const anticipoPorPieza = totalCantidad > 0 ? totalPedido * (anticipoRecomendado / 100) / totalCantidad : 0;
+
+const anticipoTotal = totalPedido * (anticipoRecomendado / 100);
+
+const gastoCubiertoConAnticipo = Math.min(anticipoTotal, costoTotalPedido);
+
+const restante = totalPedido - anticipoTotal;
 
     setCalculatorText('calc-precio-auto', formatCurrency(precioAuto));
     setCalculatorText('mini-camisetas-total', formatCurrency(costoCamisetas));
