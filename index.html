@@ -2480,6 +2480,17 @@ function addCalcProduct() {
     if (!firstGrid) return;
 
     const clone = firstGrid.cloneNode(true);
+	const removeButton = document.createElement('button');
+removeButton.type = 'button';
+removeButton.className = 'btn btn-danger';
+removeButton.style.marginTop = '15px';
+removeButton.innerHTML = 'Eliminar producto';
+
+removeButton.onclick = function () {
+    clone.remove();
+};
+
+clone.appendChild(removeButton);
 
     clone.querySelectorAll('input').forEach(input => {
         if (input.type === 'number') {
