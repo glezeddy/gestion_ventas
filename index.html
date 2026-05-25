@@ -2378,9 +2378,9 @@ const restante = totalPedido - anticipoTotal;
 });
 
     setCalculatorText('calc-precio-auto', formatCurrency(totalPedido > 0 ? totalPedido / totalCantidad : 0));
-    setCalculatorText('mini-camisetas-total', formatCurrency(costoCamisetas));
-    setCalculatorText('mini-dtf-total', formatCurrency(costoDTF));
-    setCalculatorText('mini-otros-total', formatCurrency(otrosGastos));
+    setCalculatorText('mini-camisetas-total', formatCurrency(totalCostoCamisetas));
+    setCalculatorText('mini-dtf-total', formatCurrency(totalDTF));
+    setCalculatorText('mini-otros-total', formatCurrency(totalOtros));
     setCalculatorText('mini-costo-total', formatCurrency(costoTotalPedido));
     setCalculatorText('mini-costo-anticipo', formatCurrency(gastoCubiertoConAnticipo));
     setCalculatorText('mini-ganancia-total', formatCurrency(gananciaTotal));
