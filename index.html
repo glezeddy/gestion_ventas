@@ -206,6 +206,37 @@ margin-bottom:15px;
 color:#6366f1;
 }
 
+
+
+/* ===== MULTI PRODUCTO ===== */
+
+.multi-products-wrapper{
+display:flex;
+flex-direction:column;
+gap:18px;
+margin-top:20px;
+}
+
+.multi-product-box{
+border:2px solid #e2e8f0;
+border-radius:16px;
+padding:20px;
+background:#f8fafc;
+}
+
+.multi-product-title{
+font-size:16px;
+font-weight:700;
+margin-bottom:16px;
+color:#6366f1;
+}
+
+.multi-add-btn{
+width:100%;
+margin-top:18px;
+}
+
+
 </style>
 </head>
 <body>
@@ -1669,6 +1700,37 @@ margin-bottom:15px;
 color:#6366f1;
 }
 
+
+
+/* ===== MULTI PRODUCTO ===== */
+
+.multi-products-wrapper{
+display:flex;
+flex-direction:column;
+gap:18px;
+margin-top:20px;
+}
+
+.multi-product-box{
+border:2px solid #e2e8f0;
+border-radius:16px;
+padding:20px;
+background:#f8fafc;
+}
+
+.multi-product-title{
+font-size:16px;
+font-weight:700;
+margin-bottom:16px;
+color:#6366f1;
+}
+
+.multi-add-btn{
+width:100%;
+margin-top:18px;
+}
+
+
 </style>
         </head>
         <body>
@@ -1773,6 +1835,211 @@ container.appendChild(div);
 }
 
 </script>
+
+
+
+<script>
+
+/* ===== MULTI PRODUCTOS ===== */
+
+function addMultiProduct(){
+
+const container=document.getElementById('multiProductsContainer');
+
+if(!container){return;}
+
+const count=document.querySelectorAll('.multi-product-box').length + 1;
+
+const box=document.createElement('div');
+
+box.className='multi-product-box';
+
+box.innerHTML=`
+<div class="multi-product-title">Producto #${count}</div>
+
+<div class="form-grid">
+
+<div class="form-group">
+<label>Tipo de prenda</label>
+<select class="multi-tipo">
+<option>Playera básica</option>
+<option>Polo</option>
+<option>Dry Fit</option>
+<option>Hoodie</option>
+<option>Playera niño</option>
+<option>Polo niño</option>
+<option>Dry Fit niño</option>
+<option>Hoodie niño</option>
+</select>
+</div>
+
+<div class="form-group">
+<label>Cantidad</label>
+<input type="number" class="multi-cantidad" value="1">
+</div>
+
+<div class="form-group">
+<label>Precio por pieza</label>
+<input type="number" class="multi-precio" value="0">
+</div>
+
+<div class="form-group">
+<label>Costo DTF</label>
+<input type="number" class="multi-dtf" value="0">
+</div>
+
+<div class="form-group">
+<label>Costo camiseta</label>
+<input type="number" class="multi-camiseta" value="0">
+</div>
+
+<div class="form-group">
+<label>Otros gastos</label>
+<input type="number" class="multi-otros" value="0">
+</div>
+
+</div>
+`;
+
+container.appendChild(box);
+
+calculateMultiTotals();
+
+bindMultiEvents();
+
+}
+
+function calculateMultiTotals(){
+
+let total=0;
+
+document.querySelectorAll('.multi-product-box').forEach(box=>{
+
+const cantidad=parseFloat(box.querySelector('.multi-cantidad')?.value || 0);
+const precio=parseFloat(box.querySelector('.multi-precio')?.value || 0);
+
+total += cantidad * precio;
+
+});
+
+const anticipo=total*0.70;
+const restante=total-anticipo;
+
+const totalEl=document.getElementById('multiTotal');
+const anticipoEl=document.getElementById('multiAdvance');
+const restanteEl=document.getElementById('multiRemaining');
+
+if(totalEl){totalEl.textContent='$'+total.toFixed(2);}
+if(anticipoEl){anticipoEl.textContent='$'+anticipo.toFixed(2);}
+if(restanteEl){restanteEl.textContent='$'+restante.toFixed(2);}
+
+}
+
+function bindMultiEvents(){
+
+document.querySelectorAll('.multi-cantidad,.multi-precio').forEach(el=>{
+
+el.removeEventListener('input',calculateMultiTotals);
+
+el.addEventListener('input',calculateMultiTotals);
+
+});
+
+}
+
+window.addEventListener('load',()=>{
+
+bindMultiEvents();
+
+calculateMultiTotals();
+
+});
+
+</script>
+
+
+
+
+<div style="margin-top:30px;">
+
+<h3 style="margin-bottom:18px;color:#1e293b;">Calculadora Multi‑Producto</h3>
+
+<div id="multiProductsContainer" class="multi-products-wrapper">
+
+<div class="multi-product-box">
+
+<div class="multi-product-title">Producto #1</div>
+
+<div class="form-grid">
+
+<div class="form-group">
+<label>Tipo de prenda</label>
+<select class="multi-tipo">
+<option>Playera básica</option>
+<option>Polo</option>
+<option>Dry Fit</option>
+<option>Hoodie</option>
+<option>Playera niño</option>
+<option>Polo niño</option>
+<option>Dry Fit niño</option>
+<option>Hoodie niño</option>
+</select>
+</div>
+
+<div class="form-group">
+<label>Cantidad</label>
+<input type="number" class="multi-cantidad" value="1">
+</div>
+
+<div class="form-group">
+<label>Precio por pieza</label>
+<input type="number" class="multi-precio" value="0">
+</div>
+
+<div class="form-group">
+<label>Costo DTF</label>
+<input type="number" class="multi-dtf" value="0">
+</div>
+
+<div class="form-group">
+<label>Costo camiseta</label>
+<input type="number" class="multi-camiseta" value="0">
+</div>
+
+<div class="form-group">
+<label>Otros gastos</label>
+<input type="number" class="multi-otros" value="0">
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+<button class="btn btn-primary multi-add-btn" onclick="addMultiProduct()">
++ Agregar producto
+</button>
+
+<div class="price-display" style="margin-top:20px;">
+<div>
+<div class="label">Total general</div>
+<div class="value" id="multiTotal">$0.00</div>
+</div>
+
+<div>
+<div class="label">Anticipo 70%</div>
+<div class="value" id="multiAdvance">$0.00</div>
+</div>
+
+<div>
+<div class="label">Restante</div>
+<div class="value" id="multiRemaining">$0.00</div>
+</div>
+</div>
+
+</div>
+
 
 </body>
         </html>
@@ -2627,6 +2894,210 @@ container.appendChild(div);
 }
 
 </script>
+
+
+
+<script>
+
+/* ===== MULTI PRODUCTOS ===== */
+
+function addMultiProduct(){
+
+const container=document.getElementById('multiProductsContainer');
+
+if(!container){return;}
+
+const count=document.querySelectorAll('.multi-product-box').length + 1;
+
+const box=document.createElement('div');
+
+box.className='multi-product-box';
+
+box.innerHTML=`
+<div class="multi-product-title">Producto #${count}</div>
+
+<div class="form-grid">
+
+<div class="form-group">
+<label>Tipo de prenda</label>
+<select class="multi-tipo">
+<option>Playera básica</option>
+<option>Polo</option>
+<option>Dry Fit</option>
+<option>Hoodie</option>
+<option>Playera niño</option>
+<option>Polo niño</option>
+<option>Dry Fit niño</option>
+<option>Hoodie niño</option>
+</select>
+</div>
+
+<div class="form-group">
+<label>Cantidad</label>
+<input type="number" class="multi-cantidad" value="1">
+</div>
+
+<div class="form-group">
+<label>Precio por pieza</label>
+<input type="number" class="multi-precio" value="0">
+</div>
+
+<div class="form-group">
+<label>Costo DTF</label>
+<input type="number" class="multi-dtf" value="0">
+</div>
+
+<div class="form-group">
+<label>Costo camiseta</label>
+<input type="number" class="multi-camiseta" value="0">
+</div>
+
+<div class="form-group">
+<label>Otros gastos</label>
+<input type="number" class="multi-otros" value="0">
+</div>
+
+</div>
+`;
+
+container.appendChild(box);
+
+calculateMultiTotals();
+
+bindMultiEvents();
+
+}
+
+function calculateMultiTotals(){
+
+let total=0;
+
+document.querySelectorAll('.multi-product-box').forEach(box=>{
+
+const cantidad=parseFloat(box.querySelector('.multi-cantidad')?.value || 0);
+const precio=parseFloat(box.querySelector('.multi-precio')?.value || 0);
+
+total += cantidad * precio;
+
+});
+
+const anticipo=total*0.70;
+const restante=total-anticipo;
+
+const totalEl=document.getElementById('multiTotal');
+const anticipoEl=document.getElementById('multiAdvance');
+const restanteEl=document.getElementById('multiRemaining');
+
+if(totalEl){totalEl.textContent='$'+total.toFixed(2);}
+if(anticipoEl){anticipoEl.textContent='$'+anticipo.toFixed(2);}
+if(restanteEl){restanteEl.textContent='$'+restante.toFixed(2);}
+
+}
+
+function bindMultiEvents(){
+
+document.querySelectorAll('.multi-cantidad,.multi-precio').forEach(el=>{
+
+el.removeEventListener('input',calculateMultiTotals);
+
+el.addEventListener('input',calculateMultiTotals);
+
+});
+
+}
+
+window.addEventListener('load',()=>{
+
+bindMultiEvents();
+
+calculateMultiTotals();
+
+});
+
+</script>
+
+
+
+
+<div style="margin-top:30px;">
+
+<h3 style="margin-bottom:18px;color:#1e293b;">Calculadora Multi‑Producto</h3>
+
+<div id="multiProductsContainer" class="multi-products-wrapper">
+
+<div class="multi-product-box">
+
+<div class="multi-product-title">Producto #1</div>
+
+<div class="form-grid">
+
+<div class="form-group">
+<label>Tipo de prenda</label>
+<select class="multi-tipo">
+<option>Playera básica</option>
+<option>Polo</option>
+<option>Dry Fit</option>
+<option>Hoodie</option>
+<option>Playera niño</option>
+<option>Polo niño</option>
+<option>Dry Fit niño</option>
+<option>Hoodie niño</option>
+</select>
+</div>
+
+<div class="form-group">
+<label>Cantidad</label>
+<input type="number" class="multi-cantidad" value="1">
+</div>
+
+<div class="form-group">
+<label>Precio por pieza</label>
+<input type="number" class="multi-precio" value="0">
+</div>
+
+<div class="form-group">
+<label>Costo DTF</label>
+<input type="number" class="multi-dtf" value="0">
+</div>
+
+<div class="form-group">
+<label>Costo camiseta</label>
+<input type="number" class="multi-camiseta" value="0">
+</div>
+
+<div class="form-group">
+<label>Otros gastos</label>
+<input type="number" class="multi-otros" value="0">
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+<button class="btn btn-primary multi-add-btn" onclick="addMultiProduct()">
++ Agregar producto
+</button>
+
+<div class="price-display" style="margin-top:20px;">
+<div>
+<div class="label">Total general</div>
+<div class="value" id="multiTotal">$0.00</div>
+</div>
+
+<div>
+<div class="label">Anticipo 70%</div>
+<div class="value" id="multiAdvance">$0.00</div>
+</div>
+
+<div>
+<div class="label">Restante</div>
+<div class="value" id="multiRemaining">$0.00</div>
+</div>
+</div>
+
+</div>
 </body>
 </html>
 
