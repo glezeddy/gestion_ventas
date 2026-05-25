@@ -2472,7 +2472,23 @@ document.addEventListener('DOMContentLoaded', function() {
     calculateIntegratedCalculator();
 });
 
+function addCalcProduct() {
+    const container = document.getElementById('calc-products-container');
+    if (!container) return;
 
+    const firstGrid = container.querySelector('.form-grid');
+    if (!firstGrid) return;
+
+    const clone = firstGrid.cloneNode(true);
+
+    clone.querySelectorAll('input').forEach(input => {
+        if (input.type === 'number') {
+            input.value = input.id === 'cantidad' ? 1 : 0;
+        }
+    });
+
+    container.appendChild(clone);
+}
 </script>
 </body>
 </html>
