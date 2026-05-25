@@ -2410,7 +2410,7 @@ const restante = totalPedido - anticipoTotal;
     let alertMessage = 'El anticipo sugerido cubre costos y deja margen de seguridad.';
     let marginMessage = 'Tu precio actual ya protege el margen recomendado.';
 
-    if (precio <= 0 || gananciaTotal < 0 || anticipoTotal < costoTotalPedido) {
+    if (totalPedido <= 0 || gananciaTotal < 0 || anticipoTotal < costoTotalPedido) {
         state = 'red';
         alertMessage = 'El precio actual no cubre bien los costos o está dejando pérdida.';
         marginMessage = 'Sube tu precio o reduce costos antes de confirmar el pedido.';
