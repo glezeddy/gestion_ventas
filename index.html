@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+	<!DOCTYPE html>
 <html lang="es">
 <head>
 <meta charset="UTF-8">
@@ -531,6 +531,10 @@ const priceTables = {
     'Camiseta tipo Polo': [{ min: 1, max: 5, price: 430 }, { min: 6, max: 11, price: 380 }, { min: 12, max: 23, price: 350 }, { min: 24, max: 49, price: 330 }, { min: 50, max: Infinity, price: 310 }],
     'Hoodie': [{ min: 1, max: 5, price: 530 }, { min: 6, max: Infinity, price: 450 }],
     'Sudadera': [{ min: 1, max: 5, price: 530 }, { min: 6, max: Infinity, price: 450 }]
+	'Playera Niño': [{ min: 1, max: 5, price: 280 }, { min: 6, max: 11, price: 240 }, { min: 12, max: 23, price: 220 }, { min: 24, max: 49, price: 205 }, { min: 50, max: Infinity, price: 190 }],
+    'Polo Niño': [{ min: 1, max: 5, price: 400 }, { min: 6, max: 11, price: 360 }, { min: 12, max: 23, price: 330 }, { min: 24, max: 49, price: 310 }, { min: 50, max: Infinity, price: 290 }],
+    'Dry Fit Niño': [{ min: 1, max: 5, price: 280 }, { min: 6, max: 11, price: 240 }, { min: 12, max: 23, price: 220 }, { min: 24, max: 49, price: 205 }, { min: 50, max: Infinity, price: 190 }],
+    'Hoodie Niño': [{ min: 1, max: 5, price: 500 }, { min: 6, max: Infinity, price: 430 }],
 };
 
 function getUnitPrice(productType, quantity) {
@@ -971,7 +975,7 @@ function addProductRow() {
     productItem.className = 'product-item';
     productItem.id = `product-${productCounter}`;
     productItem.innerHTML = `
-        <div class="form-group"><label>👕 Prenda</label><select class="product-type" onchange="updateProductPrice(${productCounter})"><option>Playera Básica</option><option>Dry Fit</option><option>Camiseta tipo Polo</option><option>Hoodie</option><option>Sudadera</option></select></div>
+        <div class="form-group"><label>👕 Prenda</label><select class="product-type" onchange="updateProductPrice(${productCounter})"><option>Playera Básica</option><option>Dry Fit</option><option>Camiseta tipo Polo</option><option>Hoodie</option><option>Sudadera</option><option>Playera Niño</option><option>Polo Niño</option><option>Dry Fit Niño</option><option>Hoodie Niño</option></select></div>
         <div class="form-group"><label>👥 Género</label><select class="product-gender"><option value="Caballero">Caballero</option><option value="Dama">Dama</option><option value="Niño">Niño</option></select></div>
 		<div class="form-group"><label>🎨 Color</label><select class="product-color">${Object.values(eurocottonColors).flatMap(cat => Object.keys(cat)).map(c => `<option>${c}</option>`).join('')}</select></div>
         <div class="form-group"><label>📏 Talla</label><select class="product-size"><option>XS</option><option>S</option><option>M</option><option>L</option><option>XL</option><option>XXL</option><option>XXXL</option></select></div>
