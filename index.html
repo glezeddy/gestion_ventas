@@ -2281,6 +2281,8 @@ let totalCostoCamisetas = 0;
 let totalDTF = 0;
 let totalOtros = 0;
 
+	console.log('FUNCION INICIADA');
+
     productGrids.forEach((grid, index) => {
 
     const tipoSelect = grid.querySelector('select[id^="tipo"]');
@@ -2364,6 +2366,16 @@ const anticipoTotal = totalPedido * (anticipoRecomendado / 100);
 const gastoCubiertoConAnticipo = Math.min(anticipoTotal, costoTotalPedido);
 
 const restante = totalPedido - anticipoTotal;
+
+	console.log({
+    totalPedido,
+    totalCantidad,
+    totalCostoCamisetas,
+    totalDTF,
+    totalOtros,
+    gananciaTotal,
+    margen
+});
 
     setCalculatorText('calc-precio-auto', formatCurrency(totalPedido > 0 ? totalPedido / totalCantidad : 0));
     setCalculatorText('mini-camisetas-total', formatCurrency(costoCamisetas));
