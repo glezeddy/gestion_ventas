@@ -2379,7 +2379,7 @@ const restante = totalPedido - anticipoTotal;
     setCalculatorText('r-margen', precio > 0 ? margen.toFixed(1) + '%' : '0.0%');
     setCalculatorText('r-ganancia-total', formatCurrency(gananciaTotal));
     setCalculatorText('r-total', formatCurrency(totalPedido));
-    setCalculatorText('r-total-sub', cantidad + ' pieza(s)');
+    setCalculatorText('r-total-sub', totalCantidad + ' pieza(s)');
     setCalculatorText('r-precio-min', formatCurrency(precioMinimo));
     setCalculatorText('r-precio-min-sub', precioMinimo > 0 ? 'Para lograr ' + margenMinimoDeseado + '% de margen.' : 'Con tus costos actuales.');
     setCalculatorText('r-ant-min', anticipoMinimo + '%');
