@@ -1,10 +1,11 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Sistema de Gestión - Prin Epic</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 /* ========== ESTILOS COMPLETOS (idénticos a la versión estable) ========== */
 * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -182,6 +183,13 @@ tr:hover { background: linear-gradient(90deg, #f8fafc, #fafafa); }
 .calc-copy-actions { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
 .calc-note { color: var(--gray); font-size: 13px; margin-top: 10px; }
 .calc-price-pill { display: inline-flex; align-items: center; gap: 8px; padding: 8px 14px; border-radius: 999px; font-size: 12px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; background: linear-gradient(135deg, #dbeafe, #bfdbfe); color: #1e40af; }
+.history-date-group { margin-bottom: 25px; }
+.history-date-title { font-size: 20px; font-weight: 800; color: var(--dark); margin: 0 0 14px; padding-left: 4px; }
+.history-order-card { background: white; border-radius: 16px; padding: 22px; margin-bottom: 14px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); border-left: 5px solid #6366f1; }
+.history-order-header { display: flex; justify-content: space-between; gap: 16px; align-items: flex-start; margin-bottom: 14px; flex-wrap: wrap; }
+.history-order-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; color: var(--gray); font-size: 14px; }
+.history-order-grid strong { display: block; color: var(--dark); margin-bottom: 4px; }
+.history-products { margin-top: 14px; padding-top: 14px; border-top: 1px solid #e2e8f0; color: var(--dark); font-size: 14px; line-height: 1.6; }
 @media (max-width: 768px) { .calc-grid { grid-template-columns: 1fr; } .calc-summary-row { align-items: flex-start; flex-direction: column; } }
 </style>
 </head>
@@ -201,8 +209,8 @@ tr:hover { background: linear-gradient(90deg, #f8fafc, #fafafa); }
         </div>
         <form id="loginForm" onsubmit="return false;">
             <div style="margin-bottom: 20px;">
-                <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #1e293b;">Usuario</label>
-                <input type="text" id="loginUsername" placeholder="Ingresa tu usuario" style="width: 100%; padding: 14px; border: 2px solid #e2e8f0; border-radius: 12px; font-size: 15px;">
+                <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #1e293b;">Correo</label>
+                <input type="email" id="loginUsername" placeholder="Ingresa tu correo" style="width: 100%; padding: 14px; border: 2px solid #e2e8f0; border-radius: 12px; font-size: 15px;">
             </div>
             <div style="margin-bottom: 25px;">
                 <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #1e293b;">Contraseña</label>
@@ -215,7 +223,7 @@ tr:hover { background: linear-gradient(90deg, #f8fafc, #fafafa); }
         </form>
         <div id="loginError" style="margin-top: 15px; text-align: center; font-size: 13px; color: #ef4444; display: none;"></div>
         <div style="margin-top: 20px; text-align: center; font-size: 12px; color: #94a3b8;">
-            <p>Demo: <strong>admin</strong> / <strong>prinepic2026</strong></p>
+            <p>Acceso seguro con Supabase</p>
         </div>
     </div>
 </div>
@@ -240,6 +248,10 @@ tr:hover { background: linear-gradient(90deg, #f8fafc, #fafafa); }
 <div class="nav-item" onclick="showSection('orders', this)">
 <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
 <span>Pedidos</span>
+</div>
+<div class="nav-item" onclick="showSection('history', this)">
+<svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3M5 11h14M5 5h14a2 2 0 012 2v12a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2z"/></svg>
+<span>Historial</span>
 </div>
 <div class="nav-item" onclick="showSection('gallery', this)">
 <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
@@ -392,6 +404,17 @@ Descargar Reporte Excel
 </div>
 </section>
 
+<section id="history" class="section">
+<div class="header">
+<div><h1>Historial de Pedidos</h1><p>Pedidos registrados organizados por fecha</p></div>
+<div class="header-actions">
+<button class="btn btn-secondary" onclick="loadOrdersFromStorage()">Actualizar</button>
+<button class="btn btn-primary" onclick="openNewOrderModal()">Nuevo Pedido</button>
+</div>
+</div>
+<div id="history-container"></div>
+</section>
+
 <section id="gallery" class="section">
 <div class="header"><div><h1>Galería de Mockups</h1><p>Visualiza los mockups generados para cada pedido</p></div></div>
 <div class="gallery-grid" id="gallery-container"></div>
@@ -441,7 +464,7 @@ Descargar Reporte Excel
 
 <div class="modal-overlay" id="orderDetailModal"><div class="modal"><div class="modal-header"><h2 id="detailOrderId">Pedido #</h2><button class="close-btn" onclick="closeModal('orderDetailModal')">&times;</button></div><div class="modal-body"><div id="orderDetailContent"></div></div><div class="modal-footer"><button class="btn btn-warning" onclick="markAsPaid()">Marcar como Saldado</button><button class="btn btn-secondary" onclick="printTicket()">Imprimir Ticket</button><button class="btn btn-info" onclick="downloadProductList()">Lista Productos</button><button class="btn btn-primary" onclick="closeModal('orderDetailModal')">Cerrar</button></div></div></div>
 
-<div class="modal-overlay" id="editOrderModal"><div class="modal"><div class="modal-header"><h2>✏️ Editar Pedido</h2><button class="close-btn" onclick="closeModal('editOrderModal')">&times;</button></div><div class="modal-body"><form id="editOrderForm"><input type="hidden" id="editOrderId"><div class="form-grid"><div class="form-group full-width"><label>Nombre del Cliente</label><input type="text" id="editCustomerName" required></div><div class="form-group"><label>Fecha del Pedido</label><input type="date" id="editOrderDate" required></div><div class="form-group"><label>Técnica</label><select id="editTechnique"><option>Serigrafía</option><option>DTF</option><option>Sublimación</option><option>Bordado</option><option>Vinil Textil</option></select></div><div class="form-group full-width"><label>Estado</label><select id="editStatus"><option>En espera de Anticipo</option><option>Diseño Pendiente</option><option>En Producción</option><option>Listo para Entregar</option><option>Entregado</option></select></div></div><div class="form-group full-width"><label>Productos</label><div id="editProductsList"></div><button type="button" class="add-product-btn" onclick="addEditProductRow()">+ Agregar Producto</button></div><div class="form-group full-width"><div class="price-display"><div><div class="label">Total</div><div class="value" id="editDisplayTotal">$0</div></div></div></div><div class="form-grid"><div class="form-group"><label>Costo camiseta por pieza</label><input type="number" id="editShirtCost" min="0" step="0.01" value="0"></div><div class="form-group"><label>Costo DTF total</label><input type="number" id="editDtfCost" min="0" step="0.01" value="0"></div><div class="form-group"><label>Otros gastos</label><input type="number" id="editExtraCost" min="0" step="0.01" value="0"></div></div></form></div><div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal('editOrderModal')">Cancelar</button><button class="btn btn-primary" onclick="saveEditOrder()">Guardar Cambios</button></div></div></div>
+<div class="modal-overlay" id="editOrderModal"><div class="modal"><div class="modal-header"><h2>✏️ Editar Pedido</h2><button class="close-btn" onclick="closeModal('editOrderModal')">&times;</button></div><div class="modal-body"><form id="editOrderForm"><input type="hidden" id="editOrderId"><div class="form-grid"><div class="form-group full-width"><label>Nombre del Cliente</label><input type="text" id="editCustomerName" required></div><div class="form-group"><label>Fecha del Pedido</label><input type="date" id="editOrderDate" required></div><div class="form-group"><label>Técnica</label><select id="editTechnique"><option>Serigrafía</option><option>DTF</option><option>Sublimación</option><option>Bordado</option><option>Vinil Textil</option></select></div><div class="form-group full-width"><label>Estado</label><select id="editStatus"><option>En espera de Anticipo</option><option>Diseño Pendiente</option><option>En Producción</option><option>Listo para Entregar</option><option>Entregado</option></select></div></div><div class="form-group full-width"><label>Productos</label><div id="editProductsList"></div><button type="button" class="add-product-btn" onclick="addEditProductRow()">+ Agregar Producto</button></div><div class="form-group full-width"><div class="price-display"><div><div class="label">Total</div><div class="value" id="editDisplayTotal">$0</div></div></div></div><div class="form-grid"><div class="form-group"><label>Anticipo recibido ($)</label><input type="number" id="editAdvance" min="0" step="0.01" value="0"></div><div class="form-group"><label>Costo camiseta por pieza</label><input type="number" id="editShirtCost" min="0" step="0.01" value="0"></div><div class="form-group"><label>Costo DTF total</label><input type="number" id="editDtfCost" min="0" step="0.01" value="0"></div><div class="form-group"><label>Otros gastos</label><input type="number" id="editExtraCost" min="0" step="0.01" value="0"></div></div></form></div><div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal('editOrderModal')">Cancelar</button><button class="btn btn-primary" onclick="saveEditOrder()">Guardar Cambios</button></div></div></div>
 
 <div class="modal-overlay" id="newCustomerModal"><div class="modal"><div class="modal-header"><h2>Nuevo Cliente</h2><button class="close-btn" onclick="closeModal('newCustomerModal')">&times;</button></div><div class="modal-body"><form id="customerForm"><div class="form-group"><label>Nombre</label><input type="text" id="customerName" required></div><div class="form-group"><label>Email</label><input type="email" id="customerEmail"></div></form></div><div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal('newCustomerModal')">Cancelar</button><button class="btn btn-primary" onclick="saveCustomer()">Guardar</button></div></div></div>
 
@@ -488,6 +511,9 @@ let editProductCounter = 0;
 let isDragging = false;
 let dragStartX, dragStartY, startLeft, startTop;
 const STORAGE_KEYS = { orders: 'estampados_orders', customers: 'estampados_customers' };
+const SUPABASE_URL = 'https://caubwxywjiuzrevdbnlt.supabase.co';
+const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_y9VdK2iRlUx7Wu9NFQJlJg_M5Ehe38N';
+const supabaseClient = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY) : null;
 
 // Paleta de colores (simplificada para mantener funcionalidad)
 const eurocottonColors = {
@@ -700,9 +726,15 @@ function loadData(options = {}) {
 function saveOrdersToStorage() {
     saveData({ notify: true });
 }
-function loadOrdersFromStorage() {
-    loadData({ notify: true });
-    renderAll();
+async function loadOrdersFromStorage() {
+    try {
+        await loadDataFromDatabase({ notify: true });
+    } catch (error) {
+        console.error(error);
+        loadData({ notify: true });
+        renderAll();
+        showNotification('No se pudo cargar Supabase. Se usó respaldo local.', 'warning');
+    }
 }
 function generateOrderId(dateValue = new Date()) {
     const year = dateValue.getFullYear();
@@ -716,22 +748,155 @@ function generateOrderId(dateValue = new Date()) {
     return `${prefix}${String(maxSequence + 1).padStart(4, '0')}`;
 }
 
+function isSupabaseReady() {
+    return Boolean(supabaseClient);
+}
+function toDbOrder(order) {
+    return {
+        id: order.id,
+        customer_name: order.customerName,
+        order_date: order.date,
+        technique: order.technique,
+        status: order.status,
+        total: Number(order.total) || 0,
+        total_qty: Number(order.totalQty) || 0,
+        advance: Number(order.advance) || 0,
+        remaining: Number(order.remaining) || 0,
+        paid: Boolean(order.paid),
+        shirt_cost: Number(order.shirtCost) || 0,
+        dtf_cost: Number(order.dtfCost) || 0,
+        extra_costs: Number(order.extraCosts) || 0,
+        cost_total: Number(order.costTotal) || 0,
+        net_profit: Number(order.netProfit) || 0,
+        mockup: order.mockup || null,
+        design_image: order.designImage || null,
+        updated_at: new Date().toISOString()
+    };
+}
+function toDbOrderItems(order) {
+    return (order.products || []).map(product => ({
+        order_id: order.id,
+        type: product.type,
+        gender: product.gender,
+        color: product.color,
+        size: product.size,
+        qty: Number(product.qty) || 0,
+        price: Number(product.price) || 0,
+        line_total: (Number(product.qty) || 0) * (Number(product.price) || 0)
+    }));
+}
+function fromDbOrder(row, items = []) {
+    return sanitizeOrder({
+        id: row.id,
+        customerName: row.customer_name,
+        date: row.order_date,
+        products: items.map(item => ({
+            type: item.type,
+            gender: item.gender,
+            color: item.color,
+            size: item.size,
+            qty: Number(item.qty) || 0,
+            price: Number(item.price) || 0
+        })),
+        technique: row.technique,
+        total: Number(row.total) || 0,
+        totalQty: Number(row.total_qty) || 0,
+        advance: Number(row.advance) || 0,
+        remaining: Number(row.remaining) || 0,
+        status: row.status,
+        paid: Boolean(row.paid),
+        shirtCost: Number(row.shirt_cost) || 0,
+        dtfCost: Number(row.dtf_cost) || 0,
+        extraCosts: Number(row.extra_costs) || 0,
+        costTotal: Number(row.cost_total) || 0,
+        netProfit: Number(row.net_profit) || 0,
+        mockup: row.mockup,
+        designImage: row.design_image
+    });
+}
+async function loadDataFromDatabase(options = {}) {
+    const { notify = false } = options;
+    if (!isSupabaseReady()) {
+        loadData(options);
+        return { loaded: false, fallback: true };
+    }
+    const { data: orderRows, error: ordersError } = await supabaseClient
+        .from('orders')
+        .select('*')
+        .order('order_date', { ascending: false })
+        .order('created_at', { ascending: false });
+    if (ordersError) throw ordersError;
+    const orderIds = (orderRows || []).map(order => order.id);
+    let itemRows = [];
+    if (orderIds.length) {
+        const { data, error } = await supabaseClient
+            .from('order_items')
+            .select('*')
+            .in('order_id', orderIds)
+            .order('created_at', { ascending: true });
+        if (error) throw error;
+        itemRows = data || [];
+    }
+    const itemsByOrder = itemRows.reduce((map, item) => {
+        if (!map[item.order_id]) map[item.order_id] = [];
+        map[item.order_id].push(item);
+        return map;
+    }, {});
+    orders = (orderRows || []).map(order => fromDbOrder(order, itemsByOrder[order.id] || [])).filter(Boolean);
+    syncCustomersFromOrders();
+    saveData();
+    renderAll();
+    if (notify) showNotification('Pedidos cargados desde Supabase.', 'success');
+    return { loaded: true, fallback: false };
+}
+async function persistOrderToDatabase(order) {
+    if (!isSupabaseReady()) return { saved: false, skipped: true };
+    const { error: orderError } = await supabaseClient.from('orders').upsert(toDbOrder(order));
+    if (orderError) throw orderError;
+    const { error: deleteItemsError } = await supabaseClient.from('order_items').delete().eq('order_id', order.id);
+    if (deleteItemsError) throw deleteItemsError;
+    const items = toDbOrderItems(order);
+    if (items.length) {
+        const { error: itemsError } = await supabaseClient.from('order_items').insert(items);
+        if (itemsError) throw itemsError;
+    }
+    return { saved: true };
+}
+async function deleteOrderFromDatabase(orderId) {
+    if (!isSupabaseReady()) return { deleted: false, skipped: true };
+    const { error } = await supabaseClient.from('orders').delete().eq('id', orderId);
+    if (error) throw error;
+    return { deleted: true };
+}
+
 // Autenticación
-function checkAuth() {
-    const isLoggedIn = sessionStorage.getItem('prinEpic_loggedIn') === 'true';
+async function checkAuth() {
     const loginScreen = document.getElementById('loginScreen');
     const appContent = document.querySelector('.app');
+    if (!isSupabaseReady()) {
+        if (loginScreen) loginScreen.style.display = 'flex';
+        if (appContent) appContent.style.display = 'none';
+        return;
+    }
+    const { data } = await supabaseClient.auth.getSession();
+    const isLoggedIn = Boolean(data && data.session);
     if (!isLoggedIn) {
         if (loginScreen) loginScreen.style.display = 'flex';
         if (appContent) appContent.style.display = 'none';
     } else {
         if (loginScreen) loginScreen.style.display = 'none';
         if (appContent) appContent.style.display = 'flex';
-        loadData();
-        renderAll();
+        try {
+            await loadDataFromDatabase();
+        } catch (error) {
+            console.error(error);
+            loadData();
+            renderAll();
+            showNotification('No se pudo cargar Supabase. Se muestran datos locales.', 'warning');
+        }
     }
 }
-function attemptLogin() {
+async function attemptLogin() {
     const username = document.getElementById('loginUsername').value.trim();
     const password = document.getElementById('loginPassword').value;
     const errorDiv = document.getElementById('loginError');
@@ -740,16 +905,19 @@ function attemptLogin() {
         errorDiv.style.display = 'block';
         return;
     }
-    if (username === 'admin' && password === 'prinepic2026') {
-        sessionStorage.setItem('prinEpic_loggedIn', 'true');
-        sessionStorage.setItem('prinEpic_user', username);
+    if (!isSupabaseReady()) {
+        errorDiv.textContent = 'No se pudo inicializar Supabase.';
+        errorDiv.style.display = 'block';
+        return;
+    }
+    const { error } = await supabaseClient.auth.signInWithPassword({ email: username, password });
+    if (!error) {
         document.getElementById('loginScreen').style.display = 'none';
         document.querySelector('.app').style.display = 'flex';
-        loadData();
-        renderAll();
+        await loadDataFromDatabase();
         showNotification(`✅ Bienvenido, ${username}!`, 'success');
     } else {
-        errorDiv.textContent = '❌ Usuario o contraseña incorrectos';
+        errorDiv.textContent = '❌ Correo o contraseña incorrectos';
         errorDiv.style.display = 'block';
         document.getElementById('loginPassword').value = '';
         const loginForm = document.getElementById('loginForm');
@@ -757,10 +925,9 @@ function attemptLogin() {
         setTimeout(() => { loginForm.style.animation = ''; }, 300);
     }
 }
-function logout() {
+async function logout() {
     if (confirm('¿Estás seguro de que quieres cerrar sesión?')) {
-        sessionStorage.removeItem('prinEpic_loggedIn');
-        sessionStorage.removeItem('prinEpic_user');
+        if (isSupabaseReady()) await supabaseClient.auth.signOut();
         orders = [];
         customers = [];
         document.querySelector('.app').style.display = 'none';
@@ -976,7 +1143,7 @@ function handleFileUpload(input) {
     };
     reader.readAsDataURL(file);
 }
-function saveOrder() {
+async function saveOrder() {
     const customerName = document.getElementById('orderCustomerName').value.trim();
     if (!customerName) {
         showNotification('❌ Por favor ingresa el nombre del cliente', 'error');
@@ -1025,12 +1192,15 @@ function saveOrder() {
         designImage: uploadedDesign
     };
     orders.unshift(newOrder);
-    const saveResult = saveData();
-    if (!saveResult.saved) {
+    try {
+        await persistOrderToDatabase(newOrder);
+    } catch (error) {
+        console.error(error);
         orders.shift();
-        showNotification('❌ No se pudo guardar el pedido en localStorage.', 'error');
+        showNotification('❌ No se pudo guardar el pedido en Supabase.', 'error');
         return;
     }
+    const saveResult = saveData();
     closeModal('newOrderModal');
     uploadedDesign = null;
     renderAll();
@@ -1053,6 +1223,7 @@ function openEditOrderModal(orderId) {
     document.getElementById('editOrderDate').value = order.date;
     document.getElementById('editTechnique').value = order.technique;
     document.getElementById('editStatus').value = order.status;
+    document.getElementById('editAdvance').value = order.advance || 0;
     document.getElementById('editShirtCost').value = order.shirtCost || 0;
     document.getElementById('editDtfCost').value = order.dtfCost || 0;
     document.getElementById('editExtraCost').value = order.extraCosts || 0;
@@ -1128,7 +1299,7 @@ function calculateEditPrices() {
     if (displayTotal) displayTotal.textContent = '$' + total.toLocaleString();
     return total;
 }
-function saveEditOrder() {
+async function saveEditOrder() {
     const orderId = document.getElementById('editOrderId').value;
     const customerName = document.getElementById('editCustomerName').value.trim();
     const orderDate = document.getElementById('editOrderDate').value;
@@ -1170,7 +1341,8 @@ function saveEditOrder() {
         return;
     }
     const previousOrder = orders[orderIndex];
-    let advance = Number(previousOrder.advance) || 0;
+    let advance = parseFloat(document.getElementById('editAdvance').value) || 0;
+    if (advance < 0) advance = 0;
     if (advance > total) advance = total;
     const updatedOrder = {
         ...previousOrder,
@@ -1191,11 +1363,17 @@ function saveEditOrder() {
         netProfit: total - orderCosts.costTotal
     };
     orders[orderIndex] = updatedOrder;
+    try {
+        await persistOrderToDatabase(updatedOrder);
+    } catch (error) {
+        console.error(error);
+        orders[orderIndex] = previousOrder;
+        showNotification('❌ No se pudieron guardar los cambios en Supabase.', 'error');
+        return;
+    }
     const saveResult = saveData();
     if (!saveResult.saved) {
-        orders[orderIndex] = previousOrder;
-        showNotification('❌ No se pudieron guardar los cambios del pedido.', 'error');
-        return;
+        showNotification('Pedido actualizado en Supabase. No se pudo actualizar el respaldo local.', 'warning');
     }
     closeModal('editOrderModal');
     renderAll();
@@ -1296,6 +1474,7 @@ async function generateFinalMockup() {
         const order = orders.find(o => o.id === currentOrderId);
         if (order) {
             order.mockup = mockupImage;
+            await persistOrderToDatabase(order);
             saveData();
             renderAll();
             showNotification('✅ Mockup generado y guardado', 'success');
@@ -1620,11 +1799,59 @@ function getOrderCollectedNet(order) {
 function renderAll() { 
     renderDashboard(); 
     renderOrders(); 
+    renderHistory();
     renderGallery(); 
     renderCustomers(); 
     renderFinance(); 
     renderCharts(); 
     saveData(); 
+}
+function formatDateTitle(dateValue) {
+    const date = new Date(dateValue + 'T00:00:00');
+    return date.toLocaleDateString('es-MX', { day: 'numeric', month: 'long', year: 'numeric' });
+}
+function renderHistory() {
+    const container = document.getElementById('history-container');
+    if (!container) return;
+    if (!orders.length) {
+        container.innerHTML = '<div class="empty-state"><h3>No hay pedidos registrados</h3><p>Los pedidos aparecerán aquí organizados por fecha.</p></div>';
+        return;
+    }
+    const grouped = orders.reduce((map, order) => {
+        const date = order.date || new Date().toISOString().split('T')[0];
+        if (!map[date]) map[date] = [];
+        map[date].push(order);
+        return map;
+    }, {});
+    const sortedDates = Object.keys(grouped).sort((a, b) => b.localeCompare(a));
+    container.innerHTML = sortedDates.map(date => `
+        <div class="history-date-group">
+            <h2 class="history-date-title">${formatDateTitle(date)}</h2>
+            ${grouped[date].map(order => `
+                <div class="history-order-card">
+                    <div class="history-order-header">
+                        <div>
+                            <h3>${order.customerName}</h3>
+                            <p style="color:#64748b; margin-top:4px;">${order.id} · ${order.technique || '-'}</p>
+                        </div>
+                        <div class="action-buttons">
+                            <button onclick="viewOrder('${order.id}')" class="btn btn-primary btn-sm">Ver</button>
+                            <button onclick="openEditOrderModal('${order.id}')" class="btn btn-info btn-sm">Editar</button>
+                        </div>
+                    </div>
+                    <div class="history-order-grid">
+                        <div><strong>Total</strong>$${(Number(order.total) || 0).toLocaleString()}</div>
+                        <div><strong>Anticipo</strong>$${(Number(order.advance) || 0).toLocaleString()}</div>
+                        <div><strong>Restante</strong>$${(Number(order.remaining) || 0).toLocaleString()}</div>
+                        <div><strong>Estado</strong><span class="status-badge status-${order.status==='Entregado'?'completed':order.status==='En Producción'||order.status==='Listo para Entregar'?'production':'pending'}">${order.status}</span></div>
+                    </div>
+                    <div class="history-products">
+                        ${(order.products || []).map(product => `${product.qty}x ${product.type} ${product.color || ''} talla ${product.size || ''} - $${(Number(product.price) || 0).toLocaleString()}`).join('<br>')}
+                    </div>
+                </div>
+            `).join('')}
+        </div>
+    `).join('');
 }
 function renderDashboard() {
     const today = new Date().toISOString().split('T')[0];
@@ -1710,13 +1937,20 @@ function downloadExistingMockup() {
         showNotification('📥 Mockup descargado', 'success');
     }
 }
-function markAsPaid() {
+async function markAsPaid() {
     const order = orders.find(o => o.id === currentOrderId);
     if (order) { 
         order.paid = true; 
         order.remaining = 0; 
         order.advance = order.total; 
         order.status = 'Entregado'; 
+        try {
+            await persistOrderToDatabase(order);
+        } catch (error) {
+            console.error(error);
+            showNotification('No se pudo actualizar el pedido en Supabase.', 'error');
+            return;
+        }
         saveData(); 
         renderAll(); 
         viewOrder(currentOrderId); 
@@ -1754,8 +1988,15 @@ function renderOrders() {
         `).join('');
     }
 }
-function deleteOrder(orderId) {
+async function deleteOrder(orderId) {
     if (confirm('¿Estás seguro de eliminar este pedido?')) {
+        try {
+            await deleteOrderFromDatabase(orderId);
+        } catch (error) {
+            console.error(error);
+            showNotification('No se pudo eliminar el pedido en Supabase.', 'error');
+            return;
+        }
         orders = orders.filter(o => o.id !== orderId);
         saveData();
         renderAll();
@@ -2227,3 +2468,4 @@ document.addEventListener('DOMContentLoaded', function() {
 </script>
 </body>
 </html>
+
