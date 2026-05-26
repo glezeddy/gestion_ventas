@@ -244,6 +244,30 @@ tr:hover { background: linear-gradient(90deg, #f8fafc, #fafafa); }
 .history-order-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; color: var(--gray); font-size: 14px; }
 .history-order-grid strong { display: block; color: var(--dark); margin-bottom: 4px; }
 .history-products { margin-top: 14px; padding-top: 14px; border-top: 1px solid #e2e8f0; color: var(--dark); font-size: 14px; line-height: 1.6; }
+.coupon-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(310px, 1fr)); gap: 20px; }
+.coupon-card { background: white; border-radius: 18px; padding: 22px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); border-left: 5px solid #111827; }
+.coupon-card-header { display: flex; justify-content: space-between; gap: 14px; align-items: flex-start; margin-bottom: 16px; }
+.coupon-code-box { border: 2px dashed #111827; border-radius: 12px; padding: 12px 14px; font-weight: 900; font-size: 20px; letter-spacing: 1px; text-align: center; background: #f8fafc; margin: 14px 0; overflow-wrap: anywhere; }
+.coupon-meta { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; color: var(--gray); font-size: 13px; margin-bottom: 14px; }
+.coupon-meta strong { display: block; color: var(--dark); margin-bottom: 3px; }
+.coupon-requirements { display: grid; gap: 8px; margin: 14px 0; }
+.coupon-req { display: flex; align-items: center; gap: 9px; padding: 9px 10px; border: 1px solid #e2e8f0; border-radius: 10px; background: #f8fafc; font-size: 13px; }
+.coupon-req input { width: 17px; height: 17px; flex: 0 0 auto; }
+.coupon-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.coupon-preview-stage { position: fixed; left: -9999px; top: 0; width: 420px; z-index: -1; }
+.coupon-art { width: 420px; min-height: 720px; background: #202124; color: #fff; position: relative; overflow: hidden; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 52px 34px 38px; font-family: 'Segoe UI', Arial, sans-serif; }
+.coupon-art-watermark { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; opacity: 0.26; transform: scale(1.45); }
+.coupon-art-watermark img { width: 360px; height: 360px; object-fit: contain; filter: grayscale(1); }
+.coupon-ticket { width: 100%; background: #fffdf8; color: #191919; position: relative; padding: 42px 30px 34px; text-align: center; box-shadow: 0 18px 30px rgba(0,0,0,0.22); z-index: 1; }
+.coupon-ticket::before, .coupon-ticket::after { content: ''; position: absolute; left: 0; right: 0; height: 18px; background: repeating-linear-gradient(135deg, transparent 0 12px, #fffdf8 12px 24px), repeating-linear-gradient(45deg, transparent 0 12px, #fffdf8 12px 24px); }
+.coupon-ticket::before { top: -16px; }
+.coupon-ticket::after { bottom: -16px; transform: rotate(180deg); }
+.coupon-ticket h2 { margin: 0; font-size: 44px; line-height: 0.95; font-weight: 900; letter-spacing: 0; }
+.coupon-ticket h3 { margin: 18px 0 8px; font-size: 46px; line-height: 1; font-weight: 900; }
+.coupon-ticket p { margin: 8px 0; color: #222; font-size: 18px; line-height: 1.3; }
+.coupon-art-code { border: 2px solid #222; padding: 12px 14px; margin: 18px 0 10px; font-size: 30px; font-weight: 900; letter-spacing: 1px; overflow-wrap: anywhere; }
+.coupon-art-small { font-size: 12px !important; color: #444 !important; }
+.coupon-facebook { position: relative; z-index: 1; margin-top: 44px; font-size: 22px; letter-spacing: 3px; color: #fff; text-align: center; }
 @media (max-width: 768px) { .calc-grid { grid-template-columns: 1fr; } .calc-summary-row { align-items: flex-start; flex-direction: column; } }
 </style>
 </head>
@@ -319,6 +343,10 @@ tr:hover { background: linear-gradient(90deg, #f8fafc, #fafafa); }
 <div class="nav-item" onclick="showSection('finance', this)">
 <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
 <span>Caja</span>
+</div>
+<div class="nav-item" onclick="showSection('coupons', this)">
+<svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 14l6-6m-5.5.5h.01m5 5h.01M7 3h10a2 2 0 012 2v3.172a2 2 0 00.586 1.414l1.828 1.828a2 2 0 010 2.828l-7.172 7.172a2 2 0 01-2.828 0L4.586 14.586a2 2 0 010-2.828l7.172-7.172A2 2 0 0013.172 4H7a2 2 0 01-2-2z"/></svg>
+<span>Cupones</span>
 </div>
 <div class="nav-item" onclick="showSection('calculadora', this)">
 <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m-6 4h2m-2 4h2m4-4h.01M15 15h.01M7 3h10a2 2 0 012 2v14a2 2 0 01-2 2H7a2 2 0 01-2-2V5a2 2 0 012-2z"/></svg>
@@ -489,7 +517,7 @@ Descargar Reporte Excel
 </div>
 <div class="table-container">
 <table>
-<thead> <tr><th>Nombre</th><th>Email</th><th>Fecha Registro</th><th>Pedidos</th><th>Acción</th> </tr></thead>
+<thead> <tr><th>Nombre</th><th>Teléfono</th><th>Email</th><th>Fecha Registro</th><th>Pedidos</th><th>Acción</th> </tr></thead>
 <tbody id="customers-table"></tbody>
 </table>
 </div>
@@ -518,17 +546,32 @@ Descargar Reporte Excel
 </table>
 </div>
 </section>
+
+<section id="coupons" class="section">
+<div class="header">
+<div><h1>Cupones de Descuento</h1><p>Genera, valida y comparte cupones personales para clientes</p></div>
+<div class="header-actions">
+<button class="btn btn-secondary" onclick="renderCoupons()">Actualizar</button>
+</div>
+</div>
+<div class="stats-grid">
+<div class="stat-card"><div class="stat-info"><p>Cupones Activos</p><h3 id="coupon-active-count">0</h3></div><div class="stat-icon green"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 14l6-6m-5.5.5h.01m5 5h.01M7 3h10a2 2 0 012 2v3.172a2 2 0 00.586 1.414l1.828 1.828a2 2 0 010 2.828l-7.172 7.172a2 2 0 01-2.828 0L4.586 14.586a2 2 0 010-2.828l7.172-7.172A2 2 0 0013.172 4H7a2 2 0 01-2-2z"/></svg></div></div>
+<div class="stat-card"><div class="stat-info"><p>Pendientes</p><h3 id="coupon-pending-count">0</h3></div><div class="stat-icon amber"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></div></div>
+<div class="stat-card"><div class="stat-info"><p>Usados</p><h3 id="coupon-used-count">0</h3></div><div class="stat-icon purple"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg></div></div>
+</div>
+<div class="coupon-grid" id="coupons-container"></div>
+</section>
 </main>
 </div>
 
 <!-- Modales (idénticos a versión funcional) -->
-<div class="modal-overlay" id="newOrderModal"><div class="modal"><div class="modal-header"><h2>✨ Nuevo Pedido</h2><button class="close-btn" onclick="closeModal('newOrderModal')">&times;</button></div><div class="modal-body"><form id="orderForm"><div class="form-grid"><div class="form-group full-width"><label>👤 Nombre del Cliente</label><input type="text" id="orderCustomerName" placeholder="Escribe el nombre del cliente" required></div><div class="form-group"><label>🖨️ Técnica de Estampado</label><select id="orderTechnique"><option>DTF</option></select></div><div class="form-group full-width"><label>📋 Estado Inicial</label><select id="orderStatus"><option>En espera de Anticipo</option><option>Diseño Pendiente</option><option>En Producción</option><option>Listo para Entregar</option></select></div></div><div class="products-list" id="productsList"></div><button type="button" class="add-product-btn" onclick="addProductRow()">+ Agregar Producto</button><div class="form-group full-width" style="margin-top: 25px;"><div class="price-display"><div><div class="label">Total Productos</div><div class="value" id="displayTotalQty">0</div></div><div><div class="label">Precio Total</div><div class="value" id="displayTotal">$0</div></div><div><div class="label">Anticipo Sugerido (70%)</div><div class="value" id="displayAdvance">$0</div></div></div></div><div class="form-grid"><div class="form-group"><label>🧵 Costo camiseta por pieza</label><input type="number" id="orderShirtCost" min="0" step="0.01" value="0"></div><div class="form-group"><label>🧒 Costo camiseta niño por pieza</label><input type="number" id="orderShirtCostKids" min="0" step="0.01" value="0"></div><div class="form-group"><label>🖨️ Costo DTF total</label><input type="number" id="orderDtfCost" min="0" step="0.01" value="0"></div><div class="form-group"><label>📦 Otros gastos</label><input type="number" id="orderExtraCost" min="0" step="0.01" value="0"></div></div><div class="form-grid"><div class="form-group"><label>💵 Anticipo Recibido ($)</label><input type="number" id="orderAdvance" value="0" onchange="validateAdvanceAndCalculate()"></div><div class="form-group full-width"><label>📁 Subir Diseño</label><div class="file-upload" onclick="document.getElementById('orderDesign').click()"><input type="file" id="orderDesign" accept="image/*" style="display: none;" onchange="handleFileUpload(this)"><div class="file-upload-icon">📁</div><p id="uploadText">Haz click para subir el diseño</p><img id="uploadPreview" class="file-upload-preview" style="display: none;"></div></div></div></form></div><div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal('newOrderModal')">Cancelar</button><button class="btn btn-primary" onclick="saveOrder()">Guardar Pedido</button></div></div></div>
+<div class="modal-overlay" id="newOrderModal"><div class="modal"><div class="modal-header"><h2>✨ Nuevo Pedido</h2><button class="close-btn" onclick="closeModal('newOrderModal')">&times;</button></div><div class="modal-body"><form id="orderForm"><div class="form-grid"><div class="form-group full-width"><label>👤 Nombre del Cliente</label><input type="text" id="orderCustomerName" placeholder="Escribe el nombre del cliente" required></div><div class="form-group"><label>📱 Teléfono WhatsApp</label><input type="tel" id="orderCustomerPhone" placeholder="Ej. 6641234567"></div><div class="form-group"><label>🖨️ Técnica de Estampado</label><select id="orderTechnique"><option>DTF</option></select></div><div class="form-group full-width"><label>📋 Estado Inicial</label><select id="orderStatus"><option>En espera de Anticipo</option><option>Diseño Pendiente</option><option>En Producción</option><option>Listo para Entregar</option></select></div></div><div class="products-list" id="productsList"></div><button type="button" class="add-product-btn" onclick="addProductRow()">+ Agregar Producto</button><div class="form-group full-width" style="margin-top: 25px;"><div class="price-display"><div><div class="label">Total Productos</div><div class="value" id="displayTotalQty">0</div></div><div><div class="label">Subtotal</div><div class="value" id="displaySubtotal">$0</div></div><div><div class="label">Descuento Cupón</div><div class="value" id="displayCouponDiscount">$0</div></div><div><div class="label">Precio Total</div><div class="value" id="displayTotal">$0</div></div><div><div class="label">Anticipo Sugerido (70%)</div><div class="value" id="displayAdvance">$0</div></div></div></div><div class="form-grid"><div class="form-group full-width"><label>Validar cupón de descuento</label><div style="display:flex; gap:10px; flex-wrap:wrap;"><input type="text" id="orderCouponCode" placeholder="Ej. PRI10-ABC123" style="flex:1 1 220px; text-transform:uppercase;"><button type="button" class="btn btn-info" onclick="validateCouponForOrder()">Validar cupón</button><button type="button" class="btn btn-secondary" onclick="clearOrderCoupon()">Quitar</button></div><p id="couponValidationMessage" style="margin-top:8px; color:#64748b; font-size:13px;"></p></div></div><div class="form-grid"><div class="form-group"><label>🧵 Costo camiseta por pieza</label><input type="number" id="orderShirtCost" min="0" step="0.01" value="0"></div><div class="form-group"><label>🧒 Costo camiseta niño por pieza</label><input type="number" id="orderShirtCostKids" min="0" step="0.01" value="0"></div><div class="form-group"><label>🖨️ Costo DTF total</label><input type="number" id="orderDtfCost" min="0" step="0.01" value="0"></div><div class="form-group"><label>📦 Otros gastos</label><input type="number" id="orderExtraCost" min="0" step="0.01" value="0"></div></div><div class="form-grid"><div class="form-group"><label>💵 Anticipo Recibido ($)</label><input type="number" id="orderAdvance" value="0" onchange="validateAdvanceAndCalculate()"></div><div class="form-group full-width"><label>📁 Subir Diseño</label><div class="file-upload" onclick="document.getElementById('orderDesign').click()"><input type="file" id="orderDesign" accept="image/*" style="display: none;" onchange="handleFileUpload(this)"><div class="file-upload-icon">📁</div><p id="uploadText">Haz click para subir el diseño</p><img id="uploadPreview" class="file-upload-preview" style="display: none;"></div></div></div></form></div><div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal('newOrderModal')">Cancelar</button><button class="btn btn-primary" onclick="saveOrder()">Guardar Pedido</button></div></div></div>
 
 <div class="modal-overlay" id="orderDetailModal"><div class="modal"><div class="modal-header"><h2 id="detailOrderId">Pedido #</h2><button class="close-btn" onclick="closeModal('orderDetailModal')">&times;</button></div><div class="modal-body"><div id="orderDetailContent"></div></div><div class="modal-footer"><button class="btn btn-warning" onclick="markAsPaid()">Marcar como Saldado</button><button class="btn btn-secondary" onclick="printTicket()">Imprimir Ticket</button><button class="btn btn-info" onclick="downloadTicket()">Descargar Ticket</button><button class="btn btn-success" onclick="shareTicketWhatsApp()">Compartir WhatsApp</button><button class="btn btn-info" onclick="downloadProductList()">Lista Productos</button><button class="btn btn-primary" onclick="closeModal('orderDetailModal')">Cerrar</button></div></div></div>
 
 <div class="modal-overlay" id="editOrderModal"><div class="modal"><div class="modal-header"><h2>✏️ Editar Pedido</h2><button class="close-btn" onclick="closeModal('editOrderModal')">&times;</button></div><div class="modal-body"><form id="editOrderForm"><input type="hidden" id="editOrderId"><div class="form-grid"><div class="form-group full-width"><label>Nombre del Cliente</label><input type="text" id="editCustomerName" required></div><div class="form-group"><label>Fecha del Pedido</label><input type="date" id="editOrderDate" required></div><div class="form-group"><label>Técnica</label><select id="editTechnique"><option>DTF</option></select></div><div class="form-group full-width"><label>Estado</label><select id="editStatus"><option>En espera de Anticipo</option><option>Diseño Pendiente</option><option>En Producción</option><option>Listo para Entregar</option><option>Entregado</option></select></div></div><div class="form-group full-width"><label>Productos</label><div id="editProductsList"></div><button type="button" class="add-product-btn" onclick="addEditProductRow()">+ Agregar Producto</button></div><div class="form-group full-width"><div class="price-display"><div><div class="label">Total</div><div class="value" id="editDisplayTotal">$0</div></div></div></div><div class="form-grid"><div class="form-group"><label>Anticipo recibido ($)</label><input type="number" id="editAdvance" min="0" step="0.01" value="0"></div><div class="form-group"><label>Costo camiseta por pieza</label><input type="number" id="editShirtCost" min="0" step="0.01" value="0"></div><div class="form-group"><label>Costo DTF total</label><input type="number" id="editDtfCost" min="0" step="0.01" value="0"></div><div class="form-group"><label>Otros gastos</label><input type="number" id="editExtraCost" min="0" step="0.01" value="0"></div></div></form></div><div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal('editOrderModal')">Cancelar</button><button class="btn btn-primary" onclick="saveEditOrder()">Guardar Cambios</button></div></div></div>
 
-<div class="modal-overlay" id="newCustomerModal"><div class="modal"><div class="modal-header"><h2>Nuevo Cliente</h2><button class="close-btn" onclick="closeModal('newCustomerModal')">&times;</button></div><div class="modal-body"><form id="customerForm"><div class="form-group"><label>Nombre</label><input type="text" id="customerName" required></div><div class="form-group"><label>Email</label><input type="email" id="customerEmail"></div></form></div><div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal('newCustomerModal')">Cancelar</button><button class="btn btn-primary" onclick="saveCustomer()">Guardar</button></div></div></div>
+<div class="modal-overlay" id="newCustomerModal"><div class="modal"><div class="modal-header"><h2>Nuevo Cliente</h2><button class="close-btn" onclick="closeModal('newCustomerModal')">&times;</button></div><div class="modal-body"><form id="customerForm"><div class="form-group"><label>Nombre</label><input type="text" id="customerName" required></div><div class="form-group"><label>Teléfono WhatsApp</label><input type="tel" id="customerPhone" placeholder="Ej. 6641234567"></div><div class="form-group"><label>Email</label><input type="email" id="customerEmail"></div></form></div><div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal('newCustomerModal')">Cancelar</button><button class="btn btn-primary" onclick="saveCustomer()">Guardar</button></div></div></div>
 
 <div class="modal-overlay" id="mockupModal">
     <div class="modal">
@@ -565,14 +608,16 @@ Descargar Reporte Excel
 // Data Store
 let customers = [];
 let orders = [];
+let coupons = [];
 let currentOrderId = null;
+let currentCouponForOrder = null;
 let currentFilter = 'all';
 let uploadedDesign = null;
 let productCounter = 0;
 let editProductCounter = 0;
 let isDragging = false;
 let dragStartX, dragStartY, startLeft, startTop;
-const STORAGE_KEYS = { orders: 'estampados_orders', customers: 'estampados_customers' };
+const STORAGE_KEYS = { orders: 'estampados_orders', customers: 'estampados_customers', coupons: 'estampados_coupons' };
 const SUPABASE_URL = 'https://caubwxywjiuzrevdbnlt.supabase.co';
 const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_y9VdK2iRlUx7Wu9NFQJlJg_M5Ehe38N';
 const supabaseClient = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY) : null;
@@ -634,6 +679,7 @@ function sanitizeCustomer(customer) {
     return {
         id: customer.id || Date.now() + Math.floor(Math.random() * 1000),
         name,
+        phone: String(customer.phone || customer.telefono || '').trim(),
         email: String(customer.email || '').trim(),
         date: customer.date || new Date().toISOString().split('T')[0]
     };
@@ -671,9 +717,14 @@ function sanitizeOrder(order) {
     return {
         id,
         customerName,
+        customerPhone: String(order.customerPhone || order.phone || '').trim(),
         date: order.date || new Date().toISOString().split('T')[0],
         products,
         technique: order.technique || 'Serigrafía',
+        subtotal: Math.max(0, Number(order.subtotal) || total),
+        couponCode: order.couponCode || '',
+        couponId: order.couponId || '',
+        couponDiscount: Math.max(0, Number(order.couponDiscount) || 0),
         total,
         totalQty,
         advance,
@@ -687,6 +738,26 @@ function sanitizeOrder(order) {
         netProfit: Number.isFinite(parsedNetProfit) ? parsedNetProfit : Math.max(0, total - costTotal),
         mockup: order.mockup || null,
         designImage: order.designImage || null
+    };
+}
+function sanitizeCoupon(coupon) {
+    if (!coupon || typeof coupon !== 'object') return null;
+    const code = String(coupon.code || '').trim().toUpperCase();
+    if (!code) return null;
+    const defaults = getDefaultCouponRequirements();
+    return {
+        id: coupon.id || `CP-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
+        code,
+        customerName: String(coupon.customerName || '').trim(),
+        customerPhone: String(coupon.customerPhone || '').trim(),
+        orderId: String(coupon.orderId || '').trim(),
+        discountPercent: Number(coupon.discountPercent) || 10,
+        status: ['pending', 'active', 'used', 'expired'].includes(coupon.status) ? coupon.status : 'pending',
+        createdAt: coupon.createdAt || new Date().toISOString(),
+        usedAt: coupon.usedAt || null,
+        usedOrderId: coupon.usedOrderId || '',
+        used: Boolean(coupon.used),
+        requirements: { ...defaults, ...(coupon.requirements || {}) }
     };
 }
 function dedupeOrdersById(orderList) {
@@ -718,6 +789,7 @@ function syncCustomersFromOrders() {
         mergedCustomers.push({
             id: Date.now() + mergedCustomers.length,
             name: normalizedName,
+            phone: order.customerPhone || '',
             email: '',
             date: order.date || new Date().toISOString().split('T')[0]
         });
@@ -731,9 +803,11 @@ function getStorageSnapshot(includeMedia = true) {
     orders = normalizedOrders;
     syncCustomersFromOrders();
     customers = dedupeCustomersByName((Array.isArray(customers) ? customers : []).map(sanitizeCustomer).filter(Boolean));
+    coupons = (Array.isArray(coupons) ? coupons : []).map(sanitizeCoupon).filter(Boolean);
     return {
         orders: normalizedOrders,
-        customers
+        customers,
+        coupons
     };
 }
 function saveData(options = {}) {
@@ -746,6 +820,7 @@ function saveData(options = {}) {
     try {
         localStorage.setItem(STORAGE_KEYS.orders, JSON.stringify(snapshot.orders));
         localStorage.setItem(STORAGE_KEYS.customers, JSON.stringify(snapshot.customers));
+        localStorage.setItem(STORAGE_KEYS.coupons, JSON.stringify(snapshot.coupons));
         if (notify) showNotification('Pedidos guardados correctamente en este navegador.', 'success');
         return { saved: true, unavailable: false, strippedMedia: false };
     } catch (error) {
@@ -754,6 +829,7 @@ function saveData(options = {}) {
         try {
             localStorage.setItem(STORAGE_KEYS.orders, JSON.stringify(lightSnapshot.orders));
             localStorage.setItem(STORAGE_KEYS.customers, JSON.stringify(lightSnapshot.customers));
+            localStorage.setItem(STORAGE_KEYS.coupons, JSON.stringify(lightSnapshot.coupons));
             orders = lightSnapshot.orders;
             if (notify) {
                 showNotification('Se guardaron los pedidos, pero sin imágenes pesadas para evitar llenar localStorage.', 'warning');
@@ -776,12 +852,16 @@ function loadData(options = {}) {
     }
     const savedOrders = localStorage.getItem(STORAGE_KEYS.orders);
     const savedCustomers = localStorage.getItem(STORAGE_KEYS.customers);
+    const savedCoupons = localStorage.getItem(STORAGE_KEYS.coupons);
     let parsedOrders = [];
     let parsedCustomers = [];
+    let parsedCoupons = [];
     try { parsedOrders = savedOrders ? JSON.parse(savedOrders) : []; } catch (error) { parsedOrders = []; }
     try { parsedCustomers = savedCustomers ? JSON.parse(savedCustomers) : []; } catch (error) { parsedCustomers = []; }
+    try { parsedCoupons = savedCoupons ? JSON.parse(savedCoupons) : []; } catch (error) { parsedCoupons = []; }
     orders = dedupeOrdersById((Array.isArray(parsedOrders) ? parsedOrders : []).map(sanitizeOrder).filter(Boolean));
     customers = dedupeCustomersByName((Array.isArray(parsedCustomers) ? parsedCustomers : []).map(sanitizeCustomer).filter(Boolean));
+    coupons = (Array.isArray(parsedCoupons) ? parsedCoupons : []).map(sanitizeCoupon).filter(Boolean);
     syncCustomersFromOrders();
     if (notify) {
         if (orders.length || customers.length) showNotification('Pedidos cargados desde localStorage.', 'success');
@@ -1110,17 +1190,23 @@ function getProductsFromForm() {
 function calculatePrices() {
     const products = getProductsFromForm();
     const totalQty = products.reduce((sum, p) => sum + p.qty, 0);
-    const total = products.reduce((sum, p) => sum + (p.qty * p.price), 0);
+    const subtotal = products.reduce((sum, p) => sum + (p.qty * p.price), 0);
+    const couponDiscount = currentCouponForOrder ? Math.round(subtotal * ((Number(currentCouponForOrder.discountPercent) || 10) / 100)) : 0;
+    const total = Math.max(0, subtotal - couponDiscount);
     const advance70 = Math.round(total * 0.7);
     const displayTotalQty = document.getElementById('displayTotalQty');
+    const displaySubtotal = document.getElementById('displaySubtotal');
+    const displayCouponDiscount = document.getElementById('displayCouponDiscount');
     const displayTotal = document.getElementById('displayTotal');
     const displayAdvance = document.getElementById('displayAdvance');
     const advanceInput = document.getElementById('orderAdvance');
     if (displayTotalQty) displayTotalQty.textContent = totalQty;
+    if (displaySubtotal) displaySubtotal.textContent = '$' + subtotal.toLocaleString();
+    if (displayCouponDiscount) displayCouponDiscount.textContent = '-$' + couponDiscount.toLocaleString();
     if (displayTotal) displayTotal.textContent = '$' + total.toLocaleString();
     if (displayAdvance) displayAdvance.textContent = '$' + advance70.toLocaleString();
     if (advanceInput && (parseInt(advanceInput.value) || 0) === 0) advanceInput.value = advance70;
-    return { totalQty, total, advance70 };
+    return { totalQty, subtotal, couponDiscount, total, advance70 };
 }
 function calculateOrderCosts(totalQty, shirtCost, dtfCost, extraCost) {
     const qty = Number(totalQty) || 0;
@@ -1209,6 +1295,11 @@ function openNewOrderModal() {
     if (shirtCostInput) shirtCostInput.value = 0;
     if (dtfCostInput) dtfCostInput.value = 0;
     if (extraCostInput) extraCostInput.value = 0;
+    currentCouponForOrder = null;
+    const couponInput = document.getElementById('orderCouponCode');
+    const couponMessage = document.getElementById('couponValidationMessage');
+    if (couponInput) couponInput.value = '';
+    if (couponMessage) couponMessage.textContent = '';
     uploadedDesign = null;
     const preview = document.getElementById('uploadPreview');
     const uploadText = document.getElementById('uploadText');
@@ -1252,6 +1343,7 @@ function handleFileUpload(input) {
 }
 async function saveOrder() {
     const customerName = document.getElementById('orderCustomerName').value.trim();
+    const customerPhone = document.getElementById('orderCustomerPhone') ? document.getElementById('orderCustomerPhone').value.trim() : '';
     if (!customerName) {
         showNotification('❌ Por favor ingresa el nombre del cliente', 'error');
         return;
@@ -1267,7 +1359,9 @@ async function saveOrder() {
             return;
         }
     }
-    const total = products.reduce((sum, product) => sum + (product.qty * product.price), 0);
+    const subtotal = products.reduce((sum, product) => sum + (product.qty * product.price), 0);
+    const couponDiscount = currentCouponForOrder ? Math.round(subtotal * ((Number(currentCouponForOrder.discountPercent) || 10) / 100)) : 0;
+    const total = Math.max(0, subtotal - couponDiscount);
     const totalQty = products.reduce((sum, product) => sum + product.qty, 0);
     const shirtCost = parseFloat(document.getElementById('orderShirtCost').value) || 0;
     const dtfCost = parseFloat(document.getElementById('orderDtfCost').value) || 0;
@@ -1281,9 +1375,14 @@ async function saveOrder() {
     const newOrder = {
         id: orderId,
         customerName,
+        customerPhone,
         date: new Date().toISOString().split('T')[0],
         products,
         technique,
+        subtotal,
+        couponCode: currentCouponForOrder ? currentCouponForOrder.code : '',
+        couponId: currentCouponForOrder ? currentCouponForOrder.id : '',
+        couponDiscount,
         total,
         totalQty,
         advance,
@@ -1299,6 +1398,7 @@ async function saveOrder() {
         designImage: uploadedDesign
     };
     orders.unshift(newOrder);
+    const couponToUse = currentCouponForOrder;
     try {
         await persistOrderToDatabase(newOrder);
     } catch (error) {
@@ -1307,8 +1407,10 @@ async function saveOrder() {
         showNotification('❌ No se pudo guardar el pedido en Supabase.', 'error');
         return;
     }
+    if (couponToUse) markCouponAsUsed(couponToUse.id, orderId);
     const saveResult = saveData();
     closeModal('newOrderModal');
+    currentCouponForOrder = null;
     uploadedDesign = null;
     renderAll();
     if (saveResult.strippedMedia) {
@@ -1479,6 +1581,7 @@ async function saveEditOrder() {
         return;
     }
     const saveResult = saveData();
+    if (updatedOrder.status === 'Entregado') maybeCreateCouponFromOrder(updatedOrder);
     if (!saveResult.saved) {
         showNotification('Pedido actualizado en Supabase. No se pudo actualizar el respaldo local.', 'warning');
     }
@@ -1878,7 +1981,7 @@ async function shareTicketWhatsApp() {
 }
 // Backup
 function exportBackup() {
-    const backupData = { orders, customers, exportDate: new Date().toISOString() };
+    const backupData = { orders, customers, coupons, exportDate: new Date().toISOString() };
     const dataStr = JSON.stringify(backupData, null, 2);
     const blob = new Blob([dataStr], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
@@ -1900,6 +2003,7 @@ function importBackup(input) {
             if (confirm('⚠️ Esta acción reemplazará todos los datos actuales. ¿Estás seguro?')) {
                 orders = backupData.orders;
                 customers = backupData.customers;
+                coupons = backupData.coupons || [];
                 saveData();
                 renderAll();
                 showNotification('✅ Backup importado correctamente', 'success');
@@ -1995,6 +2099,7 @@ function renderAll() {
     renderGallery(); 
     renderCustomers(); 
     renderFinance(); 
+    renderCoupons();
     renderCharts(); 
     saveData(); 
 }
@@ -2099,9 +2204,14 @@ function viewOrder(orderId) {
         `<p style="color:#f59e0b; margin-top:10px;">⚠️ No hay diseño subido. Edita el pedido para subir un diseño.</p>`;
     const mockupPreview = order.mockup ? 
         `<div style="margin-top:20px;"><h4>Mockup Generado:</h4><img src="${order.mockup}" style="max-width:200px; border-radius:10px; border:2px solid #e2e8f0;"><br><button class="btn btn-secondary btn-sm" onclick="downloadExistingMockup()" style="margin-top:10px;">📥 Descargar Mockup</button></div>` : '';
+    const relatedCoupon = coupons.find(coupon => coupon.orderId === order.id);
+    const couponButton = getOrderCouponEligibility(order)
+        ? `<button class="btn btn-success" onclick="generateCouponForCurrentOrder()" style="margin-top:10px;">${relatedCoupon ? 'Ver cupón generado' : 'Generar cupón 10%'}</button>`
+        : '';
     document.getElementById('orderDetailContent').innerHTML = `
         <div>
             <h3>Cliente: ${order.customerName}</h3>
+            <p>Teléfono: ${order.customerPhone || '-'}</p>
             <p>Fecha: ${order.date}</p>
             <p>Técnica: ${order.technique}</p>
             <p>Total: $${order.total.toLocaleString()}</p>
@@ -2115,6 +2225,7 @@ function viewOrder(orderId) {
             ${order.designImage ? `<h4>Diseño Original:</h4><img src="${order.designImage}" style="max-width:150px; border-radius:10px; margin-top:10px;">` : ''}
             ${mockupButton}
             ${mockupPreview}
+            ${couponButton}
         </div>
     `;
     document.getElementById('orderDetailModal').classList.add('active');
@@ -2144,6 +2255,8 @@ async function markAsPaid() {
             return;
         }
         saveData(); 
+        maybeCreateCouponFromOrder(order);
+        saveData();
         renderAll(); 
         viewOrder(currentOrderId); 
         showNotification('✅ Pedido marcado como saldado', 'success'); 
@@ -2219,7 +2332,7 @@ function renderCustomers() {
     const tbody = document.getElementById('customers-table');
     if (!tbody) return;
     if (customers.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:40px;">No hay clientes registrados</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:40px;">No hay clientes registrados</td></tr>';
     } else {
         tbody.innerHTML = customers.map(customer => {
             const customerName = String(customer.name || '').trim().toLowerCase();
@@ -2228,6 +2341,7 @@ function renderCustomers() {
             return `
                 <tr>
                     <td><strong>${customer.name}</strong></td>
+                    <td>${customer.phone || '-'}</td>
                     <td>${customer.email || '-'}</td>
                     <td>${customer.date}</td>
                     <td>${orderCount} pedidos</td>
@@ -2262,6 +2376,7 @@ function saveCustomer() {
     const newCustomer = {
         id: Date.now(),
         name: name,
+        phone: document.getElementById('customerPhone') ? document.getElementById('customerPhone').value.trim() : '',
         email: document.getElementById('customerEmail').value.trim(),
         date: new Date().toISOString().split('T')[0]
     };
@@ -2464,6 +2579,277 @@ function downloadProductList() {
     link.click();
     URL.revokeObjectURL(url);
     showNotification('Lista de productos descargada', 'success');
+}
+
+function getDefaultCouponRequirements() {
+    return {
+        photoUploaded: false,
+        likedPost: false,
+        commentedPost: false,
+        sharedPost: false,
+        screenshotSent: false
+    };
+}
+const COUPON_REQUIREMENT_LABELS = {
+    photoUploaded: 'Subió foto usando prenda Prin Epic',
+    likedPost: 'Dio like a una publicación',
+    commentedPost: 'Dejó comentario en publicación',
+    sharedPost: 'Compartió una publicación',
+    screenshotSent: 'Envió captura por WhatsApp'
+};
+function normalizePhoneForWhatsApp(phone) {
+    const digits = String(phone || '').replace(/\D/g, '');
+    if (!digits) return '';
+    if (digits.length === 10) return '52' + digits;
+    return digits;
+}
+function getCustomerPhoneByName(name) {
+    const key = String(name || '').trim().toLowerCase();
+    const customer = customers.find(c => String(c.name || '').trim().toLowerCase() === key);
+    return customer ? customer.phone || '' : '';
+}
+function getOrderCouponEligibility(order) {
+    return Boolean(order && Number(order.totalQty) >= 5 && order.status === 'Entregado');
+}
+function generateCouponCode() {
+    let code = '';
+    do {
+        const random = Math.random().toString(36).slice(2, 8).toUpperCase();
+        const stamp = new Date().getFullYear().toString().slice(-2);
+        code = `PRI10-${random}${stamp}`;
+    } while (coupons.some(coupon => coupon.code === code));
+    return code;
+}
+function maybeCreateCouponFromOrder(order) {
+    if (!getOrderCouponEligibility(order)) return null;
+    const existing = coupons.find(coupon => coupon.orderId === order.id);
+    if (existing) return existing;
+    const coupon = sanitizeCoupon({
+        id: `CP-${Date.now()}`,
+        code: generateCouponCode(),
+        customerName: order.customerName,
+        customerPhone: order.customerPhone || getCustomerPhoneByName(order.customerName),
+        orderId: order.id,
+        discountPercent: 10,
+        status: 'pending',
+        createdAt: new Date().toISOString(),
+        requirements: getDefaultCouponRequirements(),
+        used: false
+    });
+    coupons.unshift(coupon);
+    showNotification('Cupón pendiente generado para este cliente', 'success');
+    return coupon;
+}
+function generateCouponForCurrentOrder() {
+    const order = orders.find(item => item.id === currentOrderId);
+    if (!order) return;
+    if (!getOrderCouponEligibility(order)) {
+        showNotification('El pedido debe estar entregado y tener 5 o más prendas', 'warning');
+        return;
+    }
+    maybeCreateCouponFromOrder(order);
+    saveData();
+    renderAll();
+    showSection('coupons', document.querySelectorAll('.nav-item')[6]);
+    closeModal('orderDetailModal');
+}
+function validateCouponForOrder() {
+    const input = document.getElementById('orderCouponCode');
+    const message = document.getElementById('couponValidationMessage');
+    const code = String(input ? input.value : '').trim().toUpperCase();
+    const coupon = coupons.find(item => item.code === code);
+    if (!coupon || coupon.status !== 'active' || coupon.used) {
+        currentCouponForOrder = null;
+        if (message) {
+            message.textContent = 'El código de cupón no es válido, ya fue utilizado o todavía no está activo.';
+            message.style.color = '#ef4444';
+        }
+        calculatePrices();
+        showNotification('Cupón no válido o no activo', 'error');
+        return;
+    }
+    currentCouponForOrder = coupon;
+    if (input) input.value = coupon.code;
+    if (message) {
+        message.textContent = `Cupón válido: ${coupon.discountPercent}% de descuento aplicado.`;
+        message.style.color = '#10b981';
+    }
+    calculatePrices();
+    showNotification('Cupón aplicado correctamente', 'success');
+}
+function clearOrderCoupon() {
+    currentCouponForOrder = null;
+    const input = document.getElementById('orderCouponCode');
+    const message = document.getElementById('couponValidationMessage');
+    if (input) input.value = '';
+    if (message) message.textContent = '';
+    calculatePrices();
+}
+function markCouponAsUsed(couponId, orderId) {
+    const coupon = coupons.find(item => item.id === couponId);
+    if (!coupon) return;
+    coupon.status = 'used';
+    coupon.used = true;
+    coupon.usedAt = new Date().toISOString();
+    coupon.usedOrderId = orderId;
+}
+function toggleCouponRequirement(couponId, requirementKey, checked) {
+    const coupon = coupons.find(item => item.id === couponId);
+    if (!coupon) return;
+    coupon.requirements = { ...getDefaultCouponRequirements(), ...(coupon.requirements || {}) };
+    coupon.requirements[requirementKey] = Boolean(checked);
+    if (coupon.status === 'active' && !Object.values(coupon.requirements).every(Boolean)) coupon.status = 'pending';
+    saveData();
+    renderCoupons();
+}
+function activateCoupon(couponId) {
+    const coupon = coupons.find(item => item.id === couponId);
+    if (!coupon) return;
+    coupon.requirements = { ...getDefaultCouponRequirements(), ...(coupon.requirements || {}) };
+    if (!Object.values(coupon.requirements).every(Boolean)) {
+        showNotification('Primero marca todos los requisitos como cumplidos', 'warning');
+        return;
+    }
+    coupon.status = 'active';
+    saveData();
+    renderCoupons();
+    showNotification('Cupón activado correctamente', 'success');
+}
+function copyCouponCode(code) {
+    navigator.clipboard?.writeText(code);
+    showNotification('Código copiado', 'success');
+}
+function getCouponStatusLabel(status) {
+    return ({ pending: 'Pendiente', active: 'Activo', used: 'Usado', expired: 'Vencido' })[status] || 'Pendiente';
+}
+function buildCouponInvitationMessage(coupon) {
+    return `¡Hola! 👋😄
+Esperamos que estés disfrutando tu prenda de Prin Epic 👕🔥
+
+Queremos agradecerte por tu compra y además darte la oportunidad de obtener un cupón de descuento para tu próxima orden 🎉
+
+Para participar solo necesitas:
+
+✅ Subir una foto usando tu camiseta, hoodie o prenda de Prin Epic en nuestra página.
+✅ Darle like a una publicación de la página.
+✅ Dejar un comentario en tu publicación o en cualquier post de Prin Epic.
+✅ Compartir una publicación de nuestra página.
+✅ Enviarnos vía WhatsApp una captura de pantalla de la publicación que compartiste.
+
+📲 Una vez que validemos los requisitos, te enviaremos tu cupón de descuento directamente por este medio.
+
+⚠️ Importante:
+• El cupón es personal e intransferible.
+• Solo puede usarse una vez.
+• Válido para una futura compra en Prin Epic.
+
+¡Gracias por apoyar a Prin Epic! 💯🔥`;
+}
+function openWhatsAppMessage(phone, message) {
+    const normalized = normalizePhoneForWhatsApp(phone);
+    const base = normalized ? `https://wa.me/${normalized}` : 'https://wa.me/';
+    window.open(`${base}?text=${encodeURIComponent(message)}`, '_blank');
+}
+function sendCouponInvitationWhatsApp(couponId) {
+    const coupon = coupons.find(item => item.id === couponId);
+    if (!coupon) return;
+    openWhatsAppMessage(coupon.customerPhone, buildCouponInvitationMessage(coupon));
+}
+function buildCouponWhatsAppMessage(coupon) {
+    return `¡Hola ${coupon.customerName || ''}! Tu cupón Prin Epic ya está activo 🎉
+
+Código: ${coupon.code}
+Descuento: ${coupon.discountPercent}%
+
+Aplica este código para acceder al descuento en tu próxima compra.
+
+Importante: es personal, intransferible y válido una sola vez.
+www.facebook.com/printepic494`;
+}
+function sendCouponWhatsApp(couponId) {
+    const coupon = coupons.find(item => item.id === couponId);
+    if (!coupon) return;
+    if (coupon.status !== 'active') {
+        showNotification('El cupón debe estar activo antes de enviarlo', 'warning');
+        return;
+    }
+    openWhatsAppMessage(coupon.customerPhone, buildCouponWhatsAppMessage(coupon));
+}
+function buildCouponArt(coupon) {
+    const logo = getTicketLogoSrc();
+    return `
+        <div class="coupon-art">
+            <div class="coupon-art-watermark">${logo ? `<img src="${logo}" alt="">` : ''}</div>
+            <div class="coupon-ticket">
+                <h2>CUPÓN</h2>
+                <h3>${coupon.discountPercent}%</h3>
+                <h2>DE DESCUENTO</h2>
+                <p>aplica este código para acceder al descuento en tu próxima compra:</p>
+                <div class="coupon-art-code">${ticketEscape(coupon.code)}</div>
+                <p class="coupon-art-small">${ticketEscape(coupon.customerName)} · ${getCouponStatusLabel(coupon.status)} · ${new Date(coupon.createdAt).toLocaleDateString('es-MX')}</p>
+                <p class="coupon-art-small">Personal e intransferible. Válido una sola vez.</p>
+            </div>
+            <div class="coupon-facebook">www.facebook.com/printepic494</div>
+        </div>
+    `;
+}
+async function downloadCouponImage(couponId) {
+    const coupon = coupons.find(item => item.id === couponId);
+    if (!coupon) return;
+    const host = document.createElement('div');
+    host.className = 'coupon-preview-stage';
+    host.innerHTML = buildCouponArt(coupon);
+    document.body.appendChild(host);
+    try {
+        const canvas = await html2canvas(host.querySelector('.coupon-art'), { scale: 3, backgroundColor: '#202124', useCORS: true, logging: false });
+        const link = document.createElement('a');
+        link.download = `cupon-${coupon.code}.png`;
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+        showNotification('Cupón descargado como imagen', 'success');
+    } catch (error) {
+        console.error(error);
+        showNotification('No se pudo descargar el cupón', 'error');
+    } finally {
+        host.remove();
+    }
+}
+function renderCoupons() {
+    const container = document.getElementById('coupons-container');
+    if (!container) return;
+    document.getElementById('coupon-active-count').textContent = coupons.filter(c => c.status === 'active').length;
+    document.getElementById('coupon-pending-count').textContent = coupons.filter(c => c.status === 'pending').length;
+    document.getElementById('coupon-used-count').textContent = coupons.filter(c => c.status === 'used' || c.used).length;
+    if (!coupons.length) {
+        container.innerHTML = '<div class="empty-state"><h3>No hay cupones generados</h3><p>Marca como entregado un pedido de 5 o más prendas para generar un cupón pendiente.</p></div>';
+        return;
+    }
+    container.innerHTML = coupons.map(coupon => {
+        const req = { ...getDefaultCouponRequirements(), ...(coupon.requirements || {}) };
+        const reqHtml = Object.entries(COUPON_REQUIREMENT_LABELS).map(([key, label]) => `
+            <label class="coupon-req"><input type="checkbox" ${req[key] ? 'checked' : ''} onchange="toggleCouponRequirement('${coupon.id}', '${key}', this.checked)"> ${label}</label>
+        `).join('');
+        return `
+            <article class="coupon-card">
+                <div class="coupon-card-header"><div><h3>${ticketEscape(coupon.customerName || 'Cliente')}</h3><p style="color:#64748b;">Pedido ${ticketEscape(coupon.orderId || '-')}</p></div><span class="status-badge ${coupon.status === 'active' ? 'status-completed' : coupon.status === 'used' ? 'status-production' : 'status-pending'}">${getCouponStatusLabel(coupon.status)}</span></div>
+                <div class="coupon-code-box">${ticketEscape(coupon.code)}</div>
+                <div class="coupon-meta">
+                    <div><strong>Descuento</strong>${coupon.discountPercent}%</div>
+                    <div><strong>Teléfono</strong>${ticketEscape(coupon.customerPhone || '-')}</div>
+                    <div><strong>Generado</strong>${new Date(coupon.createdAt).toLocaleDateString('es-MX')}</div>
+                    <div><strong>Usado</strong>${coupon.usedAt ? new Date(coupon.usedAt).toLocaleDateString('es-MX') : 'No'}</div>
+                </div>
+                <div class="coupon-requirements">${reqHtml}</div>
+                <div class="coupon-actions">
+                    <button class="btn btn-secondary btn-sm" onclick="copyCouponCode('${coupon.code}')">Copiar código</button>
+                    <button class="btn btn-info btn-sm" onclick="sendCouponInvitationWhatsApp('${coupon.id}')">Invitar WhatsApp</button>
+                    <button class="btn btn-success btn-sm" onclick="activateCoupon('${coupon.id}')">Activar</button>
+                    <button class="btn btn-primary btn-sm" onclick="downloadCouponImage('${coupon.id}')">Descargar cupón</button>
+                    <button class="btn btn-warning btn-sm" onclick="sendCouponWhatsApp('${coupon.id}')">Enviar cupón</button>
+                </div>
+            </article>
+        `;
+    }).join('');
 }
 function searchDashboard(q) { renderDashboard(); }
 
