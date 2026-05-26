@@ -269,6 +269,10 @@ tr:hover { background: linear-gradient(90deg, #f8fafc, #fafafa); }
 .coupon-requirements { display: grid; gap: 8px; margin: 14px 0; }
 .coupon-req { display: flex; align-items: center; gap: 9px; padding: 9px 10px; border: 1px solid #e2e8f0; border-radius: 10px; background: #f8fafc; font-size: 13px; }
 .coupon-req input { width: 17px; height: 17px; flex: 0 0 auto; }
+.coupon-message-box { margin: 14px 0; padding: 14px; border: 1px solid #dbe3ef; border-radius: 12px; background: #f8fafc; }
+.coupon-message-box h4 { margin: 0 0 8px; color: var(--dark); font-size: 14px; }
+.coupon-message-text { white-space: pre-wrap; overflow-wrap: anywhere; color: #334155; font-size: 13px; line-height: 1.55; max-height: 280px; overflow-y: auto; }
+.coupon-message-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
 .coupon-actions { display: flex; flex-wrap: wrap; gap: 8px; }
 .coupon-preview-stage { position: fixed; left: -9999px; top: 0; width: 420px; z-index: -1; }
 .coupon-art { width: 420px; min-height: 720px; background: #202124; color: #fff; position: relative; overflow: hidden; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 52px 34px 38px; font-family: 'Segoe UI', Arial, sans-serif; }
@@ -3101,8 +3105,32 @@ function activateCoupon(couponId) {
     showNotification('Cupón activado correctamente', 'success');
 }
 function copyCouponCode(code) {
-    navigator.clipboard?.writeText(code);
-    showNotification('Código copiado', 'success');
+    copyTextToClipboard(code, 'Código copiado');
+}
+function copyTextToClipboard(text, successMessage = 'Copiado correctamente') {
+    if (navigator.clipboard?.writeText) {
+        navigator.clipboard.writeText(text)
+            .then(() => showNotification(successMessage, 'success'))
+            .catch(() => fallbackCopyText(text, successMessage));
+        return;
+    }
+    fallbackCopyText(text, successMessage);
+}
+function fallbackCopyText(text, successMessage) {
+    const textarea = document.createElement('textarea');
+    textarea.value = text;
+    textarea.setAttribute('readonly', '');
+    textarea.style.position = 'fixed';
+    textarea.style.left = '-9999px';
+    document.body.appendChild(textarea);
+    textarea.select();
+    try {
+        document.execCommand('copy');
+        showNotification(successMessage, 'success');
+    } catch (error) {
+        showNotification('No se pudo copiar el texto', 'error');
+    }
+    document.body.removeChild(textarea);
 }
 function getCouponStatusLabel(status) {
     return ({ pending: 'Pendiente', active: 'Activo', used: 'Usado', expired: 'Vencido' })[status] || 'Pendiente';
@@ -3139,6 +3167,18 @@ function sendCouponInvitationWhatsApp(couponId) {
     const coupon = coupons.find(item => item.id === couponId);
     if (!coupon) return;
     openWhatsAppMessage(coupon.customerPhone, buildCouponInvitationMessage(coupon));
+}
+function showCouponInvitationMessage(couponId) {
+    const messageBox = document.getElementById(`coupon-invitation-${couponId}`);
+    if (!messageBox) return;
+    messageBox.hidden = false;
+    messageBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    showNotification('Mensaje de invitación generado', 'success');
+}
+function copyCouponInvitationMessage(couponId) {
+    const coupon = coupons.find(item => item.id === couponId);
+    if (!coupon) return;
+    copyTextToClipboard(buildCouponInvitationMessage(coupon), 'Mensaje copiado correctamente');
 }
 function buildCouponWhatsAppMessage(coupon) {
     return `¡Hola ${coupon.customerName || ''}! Tu cupón Prin Epic ya está activo 🎉
@@ -3293,10 +3333,17 @@ function renderCoupons() {
                     <div><strong>Usado</strong>${coupon.usedAt ? new Date(coupon.usedAt).toLocaleDateString('es-MX') : 'No'}</div>
                 </div>
                 <div class="coupon-requirements">${reqHtml}</div>
+                <div class="coupon-message-box" id="coupon-invitation-${ticketEscape(coupon.id)}" hidden>
+                    <h4>Mensaje de invitación</h4>
+                    <div class="coupon-message-text">${ticketEscape(buildCouponInvitationMessage(coupon))}</div>
+                    <div class="coupon-message-actions">
+                        <button class="btn btn-secondary btn-sm" onclick="copyCouponInvitationMessage('${coupon.id}')">Copiar mensaje</button>
+                    </div>
+                </div>
                 <div class="coupon-actions">
                     <button class="btn btn-secondary btn-sm" onclick="copyCouponCode('${coupon.code}')">Copiar código</button>
                     <button class="btn btn-secondary btn-sm" onclick="openEditCoupon('${coupon.id}')">Editar</button>
-                    <button class="btn btn-info btn-sm" onclick="sendCouponInvitationWhatsApp('${coupon.id}')">Invitar WhatsApp</button>
+                    <button class="btn btn-info btn-sm" onclick="showCouponInvitationMessage('${coupon.id}')">Generar mensaje</button>
                     <button class="btn btn-success btn-sm" onclick="activateCoupon('${coupon.id}')">Activar</button>
                     <button class="btn btn-primary btn-sm" onclick="downloadCouponImage('${coupon.id}')">Descargar cupón</button>
                     <button class="btn btn-warning btn-sm" onclick="sendCouponWhatsApp('${coupon.id}')">Enviar cupón</button>
