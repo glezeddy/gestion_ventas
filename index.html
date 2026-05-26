@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
 <meta charset="UTF-8">
@@ -614,7 +614,7 @@ Descargar Reporte Excel
 
 <div class="modal-overlay" id="orderDetailModal"><div class="modal"><div class="modal-header"><h2 id="detailOrderId">Pedido #</h2><button class="close-btn" onclick="closeModal('orderDetailModal')">&times;</button></div><div class="modal-body"><div id="orderDetailContent"></div></div><div class="modal-footer"><button class="btn btn-secondary" onclick="goHome()">Home</button><button class="btn btn-warning" onclick="markAsPaid()">Marcar como Saldado</button><button class="btn btn-secondary" onclick="printTicket()">Imprimir Ticket</button><button class="btn btn-info" onclick="downloadTicket()">Descargar Ticket</button><button class="btn btn-success" onclick="shareTicketWhatsApp()">Compartir WhatsApp</button><button class="btn btn-info" onclick="downloadProductList()">Lista Productos</button><button class="btn btn-primary" onclick="closeModal('orderDetailModal')">Cerrar</button></div></div></div>
 
-<div class="modal-overlay" id="editOrderModal"><div class="modal"><div class="modal-header"><h2>✏️ Editar Pedido</h2><button class="close-btn" onclick="closeModal('editOrderModal')">&times;</button></div><div class="modal-body"><form id="editOrderForm"><input type="hidden" id="editOrderId"><div class="form-grid"><div class="form-group full-width"><label>Nombre del Cliente</label><input type="text" id="editCustomerName" required></div><div class="form-group"><label>Fecha del Pedido</label><input type="date" id="editOrderDate" required></div><div class="form-group"><label>Técnica</label><select id="editTechnique"><option>DTF</option></select></div><div class="form-group full-width"><label>Estado</label><select id="editStatus"><option>En espera de Anticipo</option><option>Diseño Pendiente</option><option>En Producción</option><option>Listo para Entregar</option><option>Entregado</option></select></div></div><div class="form-group full-width"><label>Productos</label><div id="editProductsList"></div><button type="button" class="add-product-btn" onclick="addEditProductRow()">+ Agregar Producto</button></div><div class="form-group full-width"><div class="price-display"><div><div class="label">Subtotal</div><div class="value" id="editDisplaySubtotal">$0</div></div><div><div class="label">Descuento Cupón</div><div class="value" id="editDisplayCouponDiscount">$0</div></div><div><div class="label">Total</div><div class="value" id="editDisplayTotal">$0</div></div><div><div class="label">Saldo restante</div><div class="value" id="editDisplayRemaining">$0</div></div></div></div><div class="form-grid"><div class="form-group"><label>Anticipo recibido ($)</label><input type="number" id="editAdvance" min="0" step="0.01" value="0" onchange="calculateEditPrices()" oninput="calculateEditPrices()"></div><div class="form-group"><label>Costo camiseta por pieza</label><input type="number" id="editShirtCost" min="0" step="0.01" value="0"></div><div class="form-group"><label>Costo DTF total</label><input type="number" id="editDtfCost" min="0" step="0.01" value="0"></div><div class="form-group"><label>Otros gastos</label><input type="number" id="editExtraCost" min="0" step="0.01" value="0"></div></div></form></div><div class="modal-footer"><button class="btn btn-secondary" onclick="goHome()">Home</button><button class="btn btn-secondary" onclick="closeModal('editOrderModal')">Cancelar</button><button class="btn btn-primary" onclick="saveEditOrder()">Guardar Cambios</button></div></div></div>
+<div class="modal-overlay" id="editOrderModal"><div class="modal"><div class="modal-header"><h2>✏️ Editar Pedido</h2><button class="close-btn" onclick="closeModal('editOrderModal')">&times;</button></div><div class="modal-body"><form id="editOrderForm"><input type="hidden" id="editOrderId"><div class="form-grid"><div class="form-group full-width"><label>Nombre del Cliente</label><input type="text" id="editCustomerName" required></div><div class="form-group"><label>Fecha del Pedido</label><input type="date" id="editOrderDate" required></div><div class="form-group"><label>Técnica</label><select id="editTechnique"><option>DTF</option></select></div><div class="form-group full-width"><label>Estado</label><select id="editStatus"><option>En espera de Anticipo</option><option>Diseño Pendiente</option><option>En Producción</option><option>Listo para Entregar</option><option>Entregado</option></select></div></div><div class="form-group full-width"><label>Productos</label><div id="editProductsList"></div><button type="button" class="add-product-btn" onclick="addEditProductRow()">+ Agregar Producto</button></div><div class="form-group full-width"><div class="price-display"><div><div class="label">Subtotal</div><div class="value" id="editDisplaySubtotal">$0</div></div><div><div class="label">Descuento Cupón</div><div class="value" id="editDisplayCouponDiscount">$0</div></div><div><div class="label">Total</div><div class="value" id="editDisplayTotal">$0</div></div><div><div class="label">Saldo restante</div><div class="value" id="editDisplayRemaining">$0</div></div></div></div><div class="form-grid"><div class="form-group"><label>Anticipo recibido ($)</label><input type="number" id="editAdvance" min="0" step="0.01" value="0" onchange="calculateEditPrices()" oninput="calculateEditPrices()"></div><div class="form-group"><label>Costo camiseta por pieza</label><input type="number" id="editShirtCost" min="0" step="0.01" value="0"></div><div class="form-group"><label>Costo camiseta niño por pieza</label><input type="number" id="editShirtCostKids" min="0" step="0.01" value="0"></div><div class="form-group"><label>Costo DTF total</label><input type="number" id="editDtfCost" min="0" step="0.01" value="0"></div><div class="form-group"><label>Otros gastos</label><input type="number" id="editExtraCost" min="0" step="0.01" value="0"></div></div></form></div><div class="modal-footer"><button class="btn btn-secondary" onclick="goHome()">Home</button><button class="btn btn-secondary" onclick="closeModal('editOrderModal')">Cancelar</button><button class="btn btn-primary" onclick="saveEditOrder()">Guardar Cambios</button></div></div></div>
 
 <div class="modal-overlay" id="newCustomerModal"><div class="modal"><div class="modal-header"><h2>Nuevo Cliente</h2><button class="close-btn" onclick="closeModal('newCustomerModal')">&times;</button></div><div class="modal-body"><form id="customerForm"><div class="form-group"><label>Nombre</label><input type="text" id="customerName" required></div><div class="form-group"><label>Teléfono WhatsApp</label><input type="tel" id="customerPhone" placeholder="Ej. 6641234567"></div><div class="form-group"><label>Email</label><input type="email" id="customerEmail"></div></form></div><div class="modal-footer"><button class="btn btn-secondary" onclick="goHome()">Home</button><button class="btn btn-secondary" onclick="closeModal('newCustomerModal')">Cancelar</button><button class="btn btn-primary" onclick="saveCustomer()">Guardar</button></div></div></div>
 
@@ -673,6 +673,8 @@ const TEST_CUSTOMER_PREFIX = 'Cliente TEST';
 const TEST_COUPON_PREFIX = 'TEST100-';
 const COUPON_FIXED_AMOUNT = 100;
 const COUPON_MIN_PURCHASE = 600;
+let warnedMissingCouponTable = false;
+let warnedMissingOrderColumns = false;
 
 // Paleta de colores (simplificada para mantener funcionalidad)
 const eurocottonColors = {
@@ -820,9 +822,12 @@ function sanitizeOrder(order) {
     const advance = Math.min(total, Math.max(0, Number(order.advance) || 0));
     const remaining = Math.max(0, total - advance);
     const shirtCost = Math.max(0, Number(order.shirtCost) || 0);
+    const shirtCostKids = Math.max(0, Number(order.shirtCostKids) || Number(order.kidsShirtCost) || 0);
     const dtfCost = Math.max(0, Number(order.dtfCost) || 0);
     const extraCosts = Math.max(0, Number(order.extraCosts) || Number(order.extraCost) || 0);
-    const costTotal = Math.max(0, Number(order.costTotal) || ((shirtCost * totalQty) + dtfCost + extraCosts));
+    const adultQty = products.reduce((sum, product) => sum + (/niño|nino/i.test(product.type) ? 0 : product.qty), 0);
+    const kidsQty = products.reduce((sum, product) => sum + (/niño|nino/i.test(product.type) ? product.qty : 0), 0);
+    const costTotal = Math.max(0, Number(order.costTotal) || ((shirtCost * adultQty) + (shirtCostKids * kidsQty) + dtfCost + extraCosts));
     const parsedNetProfit = Number(order.netProfit);
     return {
         id,
@@ -842,6 +847,7 @@ function sanitizeOrder(order) {
         status: order.status || 'En espera de Anticipo',
         paid: Boolean(order.paid || advance >= total),
         shirtCost,
+        shirtCostKids,
         dtfCost,
         extraCosts,
         costTotal,
@@ -982,6 +988,15 @@ function loadData(options = {}) {
     }
     return { loaded: true, unavailable: false };
 }
+function readStoredCouponsFallback() {
+    if (!canUseLocalStorage()) return coupons;
+    try {
+        const savedCoupons = localStorage.getItem(STORAGE_KEYS.coupons);
+        return savedCoupons ? JSON.parse(savedCoupons) : [];
+    } catch (error) {
+        return coupons;
+    }
+}
 function saveOrdersToStorage() {
     saveData({ notify: true });
 }
@@ -1014,6 +1029,34 @@ function toDbOrder(order) {
     return {
         id: order.id,
         customer_name: order.customerName,
+        customer_phone: order.customerPhone || '',
+        order_date: order.date,
+        technique: order.technique,
+        status: order.status,
+        subtotal: Number(order.subtotal) || Number(order.total) || 0,
+        coupon_code: order.couponCode || '',
+        coupon_id: order.couponId || '',
+        coupon_discount: Number(order.couponDiscount) || 0,
+        total: Number(order.total) || 0,
+        total_qty: Number(order.totalQty) || 0,
+        advance: Number(order.advance) || 0,
+        remaining: Number(order.remaining) || 0,
+        paid: Boolean(order.paid),
+        shirt_cost: Number(order.shirtCost) || 0,
+        shirt_cost_kids: Number(order.shirtCostKids) || 0,
+        dtf_cost: Number(order.dtfCost) || 0,
+        extra_costs: Number(order.extraCosts) || 0,
+        cost_total: Number(order.costTotal) || 0,
+        net_profit: Number(order.netProfit) || 0,
+        mockup: order.mockup || null,
+        design_image: order.designImage || null,
+        updated_at: new Date().toISOString()
+    };
+}
+function toLegacyDbOrder(order) {
+    return {
+        id: order.id,
+        customer_name: order.customerName,
         order_date: order.date,
         technique: order.technique,
         status: order.status,
@@ -1041,6 +1084,19 @@ function toDbOrderItems(order) {
         size: product.size,
         qty: Number(product.qty) || 0,
         price: Number(product.price) || 0,
+        custom_price: Boolean(product.customPrice || product.priceMode === 'custom'),
+        line_total: (Number(product.qty) || 0) * (Number(product.price) || 0)
+    }));
+}
+function toLegacyDbOrderItems(order) {
+    return (order.products || []).map(product => ({
+        order_id: order.id,
+        type: product.type,
+        gender: product.gender,
+        color: product.color,
+        size: product.size,
+        qty: Number(product.qty) || 0,
+        price: Number(product.price) || 0,
         line_total: (Number(product.qty) || 0) * (Number(product.price) || 0)
     }));
 }
@@ -1048,6 +1104,7 @@ function fromDbOrder(row, items = []) {
     return sanitizeOrder({
         id: row.id,
         customerName: row.customer_name,
+        customerPhone: row.customer_phone || row.phone || '',
         date: row.order_date,
         products: items.map(item => ({
             type: item.type,
@@ -1055,9 +1112,14 @@ function fromDbOrder(row, items = []) {
             color: item.color,
             size: item.size,
             qty: Number(item.qty) || 0,
-            price: Number(item.price) || 0
+            price: Number(item.price) || 0,
+            customPrice: Boolean(item.custom_price)
         })),
         technique: row.technique,
+        subtotal: Number(row.subtotal) || 0,
+        couponCode: row.coupon_code || '',
+        couponId: row.coupon_id || '',
+        couponDiscount: Number(row.coupon_discount) || 0,
         total: Number(row.total) || 0,
         totalQty: Number(row.total_qty) || 0,
         advance: Number(row.advance) || 0,
@@ -1065,6 +1127,7 @@ function fromDbOrder(row, items = []) {
         status: row.status,
         paid: Boolean(row.paid),
         shirtCost: Number(row.shirt_cost) || 0,
+        shirtCostKids: Number(row.shirt_cost_kids) || 0,
         dtfCost: Number(row.dtf_cost) || 0,
         extraCosts: Number(row.extra_costs) || 0,
         costTotal: Number(row.cost_total) || 0,
@@ -1073,12 +1136,120 @@ function fromDbOrder(row, items = []) {
         designImage: row.design_image
     });
 }
+function toDbCoupon(coupon) {
+    const normalized = sanitizeCoupon(coupon);
+    if (!normalized) return null;
+    return {
+        id: normalized.id,
+        code: normalized.code,
+        customer_name: normalized.customerName,
+        customer_phone: normalized.customerPhone,
+        order_id: normalized.orderId,
+        discount_type: 'fixed',
+        discount_amount: getCouponAmount(normalized),
+        min_purchase: getCouponMinimum(normalized),
+        not_stackable_with_wholesale: normalized.notStackableWithWholesale !== false,
+        status: normalized.status,
+        created_at: normalized.createdAt,
+        used_at: normalized.usedAt,
+        used_order_id: normalized.usedOrderId || null,
+        used: Boolean(normalized.used || normalized.status === 'used'),
+        requirements: normalized.requirements || getDefaultCouponRequirements(),
+        updated_at: new Date().toISOString()
+    };
+}
+function fromDbCoupon(row) {
+    return sanitizeCoupon({
+        id: row.id,
+        code: row.code,
+        customerName: row.customer_name,
+        customerPhone: row.customer_phone,
+        orderId: row.order_id,
+        discountType: row.discount_type,
+        discountAmount: row.discount_amount,
+        minPurchase: row.min_purchase,
+        notStackableWithWholesale: row.not_stackable_with_wholesale,
+        status: row.status,
+        createdAt: row.created_at,
+        usedAt: row.used_at,
+        usedOrderId: row.used_order_id,
+        used: row.used,
+        requirements: row.requirements
+    });
+}
+function mergeCoupons(...couponLists) {
+    const merged = new Map();
+    couponLists.flat().map(sanitizeCoupon).filter(Boolean).forEach(coupon => {
+        const key = coupon.id || coupon.code;
+        const existing = merged.get(key);
+        if (!existing) {
+            merged.set(key, coupon);
+            return;
+        }
+        const combined = { ...existing, ...coupon };
+        if (existing.used || coupon.used || existing.status === 'used' || coupon.status === 'used') {
+            combined.used = true;
+            combined.status = 'used';
+            combined.usedAt = coupon.usedAt || existing.usedAt || new Date().toISOString();
+            combined.usedOrderId = coupon.usedOrderId || existing.usedOrderId || '';
+        }
+        combined.requirements = { ...getDefaultCouponRequirements(), ...(existing.requirements || {}), ...(coupon.requirements || {}) };
+        merged.set(key, sanitizeCoupon(combined));
+    });
+    return Array.from(merged.values());
+}
+async function loadCouponsFromDatabase() {
+    if (!isSupabaseReady()) return [];
+    const { data, error } = await supabaseClient
+        .from('coupons')
+        .select('*')
+        .order('created_at', { ascending: false });
+    if (error) {
+        if (!warnedMissingCouponTable) {
+            console.warn('No se pudieron cargar cupones desde Supabase. Se usará respaldo local.', error);
+            warnedMissingCouponTable = true;
+        }
+        return [];
+    }
+    return (data || []).map(fromDbCoupon).filter(Boolean);
+}
+async function persistCouponToDatabase(coupon) {
+    if (!isSupabaseReady()) return { saved: false, skipped: true };
+    const payload = toDbCoupon(coupon);
+    if (!payload) return { saved: false, skipped: true };
+    const { error } = await supabaseClient.from('coupons').upsert(payload);
+    if (error) {
+        if (!warnedMissingCouponTable) {
+            console.warn('No se pudo guardar el cupón en Supabase. Se conserva en localStorage.', error);
+            warnedMissingCouponTable = true;
+        }
+        return { saved: false, fallback: true };
+    }
+    return { saved: true };
+}
+async function persistCouponsToDatabase(couponList = coupons) {
+    if (!isSupabaseReady()) return;
+    await Promise.all((Array.isArray(couponList) ? couponList : []).map(coupon => persistCouponToDatabase(coupon)));
+}
+async function deleteAllCouponsFromDatabase() {
+    if (!isSupabaseReady()) return { deleted: false, skipped: true };
+    const { error } = await supabaseClient.from('coupons').delete().neq('id', '');
+    if (error) {
+        if (!warnedMissingCouponTable) {
+            console.warn('No se pudieron borrar cupones en Supabase. Se limpió el respaldo local.', error);
+            warnedMissingCouponTable = true;
+        }
+        return { deleted: false, fallback: true };
+    }
+    return { deleted: true };
+}
 async function loadDataFromDatabase(options = {}) {
     const { notify = false } = options;
     if (!isSupabaseReady()) {
         loadData(options);
         return { loaded: false, fallback: true };
     }
+    const localCoupons = readStoredCouponsFallback();
     const { data: orderRows, error: ordersError } = await supabaseClient
         .from('orders')
         .select('*')
@@ -1102,6 +1273,9 @@ async function loadDataFromDatabase(options = {}) {
         return map;
     }, {});
     orders = (orderRows || []).map(order => fromDbOrder(order, itemsByOrder[order.id] || [])).filter(Boolean);
+    const dbCoupons = await loadCouponsFromDatabase();
+    coupons = mergeCoupons(dbCoupons, localCoupons);
+    persistCouponsToDatabase(coupons).catch(console.error);
     syncCustomersFromOrders();
     saveData();
     renderAll();
@@ -1111,13 +1285,27 @@ async function loadDataFromDatabase(options = {}) {
 async function persistOrderToDatabase(order) {
     if (!isSupabaseReady()) return { saved: false, skipped: true };
     const { error: orderError } = await supabaseClient.from('orders').upsert(toDbOrder(order));
-    if (orderError) throw orderError;
+    if (orderError) {
+        const { error: legacyError } = await supabaseClient.from('orders').upsert(toLegacyDbOrder(order));
+        if (legacyError) throw legacyError;
+        if (!warnedMissingOrderColumns) {
+            console.warn('Supabase no tiene todavía las columnas nuevas de pedidos. Se guardó el pedido con el esquema anterior.', orderError);
+            warnedMissingOrderColumns = true;
+        }
+    }
     const { error: deleteItemsError } = await supabaseClient.from('order_items').delete().eq('order_id', order.id);
     if (deleteItemsError) throw deleteItemsError;
     const items = toDbOrderItems(order);
     if (items.length) {
         const { error: itemsError } = await supabaseClient.from('order_items').insert(items);
-        if (itemsError) throw itemsError;
+        if (itemsError) {
+            const { error: legacyItemsError } = await supabaseClient.from('order_items').insert(toLegacyDbOrderItems(order));
+            if (legacyItemsError) throw legacyItemsError;
+            if (!warnedMissingOrderColumns) {
+                console.warn('Supabase no tiene todavía la columna custom_price en order_items. Se guardaron productos con el esquema anterior.', itemsError);
+                warnedMissingOrderColumns = true;
+            }
+        }
     }
     return { saved: true };
 }
@@ -1368,16 +1556,25 @@ function calculatePrices() {
     if (advanceInput && (parseInt(advanceInput.value) || 0) === 0) advanceInput.value = advance70;
     return { totalQty, subtotal, couponDiscount, total, advance70, couponValidation };
 }
-function calculateOrderCosts(totalQty, shirtCost, dtfCost, extraCost) {
+function calculateOrderCosts(totalQty, shirtCost, dtfCost, extraCost, shirtCostKids = 0, products = []) {
     const qty = Number(totalQty) || 0;
     const shirtUnitCost = Number(shirtCost) || 0;
+    const kidsShirtUnitCost = Number(shirtCostKids) || 0;
     const dtfTotalCost = Number(dtfCost) || 0;
     const extraTotalCost = Number(extraCost) || 0;
-    const shirtsTotal = shirtUnitCost * qty;
+    const productList = Array.isArray(products) ? products : [];
+    const kidsQty = productList.length
+        ? productList.reduce((sum, product) => sum + (/niño|nino/i.test(product.type) ? (Number(product.qty) || 0) : 0), 0)
+        : 0;
+    const adultQty = productList.length ? Math.max(0, qty - kidsQty) : qty;
+    const shirtsTotal = (shirtUnitCost * adultQty) + (kidsShirtUnitCost * kidsQty);
     const costTotal = shirtsTotal + dtfTotalCost + extraTotalCost;
     return {
         totalQty: qty,
         shirtUnitCost,
+        kidsShirtUnitCost,
+        adultQty,
+        kidsQty,
         shirtsTotal,
         dtfTotalCost,
         extraTotalCost,
@@ -1534,9 +1731,10 @@ async function saveOrder() {
     const total = Math.max(0, subtotal - couponDiscount);
     const totalQty = products.reduce((sum, product) => sum + product.qty, 0);
     const shirtCost = parseFloat(document.getElementById('orderShirtCost').value) || 0;
+    const shirtCostKids = parseFloat(document.getElementById('orderShirtCostKids').value) || 0;
     const dtfCost = parseFloat(document.getElementById('orderDtfCost').value) || 0;
     const extraCost = parseFloat(document.getElementById('orderExtraCost').value) || 0;
-    const orderCosts = calculateOrderCosts(totalQty, shirtCost, dtfCost, extraCost);
+    const orderCosts = calculateOrderCosts(totalQty, shirtCost, dtfCost, extraCost, shirtCostKids, products);
     let advance = parseFloat(document.getElementById('orderAdvance').value) || 0;
     if (advance > total) advance = total;
     const orderId = generateOrderId();
@@ -1560,6 +1758,7 @@ async function saveOrder() {
         status,
         paid: advance >= total,
         shirtCost,
+        shirtCostKids,
         dtfCost,
         extraCosts: extraCost,
         costTotal: orderCosts.costTotal,
@@ -1604,6 +1803,8 @@ function openEditOrderModal(orderId) {
     document.getElementById('editStatus').value = order.status;
     document.getElementById('editAdvance').value = order.advance || 0;
     document.getElementById('editShirtCost').value = order.shirtCost || 0;
+    const editShirtCostKids = document.getElementById('editShirtCostKids');
+    if (editShirtCostKids) editShirtCostKids.value = order.shirtCostKids || 0;
     document.getElementById('editDtfCost').value = order.dtfCost || 0;
     document.getElementById('editExtraCost').value = order.extraCosts || 0;
     const productsContainer = document.getElementById('editProductsList');
@@ -1800,9 +2001,10 @@ async function saveEditOrder() {
     }
     const totalQty = products.reduce((sum, product) => sum + product.qty, 0);
     const shirtCost = parseFloat(document.getElementById('editShirtCost').value) || 0;
+    const shirtCostKids = parseFloat(document.getElementById('editShirtCostKids') ? document.getElementById('editShirtCostKids').value : 0) || 0;
     const dtfCost = parseFloat(document.getElementById('editDtfCost').value) || 0;
     const extraCost = parseFloat(document.getElementById('editExtraCost').value) || 0;
-    const orderCosts = calculateOrderCosts(totalQty, shirtCost, dtfCost, extraCost);
+    const orderCosts = calculateOrderCosts(totalQty, shirtCost, dtfCost, extraCost, shirtCostKids, products);
     const orderIndex = orders.findIndex(order => order.id === orderId);
     if (orderIndex === -1) {
         showNotification('Pedido no encontrado', 'error');
@@ -1828,6 +2030,7 @@ async function saveEditOrder() {
         remaining: editTotals.total - advance,
         paid: advance >= editTotals.total,
         shirtCost,
+        shirtCostKids,
         dtfCost,
         extraCosts: extraCost,
         costTotal: orderCosts.costTotal,
@@ -1842,8 +2045,9 @@ async function saveEditOrder() {
         showNotification('❌ No se pudieron guardar los cambios en Supabase.', 'error');
         return;
     }
-    const saveResult = saveData();
     if (updatedOrder.status === 'Entregado') maybeCreateCouponFromOrder(updatedOrder);
+    const saveResult = saveData();
+    persistCouponsToDatabase().catch(console.error);
     if (!saveResult.saved) {
         showNotification('Pedido actualizado en Supabase. No se pudo actualizar el respaldo local.', 'warning');
     }
@@ -3171,6 +3375,8 @@ function maybeCreateCouponFromOrder(order) {
         used: false
     });
     coupons.unshift(coupon);
+    saveData();
+    persistCouponToDatabase(coupon).catch(console.error);
     showNotification('Cupón pendiente generado para este cliente', 'success');
     return coupon;
 }
@@ -3227,6 +3433,8 @@ function markCouponAsUsed(couponId, orderId) {
     coupon.used = true;
     coupon.usedAt = new Date().toISOString();
     coupon.usedOrderId = orderId;
+    saveData();
+    persistCouponToDatabase(coupon).catch(console.error);
 }
 function toggleCouponRequirement(couponId, requirementKey, checked) {
     const coupon = coupons.find(item => item.id === couponId);
@@ -3235,6 +3443,7 @@ function toggleCouponRequirement(couponId, requirementKey, checked) {
     coupon.requirements[requirementKey] = Boolean(checked);
     if (coupon.status === 'active' && !Object.values(coupon.requirements).every(Boolean)) coupon.status = 'pending';
     saveData();
+    persistCouponToDatabase(coupon).catch(console.error);
     renderCoupons();
 }
 function activateCoupon(couponId) {
@@ -3247,6 +3456,7 @@ function activateCoupon(couponId) {
     }
     coupon.status = 'active';
     saveData();
+    persistCouponToDatabase(coupon).catch(console.error);
     renderCoupons();
     showNotification('Cupón activado correctamente', 'success');
 }
@@ -3445,6 +3655,7 @@ function saveCouponEdit() {
 
     editingCouponId = null;
     saveData();
+    persistCouponToDatabase(coupon).catch(console.error);
     closeModal('editCouponModal');
     renderCoupons();
     showNotification('Cupón actualizado correctamente', 'success');
@@ -3460,6 +3671,7 @@ function clearAllCoupons() {
     currentCouponForOrder = null;
     editingCouponId = null;
     saveData();
+    deleteAllCouponsFromDatabase().catch(console.error);
     renderCoupons();
     showNotification('Todos los cupones fueron borrados', 'success');
 }
