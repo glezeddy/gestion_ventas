@@ -487,6 +487,8 @@ Descargar Reporte Excel
 <div class="header-actions">
 <button class="btn btn-secondary" onclick="loadOrdersFromStorage()"><svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>Cargar Pedidos</button>
 <button class="btn btn-info" onclick="saveOrdersToStorage()"><svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/></svg>Guardar Pedidos</button>
+<button class="btn btn-warning" onclick="seedTestData()">Cargar datos TEST</button>
+<button class="btn btn-danger" onclick="deleteTestData()">Eliminar datos TEST</button>
 <button class="btn btn-primary" onclick="openNewOrderModal()"><svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg>Nuevo Pedido</button>
 </div>
 </div>
@@ -652,6 +654,9 @@ const STORAGE_KEYS = { orders: 'estampados_orders', customers: 'estampados_custo
 const SUPABASE_URL = 'https://caubwxywjiuzrevdbnlt.supabase.co';
 const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_y9VdK2iRlUx7Wu9NFQJlJg_M5Ehe38N';
 const supabaseClient = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY) : null;
+const TEST_DATA_PREFIX = 'TEST-';
+const TEST_CUSTOMER_PREFIX = 'Cliente TEST';
+const TEST_COUPON_PREFIX = 'TEST10-';
 
 // Paleta de colores (simplificada para mantener funcionalidad)
 const eurocottonColors = {
@@ -2691,6 +2696,156 @@ function clearAllData() {
         renderAll();
         showNotification('Todos los datos han sido eliminados', 'warning');
     }
+}
+function isTestOrder(order) {
+    return String(order && order.id || '').startsWith(TEST_DATA_PREFIX) ||
+        String(order && order.customerName || '').includes('TEST');
+}
+function isTestCustomer(customer) {
+    return String(customer && customer.name || '').includes('TEST');
+}
+function isTestCoupon(coupon) {
+    return String(coupon && coupon.code || '').startsWith(TEST_COUPON_PREFIX) ||
+        String(coupon && coupon.customerName || '').includes('TEST') ||
+        String(coupon && coupon.orderId || '').startsWith(TEST_DATA_PREFIX);
+}
+function priceProductsForTest(products) {
+    const totalsByType = products.reduce((map, product) => {
+        const type = normalizeProductType(product.type);
+        map[type] = (map[type] || 0) + (Number(product.qty) || 0);
+        return map;
+    }, {});
+    return products.map(product => {
+        const type = normalizeProductType(product.type);
+        return {
+            type,
+            gender: product.gender || 'Caballero',
+            color: product.color || 'Blanco',
+            size: product.size || 'M',
+            qty: Number(product.qty) || 1,
+            price: getUnitPrice(type, totalsByType[type] || product.qty || 1),
+            customPrice: false
+        };
+    });
+}
+function buildTestOrder(config) {
+    const products = priceProductsForTest(config.products);
+    const subtotal = products.reduce((sum, product) => sum + (product.qty * product.price), 0);
+    const couponDiscount = config.couponCode ? Math.round(subtotal * 0.1) : 0;
+    const total = Math.max(0, subtotal - couponDiscount);
+    const advance = config.paid ? total : Math.min(total, Math.max(0, Math.round(total * (config.advanceRate ?? 0.7))));
+    const totalQty = products.reduce((sum, product) => sum + product.qty, 0);
+    const shirtCost = Number(config.shirtCost) || 100;
+    const dtfCost = Number(config.dtfCost) || Math.round(totalQty * 35);
+    const extraCosts = Number(config.extraCosts) || 0;
+    const orderCosts = calculateOrderCosts(totalQty, shirtCost, dtfCost, extraCosts);
+
+    return sanitizeOrder({
+        id: config.id,
+        customerName: config.customerName,
+        customerPhone: config.customerPhone,
+        date: config.date || new Date().toISOString().split('T')[0],
+        products,
+        technique: 'DTF',
+        subtotal,
+        couponCode: config.couponCode || '',
+        couponId: config.couponId || '',
+        couponDiscount,
+        total,
+        totalQty,
+        advance,
+        remaining: total - advance,
+        status: config.status,
+        paid: Boolean(config.paid || advance >= total),
+        shirtCost,
+        dtfCost,
+        extraCosts,
+        costTotal: orderCosts.costTotal,
+        netProfit: total - orderCosts.costTotal,
+        mockup: null,
+        designImage: null
+    });
+}
+function buildTestOrders() {
+    const today = new Date().toISOString().split('T')[0];
+    return [
+        buildTestOrder({ id: 'TEST-001', customerName: 'Cliente TEST 01', customerPhone: '+5216640000001', status: 'En espera de Anticipo', advanceRate: 0, products: [{ type: 'Playera Básica', qty: 1, color: 'Blanco', size: 'M' }], date: today }),
+        buildTestOrder({ id: 'TEST-002', customerName: 'Cliente TEST 02', customerPhone: '+5216640000002', status: 'Diseño Pendiente', advanceRate: 0.5, products: [{ type: 'Playera Básica', qty: 5, color: 'Negro', size: 'L' }], date: today }),
+        buildTestOrder({ id: 'TEST-003', customerName: 'Cliente TEST 03', customerPhone: '+5216640000003', status: 'En Producción', advanceRate: 0.7, products: [{ type: 'Playera Básica', qty: 6, color: 'Botella', size: 'M' }], date: today }),
+        buildTestOrder({ id: 'TEST-004', customerName: 'Cliente TEST 04', customerPhone: '+5216640000004', status: 'Listo para Entregar', advanceRate: 0.4, products: [{ type: 'Playera Básica', qty: 11, color: 'Marino', size: 'XL' }], date: today }),
+        buildTestOrder({ id: 'TEST-005', customerName: 'Cliente TEST 05', customerPhone: '+5216640000005', status: 'Entregado', paid: false, advanceRate: 0.7, couponCode: 'TEST10-APLICADO', couponId: 'TEST-CP-APLICADO', products: [{ type: 'Playera Básica', qty: 12, color: 'Rojo', size: 'M' }], date: today }),
+        buildTestOrder({ id: 'TEST-006', customerName: 'Cliente TEST 06', customerPhone: '+5216640000006', status: 'Entregado', paid: true, products: [{ type: 'Playera Básica', qty: 24, color: 'Oxford', size: 'L' }], date: today }),
+        buildTestOrder({ id: 'TEST-007', customerName: 'Cliente TEST 07', customerPhone: '+5216640000007', status: 'Entregado', advanceRate: 0.8, products: [{ type: 'Playera Básica', qty: 50, color: 'Negro', size: 'XL' }], date: today }),
+        buildTestOrder({ id: 'TEST-008', customerName: 'Cliente TEST 08', customerPhone: '+5216640000008', status: 'En Producción', advanceRate: 0.5, products: [{ type: 'Camiseta tipo Polo', qty: 6, color: 'Blanco', size: 'L' }], date: today }),
+        buildTestOrder({ id: 'TEST-009', customerName: 'Cliente TEST 09', customerPhone: '+5216640000009', status: 'Entregado', advanceRate: 0.7, products: [{ type: 'Hoodie', qty: 6, color: 'Negro', size: 'XL' }], date: today }),
+        buildTestOrder({ id: 'TEST-010', customerName: 'Cliente TEST 10', customerPhone: '+5216640000010', status: 'Cancelado', advanceRate: 0, products: [{ type: 'Sudadera', qty: 5, color: 'Oxford', size: 'M' }], date: today }),
+        buildTestOrder({ id: 'TEST-011', customerName: 'Cliente TEST 11', customerPhone: '+5216640000011', status: 'Entregado', paid: true, couponCode: 'TEST10-USADO', couponId: 'TEST-CP-USADO', products: [{ type: 'Dry Fit', qty: 12, color: 'Rey/Royal Blue', size: 'L' }], date: today }),
+        buildTestOrder({ id: 'TEST-012', customerName: 'Cliente TEST 12', customerPhone: '+5216640000012', status: 'En espera de Anticipo', advanceRate: 0.3, products: [{ type: 'Playera Básica', qty: 3, color: 'Blanco', size: 'M' }, { type: 'Playera Básica', qty: 3, color: 'Negro', size: 'L' }, { type: 'Polo Niño', qty: 6, color: 'Marino', size: 'S' }], date: today })
+    ].filter(Boolean);
+}
+function buildTestCoupons() {
+    return [
+        sanitizeCoupon({ id: 'TEST-CP-APLICADO', code: 'TEST10-APLICADO', customerName: 'Cliente TEST 05', customerPhone: '+5216640000005', orderId: 'TEST-005', discountPercent: 10, status: 'used', used: true, usedAt: new Date().toISOString(), usedOrderId: 'TEST-005', requirements: getDefaultCouponRequirements() }),
+        sanitizeCoupon({ id: 'TEST-CP-USADO', code: 'TEST10-USADO', customerName: 'Cliente TEST 11', customerPhone: '+5216640000011', orderId: 'TEST-011', discountPercent: 10, status: 'used', used: true, usedAt: new Date().toISOString(), usedOrderId: 'TEST-011', requirements: getDefaultCouponRequirements() }),
+        sanitizeCoupon({ id: 'TEST-CP-ACTIVO', code: 'TEST10-ACTIVO', customerName: 'Cliente TEST 12', customerPhone: '+5216640000012', orderId: 'TEST-012', discountPercent: 10, status: 'active', used: false, requirements: Object.fromEntries(Object.keys(getDefaultCouponRequirements()).map(key => [key, true])) }),
+        sanitizeCoupon({ id: 'TEST-CP-PENDIENTE', code: 'TEST10-PENDIENTE', customerName: 'Cliente TEST 03', customerPhone: '+5216640000003', orderId: 'TEST-003', discountPercent: 10, status: 'pending', used: false, requirements: getDefaultCouponRequirements() })
+    ].filter(Boolean);
+}
+async function removeTestData(options = {}) {
+    const { ask = true, notify = true } = options;
+    const testOrders = orders.filter(isTestOrder);
+    const testCoupons = coupons.filter(isTestCoupon);
+    const testCustomers = customers.filter(isTestCustomer);
+    if (ask && !testOrders.length && !testCoupons.length && !testCustomers.length) {
+        showNotification('No hay datos TEST para eliminar', 'info');
+        return { removed: 0 };
+    }
+    if (ask && !confirm(`Eliminar ${testOrders.length} pedido(s), ${testCustomers.length} cliente(s) y ${testCoupons.length} cupón(es) TEST?`)) return { removed: 0, cancelled: true };
+
+    for (const order of testOrders) {
+        try {
+            await deleteOrderFromDatabase(order.id);
+        } catch (error) {
+            console.warn('No se pudo eliminar pedido TEST en Supabase:', order.id, error);
+        }
+    }
+    orders = orders.filter(order => !isTestOrder(order));
+    customers = customers.filter(customer => !isTestCustomer(customer));
+    coupons = coupons.filter(coupon => !isTestCoupon(coupon));
+    saveData();
+    renderAll();
+    if (notify) showNotification('Datos TEST eliminados', 'success');
+    return { removed: testOrders.length };
+}
+async function seedTestData() {
+    if (!confirm('Esto cargará clientes, pedidos y cupones TEST identificados claramente. ¿Continuar?')) return;
+    await removeTestData({ ask: false, notify: false });
+    const testOrders = buildTestOrders();
+    const testCoupons = buildTestCoupons();
+    const persisted = [];
+    try {
+        for (const order of testOrders) {
+            await persistOrderToDatabase(order);
+            persisted.push(order.id);
+        }
+    } catch (error) {
+        console.error(error);
+        for (const orderId of persisted) {
+            try { await deleteOrderFromDatabase(orderId); } catch (cleanupError) { console.warn(cleanupError); }
+        }
+        showNotification('No se pudieron guardar los datos TEST en Supabase.', 'error');
+        return;
+    }
+    orders = [...testOrders, ...orders.filter(order => !isTestOrder(order))];
+    coupons = [...testCoupons, ...coupons.filter(coupon => !isTestCoupon(coupon))];
+    syncCustomersFromOrders();
+    saveData();
+    renderAll();
+    showSection('orders', document.querySelectorAll('.nav-item')[1]);
+    showNotification(`${testOrders.length} pedidos TEST cargados correctamente`, 'success');
+}
+async function deleteTestData() {
+    await removeTestData({ ask: true, notify: true });
 }
 function buildProductListDocument(order) {
     const products = Array.isArray(order.products) && order.products.length > 0
