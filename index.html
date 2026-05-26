@@ -3063,7 +3063,11 @@ function getCustomerPhoneByName(name) {
     return customer ? customer.phone || '' : '';
 }
 function getOrderCouponEligibility(order) {
-    return Boolean(order && Number(order.totalQty) >= 5 && order.status === 'Entregado');
+    if (!order || order.status !== 'Entregado') return false;
+    if ((Number(order.total) || 0) < COUPON_MIN_PURCHASE) return false;
+    if (hasWholesalePricing(order.products || [])) return false;
+    if (hasCustomPromotionalPricing(order.products || [])) return false;
+    return true;
 }
 function generateCouponCode() {
     let code = '';
@@ -3101,7 +3105,7 @@ function generateCouponForCurrentOrder() {
     const order = orders.find(item => item.id === currentOrderId);
     if (!order) return;
     if (!getOrderCouponEligibility(order)) {
-        showNotification('El pedido debe estar entregado y tener 5 o más prendas', 'warning');
+        showNotification('El pedido debe estar entregado, ser de mínimo $600 y no tener mayoreo ni promociones', 'warning');
         return;
     }
     maybeCreateCouponFromOrder(order);
@@ -3393,7 +3397,7 @@ function renderCoupons() {
     document.getElementById('coupon-pending-count').textContent = coupons.filter(c => c.status === 'pending').length;
     document.getElementById('coupon-used-count').textContent = coupons.filter(c => c.status === 'used' || c.used).length;
     if (!coupons.length) {
-        container.innerHTML = '<div class="empty-state"><h3>No hay cupones generados</h3><p>Marca como entregado un pedido de 5 o más prendas para generar un cupón pendiente.</p></div>';
+        container.innerHTML = '<div class="empty-state"><h3>No hay cupones generados</h3><p>Marca como entregado un pedido de mínimo $600 sin mayoreo ni promociones para generar un cupón pendiente.</p></div>';
         return;
     }
     container.innerHTML = coupons.map(coupon => {
