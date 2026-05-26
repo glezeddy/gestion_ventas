@@ -601,7 +601,7 @@ Descargar Reporte Excel
 <div class="form-group"><label>Cliente</label><input type="text" id="editCouponCustomerName"></div>
 <div class="form-group"><label>Teléfono WhatsApp</label><input type="tel" id="editCouponCustomerPhone"></div>
 <div class="form-group"><label>Código</label><input type="text" id="editCouponCode" style="text-transform:uppercase;"></div>
-<div class="form-group"><label>Descuento (%)</label><input type="number" id="editCouponDiscount" min="1" max="100" step="1"></div>
+<div class="form-group"><label>Descuento fijo ($)</label><input type="number" id="editCouponDiscount" min="100" max="100" step="1" value="100" readonly></div>
 <div class="form-group"><label>Estado</label><select id="editCouponStatus"><option value="pending">Pendiente</option><option value="active">Activo</option><option value="used">Usado</option><option value="expired">Vencido</option></select></div>
 <div class="form-group"><label>Pedido relacionado</label><input type="text" id="editCouponOrderId"></div>
 </div>
@@ -610,7 +610,7 @@ Descargar Reporte Excel
 <div class="modal-footer"><button class="btn btn-secondary" onclick="goHome()">Home</button><button class="btn btn-secondary" onclick="closeModal('editCouponModal')">Cancelar</button><button class="btn btn-primary" onclick="saveCouponEdit()">Guardar Cambios</button></div>
 </div>
 </div>
-<div class="modal-overlay" id="newOrderModal"><div class="modal"><div class="modal-header"><h2>✨ Nuevo Pedido</h2><button class="close-btn" onclick="closeModal('newOrderModal')">&times;</button></div><div class="modal-body"><form id="orderForm"><div class="form-grid"><div class="form-group full-width"><label>👤 Nombre del Cliente</label><input type="text" id="orderCustomerName" placeholder="Escribe el nombre del cliente" required></div><div class="form-group"><label>📱 Teléfono WhatsApp</label><input type="tel" id="orderCustomerPhone" placeholder="Ej. 6641234567"></div><div class="form-group"><label>🖨️ Técnica de Estampado</label><select id="orderTechnique"><option>DTF</option></select></div><div class="form-group full-width"><label>📋 Estado Inicial</label><select id="orderStatus"><option>En espera de Anticipo</option><option>Diseño Pendiente</option><option>En Producción</option><option>Listo para Entregar</option></select></div></div><div class="products-list" id="productsList"></div><button type="button" class="add-product-btn" onclick="addProductRow()">+ Agregar Producto</button><div class="form-group full-width" style="margin-top: 25px;"><div class="price-display"><div><div class="label">Total Productos</div><div class="value" id="displayTotalQty">0</div></div><div><div class="label">Subtotal</div><div class="value" id="displaySubtotal">$0</div></div><div><div class="label">Descuento Cupón</div><div class="value" id="displayCouponDiscount">$0</div></div><div><div class="label">Precio Total</div><div class="value" id="displayTotal">$0</div></div><div><div class="label">Anticipo Sugerido (70%)</div><div class="value" id="displayAdvance">$0</div></div></div></div><div class="form-grid"><div class="form-group full-width"><label>Validar cupón de descuento</label><div style="display:flex; gap:10px; flex-wrap:wrap;"><input type="text" id="orderCouponCode" placeholder="Ej. PRI10-ABC123" style="flex:1 1 220px; text-transform:uppercase;"><button type="button" class="btn btn-info" onclick="validateCouponForOrder()">Validar cupón</button><button type="button" class="btn btn-secondary" onclick="clearOrderCoupon()">Quitar</button></div><p id="couponValidationMessage" style="margin-top:8px; color:#64748b; font-size:13px;"></p></div></div><div class="form-grid"><div class="form-group"><label>🧵 Costo camiseta por pieza</label><input type="number" id="orderShirtCost" min="0" step="0.01" value="0"></div><div class="form-group"><label>🧒 Costo camiseta niño por pieza</label><input type="number" id="orderShirtCostKids" min="0" step="0.01" value="0"></div><div class="form-group"><label>🖨️ Costo DTF total</label><input type="number" id="orderDtfCost" min="0" step="0.01" value="0"></div><div class="form-group"><label>📦 Otros gastos</label><input type="number" id="orderExtraCost" min="0" step="0.01" value="0"></div></div><div class="form-grid"><div class="form-group"><label>💵 Anticipo Recibido ($)</label><input type="number" id="orderAdvance" value="0" onchange="validateAdvanceAndCalculate()"></div><div class="form-group full-width"><label>📁 Subir Diseño</label><div class="file-upload" onclick="document.getElementById('orderDesign').click()"><input type="file" id="orderDesign" accept="image/*" style="display: none;" onchange="handleFileUpload(this)"><div class="file-upload-icon">📁</div><p id="uploadText">Haz click para subir el diseño</p><img id="uploadPreview" class="file-upload-preview" style="display: none;"></div></div></div></form></div><div class="modal-footer"><button class="btn btn-secondary" onclick="goHome()">Home</button><button class="btn btn-secondary" onclick="closeModal('newOrderModal')">Cancelar</button><button class="btn btn-primary" onclick="saveOrder()">Guardar Pedido</button></div></div></div>
+<div class="modal-overlay" id="newOrderModal"><div class="modal"><div class="modal-header"><h2>✨ Nuevo Pedido</h2><button class="close-btn" onclick="closeModal('newOrderModal')">&times;</button></div><div class="modal-body"><form id="orderForm"><div class="form-grid"><div class="form-group full-width"><label>👤 Nombre del Cliente</label><input type="text" id="orderCustomerName" placeholder="Escribe el nombre del cliente" required></div><div class="form-group"><label>📱 Teléfono WhatsApp</label><input type="tel" id="orderCustomerPhone" placeholder="Ej. 6641234567"></div><div class="form-group"><label>🖨️ Técnica de Estampado</label><select id="orderTechnique"><option>DTF</option></select></div><div class="form-group full-width"><label>📋 Estado Inicial</label><select id="orderStatus"><option>En espera de Anticipo</option><option>Diseño Pendiente</option><option>En Producción</option><option>Listo para Entregar</option></select></div></div><div class="products-list" id="productsList"></div><button type="button" class="add-product-btn" onclick="addProductRow()">+ Agregar Producto</button><div class="form-group full-width" style="margin-top: 25px;"><div class="price-display"><div><div class="label">Total Productos</div><div class="value" id="displayTotalQty">0</div></div><div><div class="label">Subtotal</div><div class="value" id="displaySubtotal">$0</div></div><div><div class="label">Descuento Cupón</div><div class="value" id="displayCouponDiscount">$0</div></div><div><div class="label">Precio Total</div><div class="value" id="displayTotal">$0</div></div><div><div class="label">Anticipo Sugerido (70%)</div><div class="value" id="displayAdvance">$0</div></div></div></div><div class="form-grid"><div class="form-group full-width"><label>Validar cupón de descuento</label><div style="display:flex; gap:10px; flex-wrap:wrap;"><input type="text" id="orderCouponCode" placeholder="Ej. PRI100-ABC123" style="flex:1 1 220px; text-transform:uppercase;"><button type="button" class="btn btn-info" onclick="validateCouponForOrder()">Validar cupón</button><button type="button" class="btn btn-secondary" onclick="clearOrderCoupon()">Quitar</button></div><p id="couponValidationMessage" style="margin-top:8px; color:#64748b; font-size:13px;"></p></div></div><div class="form-grid"><div class="form-group"><label>🧵 Costo camiseta por pieza</label><input type="number" id="orderShirtCost" min="0" step="0.01" value="0"></div><div class="form-group"><label>🧒 Costo camiseta niño por pieza</label><input type="number" id="orderShirtCostKids" min="0" step="0.01" value="0"></div><div class="form-group"><label>🖨️ Costo DTF total</label><input type="number" id="orderDtfCost" min="0" step="0.01" value="0"></div><div class="form-group"><label>📦 Otros gastos</label><input type="number" id="orderExtraCost" min="0" step="0.01" value="0"></div></div><div class="form-grid"><div class="form-group"><label>💵 Anticipo Recibido ($)</label><input type="number" id="orderAdvance" value="0" onchange="validateAdvanceAndCalculate()"></div><div class="form-group full-width"><label>📁 Subir Diseño</label><div class="file-upload" onclick="document.getElementById('orderDesign').click()"><input type="file" id="orderDesign" accept="image/*" style="display: none;" onchange="handleFileUpload(this)"><div class="file-upload-icon">📁</div><p id="uploadText">Haz click para subir el diseño</p><img id="uploadPreview" class="file-upload-preview" style="display: none;"></div></div></div></form></div><div class="modal-footer"><button class="btn btn-secondary" onclick="goHome()">Home</button><button class="btn btn-secondary" onclick="closeModal('newOrderModal')">Cancelar</button><button class="btn btn-primary" onclick="saveOrder()">Guardar Pedido</button></div></div></div>
 
 <div class="modal-overlay" id="orderDetailModal"><div class="modal"><div class="modal-header"><h2 id="detailOrderId">Pedido #</h2><button class="close-btn" onclick="closeModal('orderDetailModal')">&times;</button></div><div class="modal-body"><div id="orderDetailContent"></div></div><div class="modal-footer"><button class="btn btn-secondary" onclick="goHome()">Home</button><button class="btn btn-warning" onclick="markAsPaid()">Marcar como Saldado</button><button class="btn btn-secondary" onclick="printTicket()">Imprimir Ticket</button><button class="btn btn-info" onclick="downloadTicket()">Descargar Ticket</button><button class="btn btn-success" onclick="shareTicketWhatsApp()">Compartir WhatsApp</button><button class="btn btn-info" onclick="downloadProductList()">Lista Productos</button><button class="btn btn-primary" onclick="closeModal('orderDetailModal')">Cerrar</button></div></div></div>
 
@@ -669,7 +669,9 @@ const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_y9VdK2iRlUx7Wu9NFQJlJg_M5Ehe38N
 const supabaseClient = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY) : null;
 const TEST_DATA_PREFIX = 'TEST-';
 const TEST_CUSTOMER_PREFIX = 'Cliente TEST';
-const TEST_COUPON_PREFIX = 'TEST10-';
+const TEST_COUPON_PREFIX = 'TEST100-';
+const COUPON_FIXED_AMOUNT = 100;
+const COUPON_MIN_PURCHASE = 600;
 
 // Paleta de colores (simplificada para mantener funcionalidad)
 const eurocottonColors = {
@@ -684,10 +686,10 @@ const eurocottonColors = {
 const priceTables = {
     'Playera Básica': [{ min: 1, max: 5, price: 300 }, { min: 6, max: 11, price: 260 }, { min: 12, max: 23, price: 240 }, { min: 24, max: 49, price: 225 }, { min: 50, max: Infinity, price: 210 }],
     'Dry Fit': [{ min: 1, max: 5, price: 300 }, { min: 6, max: 11, price: 260 }, { min: 12, max: 23, price: 240 }, { min: 24, max: 49, price: 225 }, { min: 50, max: Infinity, price: 210 }],
-    'Camiseta tipo Polo': [{ min: 1, max: 5, price: 430 }, { min: 6, max: 11, price: 380 }, { min: 12, max: 23, price: 350 }, { min: 24, max: 49, price: 330 }, { min: 50, max: Infinity, price: 310 }],
-    'Hoodie': [{ min: 1, max: 5, price: 530 }, { min: 6, max: Infinity, price: 450 }],
-    'Sudadera': [{ min: 1, max: 5, price: 530 }, { min: 6, max: Infinity, price: 450 }],
-	'Playera Niño': [{ min: 1, max: 5, price: 280 }, { min: 6, max: 11, price: 240 }, { min: 12, max: 23, price: 220 }, { min: 24, max: 49, price: 205 }, { min: 50, max: Infinity, price: 190 }],
+    'Camiseta tipo Polo': [{ min: 1, max: 5, price: 480 }, { min: 6, max: 10, price: 455 }, { min: 11, max: 15, price: 440 }, { min: 16, max: 23, price: 425 }, { min: 24, max: 49, price: 410 }, { min: 50, max: Infinity, price: 390 }],
+    'Hoodie': [{ min: 1, max: 5, price: 530 }, { min: 6, max: 10, price: 450 }, { min: 11, max: 15, price: 430 }, { min: 16, max: 23, price: 415 }, { min: 24, max: 49, price: 400 }, { min: 50, max: Infinity, price: 380 }],
+    'Sudadera': [{ min: 1, max: 5, price: 530 }, { min: 6, max: 10, price: 450 }, { min: 11, max: 15, price: 430 }, { min: 16, max: 23, price: 415 }, { min: 24, max: 49, price: 400 }, { min: 50, max: Infinity, price: 380 }],
+	'Playera Niño': [{ min: 1, max: 5, price: 240 }, { min: 6, max: 10, price: 220 }, { min: 11, max: 15, price: 210 }, { min: 16, max: 23, price: 200 }, { min: 24, max: 49, price: 190 }, { min: 50, max: Infinity, price: 180 }],
     'Polo Niño': [{ min: 1, max: 5, price: 400 }, { min: 6, max: 11, price: 360 }, { min: 12, max: 23, price: 330 }, { min: 24, max: 49, price: 310 }, { min: 50, max: Infinity, price: 290 }],
     'Dry Fit Niño': [{ min: 1, max: 5, price: 280 }, { min: 6, max: 11, price: 240 }, { min: 12, max: 23, price: 220 }, { min: 24, max: 49, price: 205 }, { min: 50, max: Infinity, price: 190 }],
     'Hoodie Niño': [{ min: 1, max: 5, price: 500 }, { min: 6, max: Infinity, price: 430 }],
@@ -721,6 +723,42 @@ function getUnitPrice(productType, quantity) {
         if (qty >= tier.min && qty <= tier.max) return tier.price;
     }
     return 300;
+}
+function getCouponAmount(coupon) {
+    return Math.max(0, Number(coupon && (coupon.discountAmount ?? coupon.fixedDiscount ?? coupon.couponAmount)) || COUPON_FIXED_AMOUNT);
+}
+function getCouponMinimum(coupon) {
+    return Math.max(0, Number(coupon && (coupon.minPurchase ?? coupon.minimumPurchase)) || COUPON_MIN_PURCHASE);
+}
+function getProductQuantityTotals(products) {
+    return (Array.isArray(products) ? products : []).reduce((totals, product) => {
+        const type = normalizeProductType(product.type);
+        totals[type] = (totals[type] || 0) + (Number(product.qty) || 0);
+        return totals;
+    }, {});
+}
+function hasWholesalePricing(products) {
+    return Object.values(getProductQuantityTotals(products)).some(qty => qty >= 6);
+}
+function hasCustomPromotionalPricing(products) {
+    return (Array.isArray(products) ? products : []).some(product => Boolean(product.customPrice || product.priceMode === 'custom'));
+}
+function getCouponValidation(coupon, products, options = {}) {
+    const code = String(coupon && coupon.code || '').trim().toUpperCase();
+    if (!coupon || !code) return { valid: false, message: 'El código de cupón no es válido.', discount: 0 };
+    if ((coupon.status === 'used' || coupon.used) && !options.allowHistoricalCoupon) return { valid: false, message: 'Este cupón ya fue utilizado.', discount: 0 };
+    if (coupon.status === 'pending') return { valid: false, message: 'Este cupón todavía no está activo.', discount: 0 };
+    if (coupon.status === 'expired') return { valid: false, message: 'Este cupón está vencido.', discount: 0 };
+    if (coupon.status !== 'active' && !options.allowHistoricalCoupon) return { valid: false, message: 'Este cupón todavía no está activo.', discount: 0 };
+
+    const subtotal = (Array.isArray(products) ? products : []).reduce((sum, product) => sum + ((Number(product.qty) || 0) * (Number(product.price) || 0)), 0);
+    const minPurchase = getCouponMinimum(coupon);
+    if (subtotal < minPurchase) return { valid: false, message: `El cupón requiere una compra mínima de ${formatTicketMoney(minPurchase)} MXN.`, discount: 0 };
+    if (coupon.notStackableWithWholesale !== false && hasWholesalePricing(products)) return { valid: false, message: 'Este cupón no es acumulable con precios de mayoreo.', discount: 0 };
+    if (hasCustomPromotionalPricing(products)) return { valid: false, message: 'Este cupón no es acumulable con precios personalizados, promociones u otros descuentos.', discount: 0 };
+
+    const discount = Math.min(getCouponAmount(coupon), subtotal);
+    return { valid: true, message: `Cupón válido: ${formatTicketMoney(discount)} MXN de descuento aplicado.`, discount, subtotal };
 }
 
 // Persistencia
@@ -822,7 +860,10 @@ function sanitizeCoupon(coupon) {
         customerName: String(coupon.customerName || '').trim(),
         customerPhone: String(coupon.customerPhone || '').trim(),
         orderId: String(coupon.orderId || '').trim(),
-        discountPercent: Number(coupon.discountPercent) || 10,
+        discountType: 'fixed',
+        discountAmount: getCouponAmount(coupon),
+        minPurchase: getCouponMinimum(coupon),
+        notStackableWithWholesale: coupon.notStackableWithWholesale !== false,
         status: ['pending', 'active', 'used', 'expired'].includes(coupon.status) ? coupon.status : 'pending',
         createdAt: coupon.createdAt || new Date().toISOString(),
         usedAt: coupon.usedAt || null,
@@ -1300,7 +1341,16 @@ function calculatePrices() {
     const products = getProductsFromForm();
     const totalQty = products.reduce((sum, p) => sum + p.qty, 0);
     const subtotal = products.reduce((sum, p) => sum + (p.qty * p.price), 0);
-    const couponDiscount = currentCouponForOrder ? Math.round(subtotal * ((Number(currentCouponForOrder.discountPercent) || 10) / 100)) : 0;
+    const couponValidation = currentCouponForOrder ? getCouponValidation(currentCouponForOrder, products) : { discount: 0 };
+    const couponDiscount = couponValidation.valid ? couponValidation.discount : 0;
+    const couponMessage = document.getElementById('couponValidationMessage');
+    if (currentCouponForOrder && couponMessage && !couponValidation.valid) {
+        couponMessage.textContent = couponValidation.message;
+        couponMessage.style.color = '#ef4444';
+    } else if (currentCouponForOrder && couponMessage && couponValidation.valid) {
+        couponMessage.textContent = couponValidation.message;
+        couponMessage.style.color = '#10b981';
+    }
     const total = Math.max(0, subtotal - couponDiscount);
     const advance70 = Math.round(total * 0.7);
     const displayTotalQty = document.getElementById('displayTotalQty');
@@ -1315,7 +1365,7 @@ function calculatePrices() {
     if (displayTotal) displayTotal.textContent = '$' + total.toLocaleString();
     if (displayAdvance) displayAdvance.textContent = '$' + advance70.toLocaleString();
     if (advanceInput && (parseInt(advanceInput.value) || 0) === 0) advanceInput.value = advance70;
-    return { totalQty, subtotal, couponDiscount, total, advance70 };
+    return { totalQty, subtotal, couponDiscount, total, advance70, couponValidation };
 }
 function calculateOrderCosts(totalQty, shirtCost, dtfCost, extraCost) {
     const qty = Number(totalQty) || 0;
@@ -1469,7 +1519,17 @@ async function saveOrder() {
         }
     }
     const subtotal = products.reduce((sum, product) => sum + (product.qty * product.price), 0);
-    const couponDiscount = currentCouponForOrder ? Math.round(subtotal * ((Number(currentCouponForOrder.discountPercent) || 10) / 100)) : 0;
+    const couponValidation = currentCouponForOrder ? getCouponValidation(currentCouponForOrder, products) : { valid: false, discount: 0 };
+    if (currentCouponForOrder && !couponValidation.valid) {
+        showNotification(couponValidation.message, 'error');
+        const couponMessage = document.getElementById('couponValidationMessage');
+        if (couponMessage) {
+            couponMessage.textContent = couponValidation.message;
+            couponMessage.style.color = '#ef4444';
+        }
+        return;
+    }
+    const couponDiscount = currentCouponForOrder ? couponValidation.discount : 0;
     const total = Math.max(0, subtotal - couponDiscount);
     const totalQty = products.reduce((sum, product) => sum + product.qty, 0);
     const shirtCost = parseFloat(document.getElementById('orderShirtCost').value) || 0;
@@ -1651,23 +1711,31 @@ function removeEditProductRow(id) {
     if (productDiv) productDiv.remove();
     refreshEditProductPrices();
 }
-function getOrderCouponPercent(order) {
-    if (!order) return 10;
+function getOrderCoupon(order) {
+    if (!order) return null;
     const relatedCoupon = coupons.find(coupon =>
         (order.couponId && coupon.id === order.couponId) ||
         (order.couponCode && coupon.code === order.couponCode)
     );
-    if (relatedCoupon && Number(relatedCoupon.discountPercent)) return Number(relatedCoupon.discountPercent);
-    const baseSubtotal = Number(order.subtotal) || (Number(order.total) + Number(order.couponDiscount || 0));
-    if (baseSubtotal > 0 && Number(order.couponDiscount) > 0) {
-        return Math.round((Number(order.couponDiscount) / baseSubtotal) * 100) || 10;
+    if (relatedCoupon) return relatedCoupon;
+    if (order.couponCode || Number(order.couponDiscount) > 0) {
+        return sanitizeCoupon({
+            id: order.couponId || `LEGACY-${order.id || Date.now()}`,
+            code: order.couponCode || 'CUPON-APLICADO',
+            status: 'active',
+            used: false,
+            discountAmount: Number(order.couponDiscount) || COUPON_FIXED_AMOUNT,
+            minPurchase: COUPON_MIN_PURCHASE,
+            notStackableWithWholesale: true
+        });
     }
-    return 10;
+    return null;
 }
 function calculateEditTotalsFromProducts(products, previousOrder) {
     const subtotal = products.reduce((sum, product) => sum + (product.qty * product.price), 0);
-    const hasCoupon = Boolean(previousOrder && (previousOrder.couponCode || previousOrder.couponDiscount));
-    const couponDiscount = hasCoupon ? Math.round(subtotal * (getOrderCouponPercent(previousOrder) / 100)) : 0;
+    const coupon = getOrderCoupon(previousOrder);
+    const couponValidation = coupon ? getCouponValidation(coupon, products, { allowHistoricalCoupon: true }) : { valid: false, discount: 0 };
+    const couponDiscount = couponValidation.valid ? couponValidation.discount : 0;
     const total = Math.max(0, subtotal - couponDiscount);
     return { subtotal, couponDiscount, total };
 }
@@ -2018,16 +2086,12 @@ function getTicketTotals(order) {
     const couponDiscount = Math.max(0, Number(order.couponDiscount) || 0);
     const couponCode = String(order.couponCode || '').trim().toUpperCase();
     const finalTotal = Math.max(0, Number(order.total) || subtotalOriginal - couponDiscount);
-    const discountPercent = subtotalOriginal > 0 && couponDiscount > 0
-        ? Math.round((couponDiscount / subtotalOriginal) * 100)
-        : 10;
 
     return {
         subtotalOriginal,
         couponDiscount,
         couponCode,
         finalTotal,
-        discountPercent,
         hasCoupon: Boolean(couponCode || couponDiscount > 0)
     };
 }
@@ -2038,8 +2102,8 @@ function buildTicketMarkup(order) {
     const safeDate = ticketEscape(order.date || new Date().toISOString().split('T')[0]);
     const totals = getTicketTotals(order);
     const discountLabel = totals.hasCoupon
-        ? `Descuento ${totals.discountPercent}% por código ${ticketEscape(totals.couponCode || 'aplicado')}`
-        : 'Descuento 10% No aplica';
+        ? 'Cupón $100 MXN aplicado'
+        : 'Cupón $100 MXN No aplica';
     const discountRowClass = totals.hasCoupon ? 'discount' : 'muted';
     const discountAmount = totals.hasCoupon ? `-${formatTicketMoney(totals.couponDiscount)}` : formatTicketMoney(0);
     return `
@@ -2063,6 +2127,7 @@ function buildTicketMarkup(order) {
             <section class="ticket-section">
                 <div class="ticket-total-row"><span>Subtotal original</span><strong>${formatTicketMoney(totals.subtotalOriginal)}</strong></div>
                 <div class="ticket-total-row ${discountRowClass}"><span>${discountLabel}</span><strong>${discountAmount}</strong></div>
+                ${totals.hasCoupon ? `<div class="ticket-total-row"><span>Código aplicado</span><strong>${ticketEscape(totals.couponCode || 'aplicado')}</strong></div>` : ''}
                 <div class="ticket-total-row payable"><span>Subtotal a pagar</span><strong>${formatTicketMoney(totals.finalTotal)}</strong></div>
                 <div class="ticket-total-row"><span>Anticipo</span><strong>${formatTicketMoney(order.advance)}</strong></div>
                 <div class="ticket-total-row highlight"><span>Saldo restante</span><strong>${formatTicketMoney(order.remaining)}</strong></div>
@@ -2174,8 +2239,8 @@ function buildWhatsAppTicketMessage(order) {
         : '• Producto personalizado';
     const totals = getTicketTotals(order);
     const discountLine = totals.hasCoupon
-        ? `Descuento ${totals.discountPercent}% por código ${totals.couponCode || 'aplicado'}: -${formatTicketMoney(totals.couponDiscount)}`
-        : `Descuento 10% No aplica: ${formatTicketMoney(0)}`;
+        ? `Cupón $100 MXN aplicado: -${formatTicketMoney(totals.couponDiscount)}\nCódigo aplicado: ${totals.couponCode || 'aplicado'}`
+        : `Cupón $100 MXN No aplica: ${formatTicketMoney(0)}`;
 
     return `Hola ${order.customerName || ''}, te comparto el resumen de tu pedido Prin Epic:\n\nPedido: ${order.id}\nFecha: ${order.date || ''}\nEstado: ${order.status || ''}\n\nProductos:\n${products}\n\nSubtotal original: ${formatTicketMoney(totals.subtotalOriginal)}\n${discountLine}\nSubtotal a pagar: ${formatTicketMoney(totals.finalTotal)}\nAnticipo: ${formatTicketMoney(order.advance)}\nSaldo restante: ${formatTicketMoney(order.remaining)}\n\nTambién puedo enviarte la imagen del ticket si la necesitas.`;
 }
@@ -2445,7 +2510,7 @@ function viewOrder(orderId) {
         `<div style="margin-top:20px;"><h4>Mockup Generado:</h4><img src="${order.mockup}" style="max-width:200px; border-radius:10px; border:2px solid #e2e8f0;"><br><button class="btn btn-secondary btn-sm" onclick="downloadExistingMockup()" style="margin-top:10px;">📥 Descargar Mockup</button></div>` : '';
     const relatedCoupon = coupons.find(coupon => coupon.orderId === order.id);
     const couponButton = getOrderCouponEligibility(order)
-        ? `<button class="btn btn-success" onclick="generateCouponForCurrentOrder()" style="margin-top:10px;">${relatedCoupon ? 'Ver cupón generado' : 'Generar cupón 10%'}</button>`
+        ? `<button class="btn btn-success" onclick="generateCouponForCurrentOrder()" style="margin-top:10px;">${relatedCoupon ? 'Ver cupón generado' : 'Generar cupón $100'}</button>`
         : '';
     document.getElementById('orderDetailContent').innerHTML = `
         <div>
@@ -2744,7 +2809,7 @@ function priceProductsForTest(products) {
 function buildTestOrder(config) {
     const products = priceProductsForTest(config.products);
     const subtotal = products.reduce((sum, product) => sum + (product.qty * product.price), 0);
-    const couponDiscount = config.couponCode ? Math.round(subtotal * 0.1) : 0;
+    const couponDiscount = config.couponCode ? Math.min(COUPON_FIXED_AMOUNT, subtotal) : 0;
     const total = Math.max(0, subtotal - couponDiscount);
     const advance = config.paid ? total : Math.min(total, Math.max(0, Math.round(total * (config.advanceRate ?? 0.7))));
     const totalQty = products.reduce((sum, product) => sum + product.qty, 0);
@@ -2786,22 +2851,22 @@ function buildTestOrders() {
         buildTestOrder({ id: 'TEST-002', customerName: 'Cliente TEST 02', customerPhone: '+5216640000002', status: 'Diseño Pendiente', advanceRate: 0.5, products: [{ type: 'Playera Básica', qty: 5, color: 'Negro', size: 'L' }], date: today }),
         buildTestOrder({ id: 'TEST-003', customerName: 'Cliente TEST 03', customerPhone: '+5216640000003', status: 'En Producción', advanceRate: 0.7, products: [{ type: 'Playera Básica', qty: 6, color: 'Botella', size: 'M' }], date: today }),
         buildTestOrder({ id: 'TEST-004', customerName: 'Cliente TEST 04', customerPhone: '+5216640000004', status: 'Listo para Entregar', advanceRate: 0.4, products: [{ type: 'Playera Básica', qty: 11, color: 'Marino', size: 'XL' }], date: today }),
-        buildTestOrder({ id: 'TEST-005', customerName: 'Cliente TEST 05', customerPhone: '+5216640000005', status: 'Entregado', paid: false, advanceRate: 0.7, couponCode: 'TEST10-APLICADO', couponId: 'TEST-CP-APLICADO', products: [{ type: 'Playera Básica', qty: 12, color: 'Rojo', size: 'M' }], date: today }),
+        buildTestOrder({ id: 'TEST-005', customerName: 'Cliente TEST 05', customerPhone: '+5216640000005', status: 'Entregado', paid: false, advanceRate: 0.7, couponCode: 'TEST100-APLICADO', couponId: 'TEST-CP-APLICADO', products: [{ type: 'Playera Básica', qty: 3, color: 'Rojo', size: 'M' }], date: today }),
         buildTestOrder({ id: 'TEST-006', customerName: 'Cliente TEST 06', customerPhone: '+5216640000006', status: 'Entregado', paid: true, products: [{ type: 'Playera Básica', qty: 24, color: 'Oxford', size: 'L' }], date: today }),
         buildTestOrder({ id: 'TEST-007', customerName: 'Cliente TEST 07', customerPhone: '+5216640000007', status: 'Entregado', advanceRate: 0.8, products: [{ type: 'Playera Básica', qty: 50, color: 'Negro', size: 'XL' }], date: today }),
         buildTestOrder({ id: 'TEST-008', customerName: 'Cliente TEST 08', customerPhone: '+5216640000008', status: 'En Producción', advanceRate: 0.5, products: [{ type: 'Camiseta tipo Polo', qty: 6, color: 'Blanco', size: 'L' }], date: today }),
         buildTestOrder({ id: 'TEST-009', customerName: 'Cliente TEST 09', customerPhone: '+5216640000009', status: 'Entregado', advanceRate: 0.7, products: [{ type: 'Hoodie', qty: 6, color: 'Negro', size: 'XL' }], date: today }),
         buildTestOrder({ id: 'TEST-010', customerName: 'Cliente TEST 10', customerPhone: '+5216640000010', status: 'Cancelado', advanceRate: 0, products: [{ type: 'Sudadera', qty: 5, color: 'Oxford', size: 'M' }], date: today }),
-        buildTestOrder({ id: 'TEST-011', customerName: 'Cliente TEST 11', customerPhone: '+5216640000011', status: 'Entregado', paid: true, couponCode: 'TEST10-USADO', couponId: 'TEST-CP-USADO', products: [{ type: 'Dry Fit', qty: 12, color: 'Rey/Royal Blue', size: 'L' }], date: today }),
+        buildTestOrder({ id: 'TEST-011', customerName: 'Cliente TEST 11', customerPhone: '+5216640000011', status: 'Entregado', paid: true, couponCode: 'TEST100-USADO', couponId: 'TEST-CP-USADO', products: [{ type: 'Dry Fit', qty: 3, color: 'Rey/Royal Blue', size: 'L' }], date: today }),
         buildTestOrder({ id: 'TEST-012', customerName: 'Cliente TEST 12', customerPhone: '+5216640000012', status: 'En espera de Anticipo', advanceRate: 0.3, products: [{ type: 'Playera Básica', qty: 3, color: 'Blanco', size: 'M' }, { type: 'Playera Básica', qty: 3, color: 'Negro', size: 'L' }, { type: 'Polo Niño', qty: 6, color: 'Marino', size: 'S' }], date: today })
     ].filter(Boolean);
 }
 function buildTestCoupons() {
     return [
-        sanitizeCoupon({ id: 'TEST-CP-APLICADO', code: 'TEST10-APLICADO', customerName: 'Cliente TEST 05', customerPhone: '+5216640000005', orderId: 'TEST-005', discountPercent: 10, status: 'used', used: true, usedAt: new Date().toISOString(), usedOrderId: 'TEST-005', requirements: getDefaultCouponRequirements() }),
-        sanitizeCoupon({ id: 'TEST-CP-USADO', code: 'TEST10-USADO', customerName: 'Cliente TEST 11', customerPhone: '+5216640000011', orderId: 'TEST-011', discountPercent: 10, status: 'used', used: true, usedAt: new Date().toISOString(), usedOrderId: 'TEST-011', requirements: getDefaultCouponRequirements() }),
-        sanitizeCoupon({ id: 'TEST-CP-ACTIVO', code: 'TEST10-ACTIVO', customerName: 'Cliente TEST 12', customerPhone: '+5216640000012', orderId: 'TEST-012', discountPercent: 10, status: 'active', used: false, requirements: Object.fromEntries(Object.keys(getDefaultCouponRequirements()).map(key => [key, true])) }),
-        sanitizeCoupon({ id: 'TEST-CP-PENDIENTE', code: 'TEST10-PENDIENTE', customerName: 'Cliente TEST 03', customerPhone: '+5216640000003', orderId: 'TEST-003', discountPercent: 10, status: 'pending', used: false, requirements: getDefaultCouponRequirements() })
+        sanitizeCoupon({ id: 'TEST-CP-APLICADO', code: 'TEST100-APLICADO', customerName: 'Cliente TEST 05', customerPhone: '+5216640000005', orderId: 'TEST-005', discountAmount: COUPON_FIXED_AMOUNT, status: 'used', used: true, usedAt: new Date().toISOString(), usedOrderId: 'TEST-005', requirements: getDefaultCouponRequirements() }),
+        sanitizeCoupon({ id: 'TEST-CP-USADO', code: 'TEST100-USADO', customerName: 'Cliente TEST 11', customerPhone: '+5216640000011', orderId: 'TEST-011', discountAmount: COUPON_FIXED_AMOUNT, status: 'used', used: true, usedAt: new Date().toISOString(), usedOrderId: 'TEST-011', requirements: getDefaultCouponRequirements() }),
+        sanitizeCoupon({ id: 'TEST-CP-ACTIVO', code: 'TEST100-ACTIVO', customerName: 'Cliente TEST 12', customerPhone: '+5216640000012', orderId: 'TEST-012', discountAmount: COUPON_FIXED_AMOUNT, status: 'active', used: false, requirements: Object.fromEntries(Object.keys(getDefaultCouponRequirements()).map(key => [key, true])) }),
+        sanitizeCoupon({ id: 'TEST-CP-PENDIENTE', code: 'TEST100-PENDIENTE', customerName: 'Cliente TEST 03', customerPhone: '+5216640000003', orderId: 'TEST-003', discountAmount: COUPON_FIXED_AMOUNT, status: 'pending', used: false, requirements: getDefaultCouponRequirements() })
     ].filter(Boolean);
 }
 async function removeTestData(options = {}) {
@@ -3005,7 +3070,7 @@ function generateCouponCode() {
     do {
         const random = Math.random().toString(36).slice(2, 8).toUpperCase();
         const stamp = new Date().getFullYear().toString().slice(-2);
-        code = `PRI10-${random}${stamp}`;
+        code = `PRI100-${random}${stamp}`;
     } while (coupons.some(coupon => coupon.code === code));
     return code;
 }
@@ -3019,7 +3084,10 @@ function maybeCreateCouponFromOrder(order) {
         customerName: order.customerName,
         customerPhone: order.customerPhone || getCustomerPhoneByName(order.customerName),
         orderId: order.id,
-        discountPercent: 10,
+        discountType: 'fixed',
+        discountAmount: COUPON_FIXED_AMOUNT,
+        minPurchase: COUPON_MIN_PURCHASE,
+        notStackableWithWholesale: true,
         status: 'pending',
         createdAt: new Date().toISOString(),
         requirements: getDefaultCouponRequirements(),
@@ -3047,20 +3115,21 @@ function validateCouponForOrder() {
     const message = document.getElementById('couponValidationMessage');
     const code = String(input ? input.value : '').trim().toUpperCase();
     const coupon = coupons.find(item => item.code === code);
-    if (!coupon || coupon.status !== 'active' || coupon.used) {
+    const couponValidation = getCouponValidation(coupon, getProductsFromForm());
+    if (!couponValidation.valid) {
         currentCouponForOrder = null;
         if (message) {
-            message.textContent = 'El código de cupón no es válido, ya fue utilizado o todavía no está activo.';
+            message.textContent = couponValidation.message;
             message.style.color = '#ef4444';
         }
         calculatePrices();
-        showNotification('Cupón no válido o no activo', 'error');
+        showNotification(couponValidation.message, 'error');
         return;
     }
     currentCouponForOrder = coupon;
     if (input) input.value = coupon.code;
     if (message) {
-        message.textContent = `Cupón válido: ${coupon.discountPercent}% de descuento aplicado.`;
+        message.textContent = couponValidation.message;
         message.style.color = '#10b981';
     }
     calculatePrices();
@@ -3139,7 +3208,7 @@ function buildCouponInvitationMessage(coupon) {
     return `¡Hola! 👋😄
 Esperamos que estés disfrutando tu prenda de Prin Epic 👕🔥
 
-Queremos agradecerte por tu compra y además darte la oportunidad de obtener un cupón de descuento para tu próxima orden 🎉
+Queremos agradecerte por tu compra y además darte la oportunidad de obtener un cupón de $100 MXN de descuento para tu próxima orden 🎉
 
 Para participar solo necesitas:
 
@@ -3154,7 +3223,8 @@ Para participar solo necesitas:
 ⚠️ Importante:
 • El cupón es personal e intransferible.
 • Solo puede usarse una vez.
-• Válido para una futura compra en Prin Epic.
+• Válido en compra mínima de $600 MXN.
+• No acumulable con precios de mayoreo, promociones u otros descuentos.
 
 ¡Gracias por apoyar a Prin Epic! 💯🔥`;
 }
@@ -3181,15 +3251,20 @@ function copyCouponInvitationMessage(couponId) {
     copyTextToClipboard(buildCouponInvitationMessage(coupon), 'Mensaje copiado correctamente');
 }
 function buildCouponWhatsAppMessage(coupon) {
-    return `¡Hola ${coupon.customerName || ''}! Tu cupón Prin Epic ya está activo 🎉
+    return `¡Hola! 👋😄
+Ya validamos tus requisitos y tu cupón de descuento está listo 🎉
+
+Tu cupón es de $100 MXN de descuento para tu próxima compra en Prin Epic.
 
 Código: ${coupon.code}
-Descuento: ${coupon.discountPercent}%
 
-Aplica este código para acceder al descuento en tu próxima compra.
+Condiciones:
+• Compra mínima de $600 MXN.
+• Válido una sola vez.
+• Personal e intransferible.
+• No acumulable con precios de mayoreo, promociones u otros descuentos.
 
-Importante: es personal, intransferible y válido una sola vez.
-www.facebook.com/printepic494`;
+¡Gracias por apoyar a Prin Epic! 👕🔥`;
 }
 function sendCouponWhatsApp(couponId) {
     const coupon = coupons.find(item => item.id === couponId);
@@ -3207,11 +3282,12 @@ function buildCouponArt(coupon) {
             <div class="coupon-art-watermark">${logo ? `<img src="${logo}" alt="">` : ''}</div>
             <div class="coupon-ticket">
                 <h2>CUPÓN</h2>
-                <h3>${coupon.discountPercent}%</h3>
+                <h3>$100 MXN</h3>
                 <h2>DE DESCUENTO</h2>
                 <p>aplica este código para acceder al descuento en tu próxima compra:</p>
                 <div class="coupon-art-code">${ticketEscape(coupon.code)}</div>
                 <p class="coupon-art-small">${ticketEscape(coupon.customerName)} · ${getCouponStatusLabel(coupon.status)} · ${new Date(coupon.createdAt).toLocaleDateString('es-MX')}</p>
+                <p class="coupon-art-small">Compra mínima $600 MXN. No acumulable con mayoreo.</p>
                 <p class="coupon-art-small">Personal e intransferible. Válido una sola vez.</p>
             </div>
             <div class="coupon-facebook">www.facebook.com/printepic494</div>
@@ -3250,7 +3326,7 @@ function openEditCoupon(couponId) {
     setValue('editCouponCustomerName', coupon.customerName);
     setValue('editCouponCustomerPhone', coupon.customerPhone);
     setValue('editCouponCode', coupon.code);
-    setValue('editCouponDiscount', coupon.discountPercent || 10);
+    setValue('editCouponDiscount', getCouponAmount(coupon));
     setValue('editCouponStatus', coupon.status || 'pending');
     setValue('editCouponOrderId', coupon.orderId);
     openModal('editCouponModal');
@@ -3277,7 +3353,10 @@ function saveCouponEdit() {
     coupon.customerName = getValue('editCouponCustomerName') || coupon.customerName;
     coupon.customerPhone = getValue('editCouponCustomerPhone');
     coupon.code = nextCode;
-    coupon.discountPercent = Math.max(1, Math.min(100, Number(getValue('editCouponDiscount')) || 10));
+    coupon.discountType = 'fixed';
+    coupon.discountAmount = COUPON_FIXED_AMOUNT;
+    coupon.minPurchase = COUPON_MIN_PURCHASE;
+    coupon.notStackableWithWholesale = true;
     coupon.status = ['pending', 'active', 'used', 'expired'].includes(nextStatus) ? nextStatus : 'pending';
     coupon.orderId = getValue('editCouponOrderId');
     coupon.used = coupon.status === 'used';
@@ -3327,7 +3406,9 @@ function renderCoupons() {
                 <div class="coupon-card-header"><div><h3>${ticketEscape(coupon.customerName || 'Cliente')}</h3><p style="color:#64748b;">Pedido ${ticketEscape(coupon.orderId || '-')}</p></div><span class="status-badge ${coupon.status === 'active' ? 'status-completed' : coupon.status === 'used' ? 'status-production' : 'status-pending'}">${getCouponStatusLabel(coupon.status)}</span></div>
                 <div class="coupon-code-box">${ticketEscape(coupon.code)}</div>
                 <div class="coupon-meta">
-                    <div><strong>Descuento</strong>${coupon.discountPercent}%</div>
+                    <div><strong>Descuento</strong>${formatTicketMoney(getCouponAmount(coupon))}</div>
+                    <div><strong>Compra mínima</strong>${formatTicketMoney(getCouponMinimum(coupon))}</div>
+                    <div><strong>No acumulable</strong>Mayoreo/promos</div>
                     <div><strong>Teléfono</strong>${ticketEscape(coupon.customerPhone || '-')}</div>
                     <div><strong>Generado</strong>${new Date(coupon.createdAt).toLocaleDateString('es-MX')}</div>
                     <div><strong>Usado</strong>${coupon.usedAt ? new Date(coupon.usedAt).toLocaleDateString('es-MX') : 'No'}</div>
@@ -3753,6 +3834,7 @@ function addCalcProduct() {
 </script>
 </body>
 </html>
+
 
 
 
