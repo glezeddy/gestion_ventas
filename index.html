@@ -111,6 +111,9 @@ tr:hover { background: linear-gradient(90deg, #f8fafc, #fafafa); }
 .product-item .form-group label { font-size: 12px; margin-bottom: 5px; }
 .product-item .btn-remove { background: linear-gradient(135deg, #ef4444, #dc2626); color: white; border: none; width: 40px; height: 40px; border-radius: 10px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.3s; margin-bottom: 0; font-size: 20px; }
 .product-item .btn-remove:hover { transform: scale(1.1); box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4); }
+.price-mode-toggle { display: flex; align-items: center; gap: 8px; padding: 10px 12px; background: #eef2ff; border: 1px solid #c7d2fe; border-radius: 10px; color: #3730a3; font-size: 12px; font-weight: 700; }
+.price-mode-toggle input { width: 16px; height: 16px; flex: 0 0 auto; }
+.price-mode-note { font-size: 11px; color: #64748b; margin-top: 6px; line-height: 1.3; }
 .add-product-btn { width: 100%; padding: 15px; background: linear-gradient(135deg, #10b981, #059669); color: white; border: none; border-radius: 12px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; transition: all 0.3s; margin-top: 15px; }
 .add-product-btn:hover { box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4); transform: translateY(-2px); }
 .color-swatches-container { grid-column: 1 / -1; margin-top: 8px; padding: 10px 12px; border-top: 1px dashed #e2e8f0; background: #fafafa; border-radius: 10px; }
@@ -159,6 +162,9 @@ tr:hover { background: linear-gradient(90deg, #f8fafc, #fafafa); }
 .empty-state p { color: #94a3b8; }
 .mobile-menu-toggle { display: none; position: fixed; top: 15px; left: 15px; z-index: 1200; background: white; border: none; padding: 12px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.18); cursor: pointer; }
 .mobile-menu-overlay { display: none; position: fixed; inset: 0; background: rgba(15,23,42,0.55); backdrop-filter: blur(2px); z-index: 1090; }
+.home-fab { display: none; position: fixed; right: 22px; bottom: 22px; z-index: 950; border: none; border-radius: 999px; padding: 13px 18px; align-items: center; gap: 8px; color: white; background: linear-gradient(135deg, #111827, #334155); box-shadow: 0 12px 28px rgba(15,23,42,0.28); cursor: pointer; font-weight: 800; }
+.home-fab.visible { display: inline-flex; }
+.home-fab:hover { transform: translateY(-2px); box-shadow: 0 16px 34px rgba(15,23,42,0.34); }
 @media (min-width: 1600px) { .main-content { padding: 40px; } .stats-grid { grid-template-columns: repeat(4, minmax(260px, 1fr)); } .modal { max-width: 1040px; } }
 @media (max-width: 1024px) {
     .mobile-menu-toggle { display: flex; align-items: center; justify-content: center; }
@@ -187,6 +193,7 @@ tr:hover { background: linear-gradient(90deg, #f8fafc, #fafafa); }
     .modal-footer .btn { flex: 1 1 180px; justify-content: center; }
     .product-item { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; padding: 16px; }
     .product-item .btn-remove { grid-column: 1 / -1; width: 100%; }
+    .home-fab { right: 14px; bottom: 14px; padding: 12px 14px; }
 }
 @media (max-width: 640px) {
     .main-content { padding: 72px 12px 18px; }
@@ -311,6 +318,10 @@ tr:hover { background: linear-gradient(90deg, #f8fafc, #fafafa); }
 <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
 </button>
 <div class="mobile-menu-overlay" onclick="closeMobileMenu()" aria-hidden="true"></div>
+<button class="home-fab" id="homeFab" onclick="goHome()" aria-label="Volver al dashboard">
+<svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M3 12l9-9 9 9M5 10v10h5v-6h4v6h5V10"/></svg>
+<span>Home</span>
+</button>
 <aside class="sidebar" id="sidebar">
 <div class="logo">
     <div class="logo-icon">
@@ -581,16 +592,16 @@ Descargar Reporte Excel
 </div>
 </form>
 </div>
-<div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal('editCouponModal')">Cancelar</button><button class="btn btn-primary" onclick="saveCouponEdit()">Guardar Cambios</button></div>
+<div class="modal-footer"><button class="btn btn-secondary" onclick="goHome()">Home</button><button class="btn btn-secondary" onclick="closeModal('editCouponModal')">Cancelar</button><button class="btn btn-primary" onclick="saveCouponEdit()">Guardar Cambios</button></div>
 </div>
 </div>
-<div class="modal-overlay" id="newOrderModal"><div class="modal"><div class="modal-header"><h2>✨ Nuevo Pedido</h2><button class="close-btn" onclick="closeModal('newOrderModal')">&times;</button></div><div class="modal-body"><form id="orderForm"><div class="form-grid"><div class="form-group full-width"><label>👤 Nombre del Cliente</label><input type="text" id="orderCustomerName" placeholder="Escribe el nombre del cliente" required></div><div class="form-group"><label>📱 Teléfono WhatsApp</label><input type="tel" id="orderCustomerPhone" placeholder="Ej. 6641234567"></div><div class="form-group"><label>🖨️ Técnica de Estampado</label><select id="orderTechnique"><option>DTF</option></select></div><div class="form-group full-width"><label>📋 Estado Inicial</label><select id="orderStatus"><option>En espera de Anticipo</option><option>Diseño Pendiente</option><option>En Producción</option><option>Listo para Entregar</option></select></div></div><div class="products-list" id="productsList"></div><button type="button" class="add-product-btn" onclick="addProductRow()">+ Agregar Producto</button><div class="form-group full-width" style="margin-top: 25px;"><div class="price-display"><div><div class="label">Total Productos</div><div class="value" id="displayTotalQty">0</div></div><div><div class="label">Subtotal</div><div class="value" id="displaySubtotal">$0</div></div><div><div class="label">Descuento Cupón</div><div class="value" id="displayCouponDiscount">$0</div></div><div><div class="label">Precio Total</div><div class="value" id="displayTotal">$0</div></div><div><div class="label">Anticipo Sugerido (70%)</div><div class="value" id="displayAdvance">$0</div></div></div></div><div class="form-grid"><div class="form-group full-width"><label>Validar cupón de descuento</label><div style="display:flex; gap:10px; flex-wrap:wrap;"><input type="text" id="orderCouponCode" placeholder="Ej. PRI10-ABC123" style="flex:1 1 220px; text-transform:uppercase;"><button type="button" class="btn btn-info" onclick="validateCouponForOrder()">Validar cupón</button><button type="button" class="btn btn-secondary" onclick="clearOrderCoupon()">Quitar</button></div><p id="couponValidationMessage" style="margin-top:8px; color:#64748b; font-size:13px;"></p></div></div><div class="form-grid"><div class="form-group"><label>🧵 Costo camiseta por pieza</label><input type="number" id="orderShirtCost" min="0" step="0.01" value="0"></div><div class="form-group"><label>🧒 Costo camiseta niño por pieza</label><input type="number" id="orderShirtCostKids" min="0" step="0.01" value="0"></div><div class="form-group"><label>🖨️ Costo DTF total</label><input type="number" id="orderDtfCost" min="0" step="0.01" value="0"></div><div class="form-group"><label>📦 Otros gastos</label><input type="number" id="orderExtraCost" min="0" step="0.01" value="0"></div></div><div class="form-grid"><div class="form-group"><label>💵 Anticipo Recibido ($)</label><input type="number" id="orderAdvance" value="0" onchange="validateAdvanceAndCalculate()"></div><div class="form-group full-width"><label>📁 Subir Diseño</label><div class="file-upload" onclick="document.getElementById('orderDesign').click()"><input type="file" id="orderDesign" accept="image/*" style="display: none;" onchange="handleFileUpload(this)"><div class="file-upload-icon">📁</div><p id="uploadText">Haz click para subir el diseño</p><img id="uploadPreview" class="file-upload-preview" style="display: none;"></div></div></div></form></div><div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal('newOrderModal')">Cancelar</button><button class="btn btn-primary" onclick="saveOrder()">Guardar Pedido</button></div></div></div>
+<div class="modal-overlay" id="newOrderModal"><div class="modal"><div class="modal-header"><h2>✨ Nuevo Pedido</h2><button class="close-btn" onclick="closeModal('newOrderModal')">&times;</button></div><div class="modal-body"><form id="orderForm"><div class="form-grid"><div class="form-group full-width"><label>👤 Nombre del Cliente</label><input type="text" id="orderCustomerName" placeholder="Escribe el nombre del cliente" required></div><div class="form-group"><label>📱 Teléfono WhatsApp</label><input type="tel" id="orderCustomerPhone" placeholder="Ej. 6641234567"></div><div class="form-group"><label>🖨️ Técnica de Estampado</label><select id="orderTechnique"><option>DTF</option></select></div><div class="form-group full-width"><label>📋 Estado Inicial</label><select id="orderStatus"><option>En espera de Anticipo</option><option>Diseño Pendiente</option><option>En Producción</option><option>Listo para Entregar</option></select></div></div><div class="products-list" id="productsList"></div><button type="button" class="add-product-btn" onclick="addProductRow()">+ Agregar Producto</button><div class="form-group full-width" style="margin-top: 25px;"><div class="price-display"><div><div class="label">Total Productos</div><div class="value" id="displayTotalQty">0</div></div><div><div class="label">Subtotal</div><div class="value" id="displaySubtotal">$0</div></div><div><div class="label">Descuento Cupón</div><div class="value" id="displayCouponDiscount">$0</div></div><div><div class="label">Precio Total</div><div class="value" id="displayTotal">$0</div></div><div><div class="label">Anticipo Sugerido (70%)</div><div class="value" id="displayAdvance">$0</div></div></div></div><div class="form-grid"><div class="form-group full-width"><label>Validar cupón de descuento</label><div style="display:flex; gap:10px; flex-wrap:wrap;"><input type="text" id="orderCouponCode" placeholder="Ej. PRI10-ABC123" style="flex:1 1 220px; text-transform:uppercase;"><button type="button" class="btn btn-info" onclick="validateCouponForOrder()">Validar cupón</button><button type="button" class="btn btn-secondary" onclick="clearOrderCoupon()">Quitar</button></div><p id="couponValidationMessage" style="margin-top:8px; color:#64748b; font-size:13px;"></p></div></div><div class="form-grid"><div class="form-group"><label>🧵 Costo camiseta por pieza</label><input type="number" id="orderShirtCost" min="0" step="0.01" value="0"></div><div class="form-group"><label>🧒 Costo camiseta niño por pieza</label><input type="number" id="orderShirtCostKids" min="0" step="0.01" value="0"></div><div class="form-group"><label>🖨️ Costo DTF total</label><input type="number" id="orderDtfCost" min="0" step="0.01" value="0"></div><div class="form-group"><label>📦 Otros gastos</label><input type="number" id="orderExtraCost" min="0" step="0.01" value="0"></div></div><div class="form-grid"><div class="form-group"><label>💵 Anticipo Recibido ($)</label><input type="number" id="orderAdvance" value="0" onchange="validateAdvanceAndCalculate()"></div><div class="form-group full-width"><label>📁 Subir Diseño</label><div class="file-upload" onclick="document.getElementById('orderDesign').click()"><input type="file" id="orderDesign" accept="image/*" style="display: none;" onchange="handleFileUpload(this)"><div class="file-upload-icon">📁</div><p id="uploadText">Haz click para subir el diseño</p><img id="uploadPreview" class="file-upload-preview" style="display: none;"></div></div></div></form></div><div class="modal-footer"><button class="btn btn-secondary" onclick="goHome()">Home</button><button class="btn btn-secondary" onclick="closeModal('newOrderModal')">Cancelar</button><button class="btn btn-primary" onclick="saveOrder()">Guardar Pedido</button></div></div></div>
 
-<div class="modal-overlay" id="orderDetailModal"><div class="modal"><div class="modal-header"><h2 id="detailOrderId">Pedido #</h2><button class="close-btn" onclick="closeModal('orderDetailModal')">&times;</button></div><div class="modal-body"><div id="orderDetailContent"></div></div><div class="modal-footer"><button class="btn btn-warning" onclick="markAsPaid()">Marcar como Saldado</button><button class="btn btn-secondary" onclick="printTicket()">Imprimir Ticket</button><button class="btn btn-info" onclick="downloadTicket()">Descargar Ticket</button><button class="btn btn-success" onclick="shareTicketWhatsApp()">Compartir WhatsApp</button><button class="btn btn-info" onclick="downloadProductList()">Lista Productos</button><button class="btn btn-primary" onclick="closeModal('orderDetailModal')">Cerrar</button></div></div></div>
+<div class="modal-overlay" id="orderDetailModal"><div class="modal"><div class="modal-header"><h2 id="detailOrderId">Pedido #</h2><button class="close-btn" onclick="closeModal('orderDetailModal')">&times;</button></div><div class="modal-body"><div id="orderDetailContent"></div></div><div class="modal-footer"><button class="btn btn-secondary" onclick="goHome()">Home</button><button class="btn btn-warning" onclick="markAsPaid()">Marcar como Saldado</button><button class="btn btn-secondary" onclick="printTicket()">Imprimir Ticket</button><button class="btn btn-info" onclick="downloadTicket()">Descargar Ticket</button><button class="btn btn-success" onclick="shareTicketWhatsApp()">Compartir WhatsApp</button><button class="btn btn-info" onclick="downloadProductList()">Lista Productos</button><button class="btn btn-primary" onclick="closeModal('orderDetailModal')">Cerrar</button></div></div></div>
 
-<div class="modal-overlay" id="editOrderModal"><div class="modal"><div class="modal-header"><h2>✏️ Editar Pedido</h2><button class="close-btn" onclick="closeModal('editOrderModal')">&times;</button></div><div class="modal-body"><form id="editOrderForm"><input type="hidden" id="editOrderId"><div class="form-grid"><div class="form-group full-width"><label>Nombre del Cliente</label><input type="text" id="editCustomerName" required></div><div class="form-group"><label>Fecha del Pedido</label><input type="date" id="editOrderDate" required></div><div class="form-group"><label>Técnica</label><select id="editTechnique"><option>DTF</option></select></div><div class="form-group full-width"><label>Estado</label><select id="editStatus"><option>En espera de Anticipo</option><option>Diseño Pendiente</option><option>En Producción</option><option>Listo para Entregar</option><option>Entregado</option></select></div></div><div class="form-group full-width"><label>Productos</label><div id="editProductsList"></div><button type="button" class="add-product-btn" onclick="addEditProductRow()">+ Agregar Producto</button></div><div class="form-group full-width"><div class="price-display"><div><div class="label">Total</div><div class="value" id="editDisplayTotal">$0</div></div></div></div><div class="form-grid"><div class="form-group"><label>Anticipo recibido ($)</label><input type="number" id="editAdvance" min="0" step="0.01" value="0"></div><div class="form-group"><label>Costo camiseta por pieza</label><input type="number" id="editShirtCost" min="0" step="0.01" value="0"></div><div class="form-group"><label>Costo DTF total</label><input type="number" id="editDtfCost" min="0" step="0.01" value="0"></div><div class="form-group"><label>Otros gastos</label><input type="number" id="editExtraCost" min="0" step="0.01" value="0"></div></div></form></div><div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal('editOrderModal')">Cancelar</button><button class="btn btn-primary" onclick="saveEditOrder()">Guardar Cambios</button></div></div></div>
+<div class="modal-overlay" id="editOrderModal"><div class="modal"><div class="modal-header"><h2>✏️ Editar Pedido</h2><button class="close-btn" onclick="closeModal('editOrderModal')">&times;</button></div><div class="modal-body"><form id="editOrderForm"><input type="hidden" id="editOrderId"><div class="form-grid"><div class="form-group full-width"><label>Nombre del Cliente</label><input type="text" id="editCustomerName" required></div><div class="form-group"><label>Fecha del Pedido</label><input type="date" id="editOrderDate" required></div><div class="form-group"><label>Técnica</label><select id="editTechnique"><option>DTF</option></select></div><div class="form-group full-width"><label>Estado</label><select id="editStatus"><option>En espera de Anticipo</option><option>Diseño Pendiente</option><option>En Producción</option><option>Listo para Entregar</option><option>Entregado</option></select></div></div><div class="form-group full-width"><label>Productos</label><div id="editProductsList"></div><button type="button" class="add-product-btn" onclick="addEditProductRow()">+ Agregar Producto</button></div><div class="form-group full-width"><div class="price-display"><div><div class="label">Subtotal</div><div class="value" id="editDisplaySubtotal">$0</div></div><div><div class="label">Descuento Cupón</div><div class="value" id="editDisplayCouponDiscount">$0</div></div><div><div class="label">Total</div><div class="value" id="editDisplayTotal">$0</div></div><div><div class="label">Saldo restante</div><div class="value" id="editDisplayRemaining">$0</div></div></div></div><div class="form-grid"><div class="form-group"><label>Anticipo recibido ($)</label><input type="number" id="editAdvance" min="0" step="0.01" value="0" onchange="calculateEditPrices()" oninput="calculateEditPrices()"></div><div class="form-group"><label>Costo camiseta por pieza</label><input type="number" id="editShirtCost" min="0" step="0.01" value="0"></div><div class="form-group"><label>Costo DTF total</label><input type="number" id="editDtfCost" min="0" step="0.01" value="0"></div><div class="form-group"><label>Otros gastos</label><input type="number" id="editExtraCost" min="0" step="0.01" value="0"></div></div></form></div><div class="modal-footer"><button class="btn btn-secondary" onclick="goHome()">Home</button><button class="btn btn-secondary" onclick="closeModal('editOrderModal')">Cancelar</button><button class="btn btn-primary" onclick="saveEditOrder()">Guardar Cambios</button></div></div></div>
 
-<div class="modal-overlay" id="newCustomerModal"><div class="modal"><div class="modal-header"><h2>Nuevo Cliente</h2><button class="close-btn" onclick="closeModal('newCustomerModal')">&times;</button></div><div class="modal-body"><form id="customerForm"><div class="form-group"><label>Nombre</label><input type="text" id="customerName" required></div><div class="form-group"><label>Teléfono WhatsApp</label><input type="tel" id="customerPhone" placeholder="Ej. 6641234567"></div><div class="form-group"><label>Email</label><input type="email" id="customerEmail"></div></form></div><div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal('newCustomerModal')">Cancelar</button><button class="btn btn-primary" onclick="saveCustomer()">Guardar</button></div></div></div>
+<div class="modal-overlay" id="newCustomerModal"><div class="modal"><div class="modal-header"><h2>Nuevo Cliente</h2><button class="close-btn" onclick="closeModal('newCustomerModal')">&times;</button></div><div class="modal-body"><form id="customerForm"><div class="form-group"><label>Nombre</label><input type="text" id="customerName" required></div><div class="form-group"><label>Teléfono WhatsApp</label><input type="tel" id="customerPhone" placeholder="Ej. 6641234567"></div><div class="form-group"><label>Email</label><input type="email" id="customerEmail"></div></form></div><div class="modal-footer"><button class="btn btn-secondary" onclick="goHome()">Home</button><button class="btn btn-secondary" onclick="closeModal('newCustomerModal')">Cancelar</button><button class="btn btn-primary" onclick="saveCustomer()">Guardar</button></div></div></div>
 
 <div class="modal-overlay" id="mockupModal">
     <div class="modal">
@@ -664,11 +675,32 @@ const priceTables = {
     'Hoodie Niño': [{ min: 1, max: 5, price: 500 }, { min: 6, max: Infinity, price: 430 }],
 };
 
+function normalizeProductType(productType) {
+    const raw = String(productType || '').trim();
+    const aliases = {
+        'Playera B?sica': 'Playera Básica',
+        'Playera Basica': 'Playera Básica',
+        'Playera b&aacute;sica': 'Playera Básica',
+        'Playera básica': 'Playera Básica',
+        'Playera Ni?o': 'Playera Niño',
+        'Playera Nino': 'Playera Niño',
+        'Dry Fit Ni?o': 'Dry Fit Niño',
+        'Dry Fit Nino': 'Dry Fit Niño',
+        'Polo Ni?o': 'Polo Niño',
+        'Polo Nino': 'Polo Niño',
+        'Hoodie Ni?o': 'Hoodie Niño',
+        'Hoodie Nino': 'Hoodie Niño',
+        'Polo': 'Camiseta tipo Polo'
+    };
+    return aliases[raw] || raw || 'Playera Básica';
+}
 function getUnitPrice(productType, quantity) {
-    const priceTable = priceTables[productType];
+    const normalizedType = normalizeProductType(productType);
+    const priceTable = priceTables[normalizedType];
     if (!priceTable) return 300;
+    const qty = Math.max(1, Number(quantity) || 1);
     for (const tier of priceTable) {
-        if (quantity >= tier.min && quantity <= tier.max) return tier.price;
+        if (qty >= tier.min && qty <= tier.max) return tier.price;
     }
     return 300;
 }
@@ -710,12 +742,13 @@ function sanitizeProduct(product) {
     const price = Math.max(0, Number(product.price) || 0);
     if (!qty) return null;
     return {
-        type: product.type || 'Playera Básica',
+        type: normalizeProductType(product.type || 'Playera Básica'),
         gender: product.gender || 'Caballero',
         color: product.color || 'Blanco',
         size: product.size || 'M',
         qty,
-        price
+        price,
+        customPrice: Boolean(product.customPrice || product.priceMode === 'custom')
     };
 }
 function sanitizeOrder(order) {
@@ -1170,40 +1203,78 @@ function addProductRow() {
     productItem.className = 'product-item';
     productItem.id = `product-${productCounter}`;
     productItem.innerHTML = `
-        <div class="form-group"><label>👕 Prenda</label><select class="product-type" onchange="updateProductPrice(${productCounter})"><option>Playera Básica</option><option>Dry Fit</option><option>Camiseta tipo Polo</option><option>Hoodie</option><option>Sudadera</option><option>Playera Niño</option><option>Polo Niño</option><option>Dry Fit Niño</option><option>Hoodie Niño</option></select></div>
+        <div class="form-group"><label>👕 Prenda</label><select class="product-type" onchange="refreshProductPrices()"><option>Playera Básica</option><option>Dry Fit</option><option>Camiseta tipo Polo</option><option>Hoodie</option><option>Sudadera</option><option>Playera Niño</option><option>Polo Niño</option><option>Dry Fit Niño</option><option>Hoodie Niño</option></select></div>
         <div class="form-group"><label>👥 Género</label><select class="product-gender"><option value="Caballero">Caballero</option><option value="Dama">Dama</option><option value="Niño">Niño</option></select></div>
 		<div class="form-group"><label>🎨 Color</label><select class="product-color">${Object.values(eurocottonColors).flatMap(cat => Object.keys(cat)).map(c => `<option>${c}</option>`).join('')}</select></div>
         <div class="form-group"><label>📏 Talla</label><select class="product-size"><option>XS</option><option>S</option><option>M</option><option>L</option><option>XL</option><option>XXL</option><option>XXXL</option></select></div>
-        <div class="form-group"><label>🔢 Cantidad</label><input type="number" class="product-qty" value="1" min="1" onchange="updateProductPrice(${productCounter})"></div>
-        <div class="form-group"><label>💲 Precio</label><input type="number" class="product-price" value="300" min="0" onchange="calculatePrices()"></div>
+        <div class="form-group"><label>🔢 Cantidad</label><input type="number" class="product-qty" value="1" min="1" onchange="refreshProductPrices()" oninput="refreshProductPrices()"></div>
+        <div class="form-group"><label>💲 Precio</label><input type="number" class="product-price" value="300" min="0" onchange="markProductCustomPrice(${productCounter}, true)" oninput="markProductCustomPrice(${productCounter}, true)"><div class="price-mode-note">Automático por mayoreo si no activas precio personalizado.</div></div>
+        <label class="price-mode-toggle"><input type="checkbox" class="product-custom-price" onchange="toggleProductCustomPrice(${productCounter}, this.checked)"> Precio personalizado</label>
         <button type="button" class="btn-remove" onclick="removeProductRow(${productCounter})">✖</button>
         <div id="colorSwatches-${productCounter}" class="color-swatches-container"></div>
     `;
     productsList.appendChild(productItem);
     generateColorSelector(`colorSwatches-${productCounter}`);
-    updateProductPrice(productCounter);
+    refreshProductPrices();
+}
+function getProductTypeTotals(containerSelector, typeSelector, qtySelector) {
+    const totals = {};
+    document.querySelectorAll(`${containerSelector} .product-item`).forEach(item => {
+        const type = normalizeProductType(item.querySelector(typeSelector).value);
+        const qty = parseInt(item.querySelector(qtySelector).value, 10) || 0;
+        totals[type] = (totals[type] || 0) + Math.max(0, qty);
+    });
+    return totals;
+}
+function isProductCustomPrice(productItem) {
+    const toggle = productItem ? productItem.querySelector('.product-custom-price') : null;
+    return Boolean(toggle && toggle.checked);
+}
+function markProductCustomPrice(productId, custom) {
+    const productItem = document.getElementById(`product-${productId}`);
+    if (!productItem) return;
+    const toggle = productItem.querySelector('.product-custom-price');
+    if (toggle) toggle.checked = Boolean(custom);
+    calculatePrices();
+}
+function toggleProductCustomPrice(productId, custom) {
+    if (!custom) updateProductPrice(productId);
+    else calculatePrices();
+}
+function refreshProductPrices() {
+    document.querySelectorAll('#productsList .product-item').forEach(item => {
+        const productId = Number(String(item.id || '').replace('product-', ''));
+        if (productId) updateProductPrice(productId);
+    });
+    calculatePrices();
 }
 function updateProductPrice(productId) {
     const productItem = document.getElementById(`product-${productId}`);
     if (!productItem) return;
-    const productType = productItem.querySelector('.product-type').value;
-    const quantity = parseInt(productItem.querySelector('.product-qty').value) || 1;
+    if (isProductCustomPrice(productItem)) {
+        calculatePrices();
+        return;
+    }
+    const productType = normalizeProductType(productItem.querySelector('.product-type').value);
+    const typeTotals = getProductTypeTotals('#productsList', '.product-type', '.product-qty');
+    const quantity = typeTotals[productType] || parseInt(productItem.querySelector('.product-qty').value) || 1;
     const priceInput = productItem.querySelector('.product-price');
     const unitPrice = getUnitPrice(productType, quantity);
     priceInput.value = unitPrice;
     calculatePrices();
 }
-function removeProductRow(id) { const item = document.getElementById(`product-${id}`); if (item) item.remove(); calculatePrices(); }
+function removeProductRow(id) { const item = document.getElementById(`product-${id}`); if (item) item.remove(); refreshProductPrices(); }
 function getProductsFromForm() {
     const products = [];
     document.querySelectorAll('#productsList .product-item').forEach(item => {
-        const type = item.querySelector('.product-type').value;
+        const type = normalizeProductType(item.querySelector('.product-type').value);
         const gender = item.querySelector('.product-gender').value;
         const color = item.querySelector('.product-color').value;
         const size = item.querySelector('.product-size').value;
         const qty = parseInt(item.querySelector('.product-qty').value, 10) || 0;
         const price = parseFloat(item.querySelector('.product-price').value) || 0;
-        if (qty > 0 && price >= 0) products.push({ type, gender, color, size, qty, price });
+        const customPrice = isProductCustomPrice(item);
+        if (qty > 0 && price >= 0) products.push({ type, gender, color, size, qty, price, customPrice });
     });
     return products;
 }
@@ -1246,14 +1317,14 @@ function calculateOrderCosts(totalQty, shirtCost, dtfCost, extraCost) {
 }
 function mapCalculatorTypeToOrderType(type) {
     const typeMap = {
-        basica: 'Playera B?sica',
-        nino: 'Playera Ni?o',
+        basica: 'Playera Básica',
+        nino: 'Playera Niño',
         polo: 'Camiseta tipo Polo',
-        polonino: 'Polo Ni?o',
+        polonino: 'Polo Niño',
         dryfit: 'Dry Fit',
-        dryfitnino: 'Dry Fit Ni?o',
+        dryfitnino: 'Dry Fit Niño',
         hoodie: 'Hoodie',
-        hoodienino: 'Hoodie Ni?o'
+        hoodienino: 'Hoodie Niño'
     };
 
     return typeMap[type] || type;
@@ -1464,8 +1535,14 @@ function openEditOrderModal(orderId) {
     } else {
         addEditProductRow();
     }
+    refreshEditProductPrices();
     calculateEditPrices();
     document.getElementById('editOrderModal').classList.add('active');
+}
+function getProductOptionsHtml(selectedType = '') {
+    const options = Object.keys(priceTables);
+    const normalizedSelected = normalizeProductType(selectedType || options[0]);
+    return options.map(type => `<option value="${type}" ${type === normalizedSelected ? 'selected' : ''}>${type}</option>`).join('');
 }
 function addEditProductRow(product = null) {
     editProductCounter++;
@@ -1480,34 +1557,73 @@ function addEditProductRow(product = null) {
         }
     }
     const colorOptionsHtml = colorOptions.join('');
+    const normalizedType = normalizeProductType(product && product.type ? product.type : 'Playera Básica');
+    const isCustomPrice = Boolean(product && product.customPrice);
     productDiv.innerHTML = `
-        <div class="form-group"><label>👕 Prenda</label><select class="edit-product-type" onchange="updateEditProductPrice(${editProductCounter})"><option>Playera B?sica</option><option>Playera Ni?o</option><option>Dry Fit</option><option>Dry Fit Ni?o</option><option>Camiseta tipo Polo</option><option>Polo Ni?o</option><option>Hoodie</option><option>Hoodie Ni?o</option><option>Sudadera</option></select></div>
+        <div class="form-group"><label>👕 Prenda</label><select class="edit-product-type" onchange="refreshEditProductPrices()">${getProductOptionsHtml(normalizedType)}</select></div>
         <div class="form-group"><label>👥 Género</label><select class="edit-product-gender"><option value="Caballero">Caballero</option><option value="Dama">Dama</option><option value="Niño">Niño</option></select></div>
         <div class="form-group"><label>🎨 Color</label><select class="edit-product-color">${colorOptionsHtml}</select></div>
         <div class="form-group"><label>📏 Talla</label><select class="edit-product-size"><option>XS</option><option>S</option><option>M</option><option>L</option><option>XL</option><option>XXL</option><option>XXXL</option></select></div>
-        <div class="form-group"><label>🔢 Cantidad</label><input type="number" class="edit-product-qty" value="1" min="1" onchange="updateEditProductPrice(${editProductCounter})"></div>
-        <div class="form-group"><label>💲 Precio</label><input type="number" class="edit-product-price" value="300" min="0" step="0.01" onchange="calculateEditPrices()"></div>
+        <div class="form-group"><label>🔢 Cantidad</label><input type="number" class="edit-product-qty" value="1" min="1" onchange="refreshEditProductPrices()" oninput="refreshEditProductPrices()"></div>
+        <div class="form-group"><label>💲 Precio</label><input type="number" class="edit-product-price" value="300" min="0" step="0.01" onchange="markEditProductCustomPrice(${editProductCounter}, true)" oninput="markEditProductCustomPrice(${editProductCounter}, true)"><div class="price-mode-note">Automático por mayoreo si no activas precio personalizado.</div></div>
+        <label class="price-mode-toggle"><input type="checkbox" class="edit-product-custom-price" ${isCustomPrice ? 'checked' : ''} onchange="toggleEditProductCustomPrice(${editProductCounter}, this.checked)"> Precio personalizado</label>
         <button type="button" class="btn-remove" onclick="removeEditProductRow(${editProductCounter})">✖</button>
     `;
     container.appendChild(productDiv);
     if (product) {
-        productDiv.querySelector('.edit-product-type').value = product.type || 'Playera Básica';
+        productDiv.querySelector('.edit-product-type').value = normalizedType;
         productDiv.querySelector('.edit-product-gender').value = product.gender || 'Caballero';
         productDiv.querySelector('.edit-product-color').value = product.color || 'Blanco';
         productDiv.querySelector('.edit-product-size').value = product.size || 'M';
         productDiv.querySelector('.edit-product-qty').value = product.qty || 1;
         productDiv.querySelector('.edit-product-price').value = product.price || 0;
-        updateEditProductPrice(editProductCounter);
     } else {
         updateEditProductPrice(editProductCounter);
     }
+    refreshEditProductPrices();
+}
+function getEditProductTypeTotals() {
+    const totals = {};
+    document.querySelectorAll('#editProductsList .product-item').forEach(item => {
+        const type = normalizeProductType(item.querySelector('.edit-product-type').value);
+        const qty = parseInt(item.querySelector('.edit-product-qty').value, 10) || 0;
+        totals[type] = (totals[type] || 0) + Math.max(0, qty);
+    });
+    return totals;
+}
+function isEditProductCustomPrice(productDiv) {
+    const toggle = productDiv ? productDiv.querySelector('.edit-product-custom-price') : null;
+    return Boolean(toggle && toggle.checked);
+}
+function markEditProductCustomPrice(productId, custom) {
+    const productDiv = document.getElementById(`edit-product-${productId}`);
+    if (!productDiv) return;
+    const toggle = productDiv.querySelector('.edit-product-custom-price');
+    if (toggle) toggle.checked = Boolean(custom);
+    calculateEditPrices();
+}
+function toggleEditProductCustomPrice(productId, custom) {
+    if (!custom) updateEditProductPrice(productId);
+    else calculateEditPrices();
+}
+function refreshEditProductPrices() {
+    document.querySelectorAll('#editProductsList .product-item').forEach(item => {
+        const productId = Number(String(item.id || '').replace('edit-product-', ''));
+        if (productId) updateEditProductPrice(productId);
+    });
+    calculateEditPrices();
 }
 function updateEditProductPrice(productId) {
     const productDiv = document.getElementById(`edit-product-${productId}`);
     if (!productDiv) return;
-    const type = productDiv.querySelector('.edit-product-type').value;
-    const qty = parseInt(productDiv.querySelector('.edit-product-qty').value) || 1;
-    const price = getUnitPrice(type, qty);
+    if (isEditProductCustomPrice(productDiv)) {
+        calculateEditPrices();
+        return;
+    }
+    const type = normalizeProductType(productDiv.querySelector('.edit-product-type').value);
+    const typeTotals = getEditProductTypeTotals();
+    const qtyForPricing = typeTotals[type] || parseInt(productDiv.querySelector('.edit-product-qty').value, 10) || 1;
+    const price = getUnitPrice(type, qtyForPricing);
     const priceInput = productDiv.querySelector('.edit-product-price');
     if (priceInput) priceInput.value = price;
     calculateEditPrices();
@@ -1515,18 +1631,66 @@ function updateEditProductPrice(productId) {
 function removeEditProductRow(id) {
     const productDiv = document.getElementById(`edit-product-${id}`);
     if (productDiv) productDiv.remove();
-    calculateEditPrices();
+    refreshEditProductPrices();
+}
+function getOrderCouponPercent(order) {
+    if (!order) return 10;
+    const relatedCoupon = coupons.find(coupon =>
+        (order.couponId && coupon.id === order.couponId) ||
+        (order.couponCode && coupon.code === order.couponCode)
+    );
+    if (relatedCoupon && Number(relatedCoupon.discountPercent)) return Number(relatedCoupon.discountPercent);
+    const baseSubtotal = Number(order.subtotal) || (Number(order.total) + Number(order.couponDiscount || 0));
+    if (baseSubtotal > 0 && Number(order.couponDiscount) > 0) {
+        return Math.round((Number(order.couponDiscount) / baseSubtotal) * 100) || 10;
+    }
+    return 10;
+}
+function calculateEditTotalsFromProducts(products, previousOrder) {
+    const subtotal = products.reduce((sum, product) => sum + (product.qty * product.price), 0);
+    const hasCoupon = Boolean(previousOrder && (previousOrder.couponCode || previousOrder.couponDiscount));
+    const couponDiscount = hasCoupon ? Math.round(subtotal * (getOrderCouponPercent(previousOrder) / 100)) : 0;
+    const total = Math.max(0, subtotal - couponDiscount);
+    return { subtotal, couponDiscount, total };
+}
+function getEditProductsFromForm() {
+    const products = [];
+    let valid = true;
+    document.querySelectorAll('#editProductsList .product-item').forEach(item => {
+        const type = normalizeProductType(item.querySelector('.edit-product-type').value);
+        const gender = item.querySelector('.edit-product-gender').value;
+        const color = item.querySelector('.edit-product-color').value;
+        const size = item.querySelector('.edit-product-size').value;
+        const qty = parseInt(item.querySelector('.edit-product-qty').value, 10) || 0;
+        const price = parseFloat(item.querySelector('.edit-product-price').value) || 0;
+        const customPrice = isEditProductCustomPrice(item);
+        if (qty <= 0 || price < 0) valid = false;
+        if (qty > 0) products.push({ type, gender, color, size, qty, price, customPrice });
+    });
+    return { products, valid };
 }
 function calculateEditPrices() {
-    let total = 0;
-    document.querySelectorAll('#editProductsList .product-item').forEach(item => {
-        const qty = parseInt(item.querySelector('.edit-product-qty').value) || 0;
-        const price = parseFloat(item.querySelector('.edit-product-price').value) || 0;
-        if (qty > 0 && price >= 0) total += qty * price;
-    });
+    const orderId = document.getElementById('editOrderId') ? document.getElementById('editOrderId').value : '';
+    const existingOrder = orders.find(order => order.id === orderId) || {};
+    const { products } = getEditProductsFromForm();
+    const totals = calculateEditTotalsFromProducts(products, existingOrder);
+    const advanceInput = document.getElementById('editAdvance');
+    let advance = parseFloat(advanceInput ? advanceInput.value : 0) || 0;
+    if (advance < 0) advance = 0;
+    if (advance > totals.total) {
+        advance = totals.total;
+        if (advanceInput) advanceInput.value = advance;
+    }
+    const remaining = Math.max(0, totals.total - advance);
+    const displaySubtotal = document.getElementById('editDisplaySubtotal');
+    const displayCouponDiscount = document.getElementById('editDisplayCouponDiscount');
     const displayTotal = document.getElementById('editDisplayTotal');
-    if (displayTotal) displayTotal.textContent = '$' + total.toLocaleString();
-    return total;
+    const displayRemaining = document.getElementById('editDisplayRemaining');
+    if (displaySubtotal) displaySubtotal.textContent = '$' + totals.subtotal.toLocaleString();
+    if (displayCouponDiscount) displayCouponDiscount.textContent = '-$' + totals.couponDiscount.toLocaleString();
+    if (displayTotal) displayTotal.textContent = '$' + totals.total.toLocaleString();
+    if (displayRemaining) displayRemaining.textContent = '$' + remaining.toLocaleString();
+    return { ...totals, advance, remaining };
 }
 async function saveEditOrder() {
     const orderId = document.getElementById('editOrderId').value;
@@ -1538,18 +1702,7 @@ async function saveEditOrder() {
         showNotification('Por favor completa todos los campos requeridos', 'error');
         return;
     }
-    const products = [];
-    let valid = true;
-    document.querySelectorAll('#editProductsList .product-item').forEach(item => {
-        const type = item.querySelector('.edit-product-type').value;
-        const gender = item.querySelector('.edit-product-gender').value;
-        const color = item.querySelector('.edit-product-color').value;
-        const size = item.querySelector('.edit-product-size').value;
-        const qty = parseInt(item.querySelector('.edit-product-qty').value, 10) || 0;
-        const price = parseFloat(item.querySelector('.edit-product-price').value) || 0;
-        if (qty <= 0 || price < 0) valid = false;
-        if (qty > 0) products.push({ type, gender, color, size, qty, price });
-    });
+    const { products, valid } = getEditProductsFromForm();
     if (!valid) {
         showNotification('❌ Cantidad debe ser mayor a cero y precio no puede ser negativo', 'error');
         return;
@@ -1558,7 +1711,6 @@ async function saveEditOrder() {
         showNotification('Por favor agrega al menos un producto', 'error');
         return;
     }
-    const total = products.reduce((sum, product) => sum + (product.qty * product.price), 0);
     const totalQty = products.reduce((sum, product) => sum + product.qty, 0);
     const shirtCost = parseFloat(document.getElementById('editShirtCost').value) || 0;
     const dtfCost = parseFloat(document.getElementById('editDtfCost').value) || 0;
@@ -1570,9 +1722,10 @@ async function saveEditOrder() {
         return;
     }
     const previousOrder = orders[orderIndex];
+    const editTotals = calculateEditTotalsFromProducts(products, previousOrder);
     let advance = parseFloat(document.getElementById('editAdvance').value) || 0;
     if (advance < 0) advance = 0;
-    if (advance > total) advance = total;
+    if (advance > editTotals.total) advance = editTotals.total;
     const updatedOrder = {
         ...previousOrder,
         customerName,
@@ -1580,16 +1733,18 @@ async function saveEditOrder() {
         technique,
         status,
         products,
-        total,
+        subtotal: editTotals.subtotal,
+        couponDiscount: editTotals.couponDiscount,
+        total: editTotals.total,
         totalQty,
         advance,
-        remaining: total - advance,
-        paid: advance >= total,
+        remaining: editTotals.total - advance,
+        paid: advance >= editTotals.total,
         shirtCost,
         dtfCost,
         extraCosts: extraCost,
         costTotal: orderCosts.costTotal,
-        netProfit: total - orderCosts.costTotal
+        netProfit: editTotals.total - orderCosts.costTotal
     };
     orders[orderIndex] = updatedOrder;
     try {
@@ -2095,6 +2250,16 @@ function closeMobileMenu() {
 function toggleMobileMenu() {
     document.body.classList.toggle('mobile-menu-open');
 }
+function updateHomeButtonVisibility(sectionId) {
+    const homeButton = document.getElementById('homeFab');
+    if (!homeButton) return;
+    homeButton.classList.toggle('visible', sectionId !== DEFAULT_SECTION_ID);
+}
+function goHome() {
+    document.querySelectorAll('.modal-overlay.active').forEach(modal => modal.classList.remove('active'));
+    rememberActiveModal(null);
+    showSection(DEFAULT_SECTION_ID, null);
+}
 function showSection(sectionId, navElement, options = {}) {
     const targetSectionId = document.getElementById(sectionId) ? sectionId : DEFAULT_SECTION_ID;
     document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
@@ -2104,6 +2269,7 @@ function showSection(sectionId, navElement, options = {}) {
     const resolvedNav = navElement || Array.from(document.querySelectorAll('.nav-item')).find(item => item.getAttribute('onclick') && item.getAttribute('onclick').includes("showSection('" + targetSectionId + "'"));
     if (resolvedNav) resolvedNav.classList.add('active');
     rememberActiveSection(targetSectionId);
+    updateHomeButtonVisibility(targetSectionId);
     if (window.innerWidth <= 1024) closeMobileMenu();
     if (!options.skipRender) renderAll();
 }
@@ -3376,6 +3542,8 @@ function addCalcProduct() {
 </script>
 </body>
 </html>
+
+
 
 
 
