@@ -657,6 +657,7 @@ let coupons = [];
 let currentOrderId = null;
 let currentCouponForOrder = null;
 let editingCouponId = null;
+let editingCustomerId = null;
 let currentFilter = 'all';
 let uploadedDesign = null;
 let productCounter = 0;
@@ -2644,16 +2645,34 @@ function renderCustomers() {
             const safeCustomerId = String(customer.id).replace(/'/g, "\\'");
             return `
                 <tr>
-                    <td><strong>${customer.name}</strong></td>
-                    <td>${customer.phone || '-'}</td>
-                    <td>${customer.email || '-'}</td>
-                    <td>${customer.date}</td>
+                    <td><strong>${ticketEscape(customer.name)}</strong></td>
+                    <td>${ticketEscape(customer.phone || '-')}</td>
+                    <td>${ticketEscape(customer.email || '-')}</td>
+                    <td>${ticketEscape(customer.date)}</td>
                     <td>${orderCount} pedidos</td>
-                    <td><button onclick="deleteCustomer('${safeCustomerId}')" class="btn btn-danger btn-sm">Eliminar</button></td>
+                    <td><div class="action-buttons"><button onclick="openEditCustomerModal('${safeCustomerId}')" class="btn btn-info btn-sm">Editar</button><button onclick="deleteCustomer('${safeCustomerId}')" class="btn btn-danger btn-sm">Eliminar</button></div></td>
                 </tr>
             `;
         }).join('');
     }
+}
+function openEditCustomerModal(id) {
+    const customer = customers.find(c => String(c.id) === String(id));
+    if (!customer) {
+        showNotification('Cliente no encontrado', 'error');
+        return;
+    }
+    editingCustomerId = String(customer.id);
+    const title = document.querySelector('#newCustomerModal .modal-header h2');
+    if (title) title.textContent = 'Editar Cliente';
+    const nameInput = document.getElementById('customerName');
+    const phoneInput = document.getElementById('customerPhone');
+    const emailInput = document.getElementById('customerEmail');
+    if (nameInput) nameInput.value = customer.name || '';
+    if (phoneInput) phoneInput.value = customer.phone || '';
+    if (emailInput) emailInput.value = customer.email || '';
+    rememberActiveModal('newCustomerModal');
+    openModal('newCustomerModal');
 }
 function deleteCustomer(id) {
     const customer = customers.find(c => String(c.id) === String(id));
@@ -2674,26 +2693,72 @@ function deleteCustomer(id) {
         showNotification('Cliente eliminado', 'success');
     }
 }
-function saveCustomer() {
+async function saveCustomer() {
     const name = document.getElementById('customerName').value.trim();
     if (!name) { showNotification('Ingresa el nombre del cliente', 'error'); return; }
-    const newCustomer = {
-        id: Date.now(),
-        name: name,
-        phone: document.getElementById('customerPhone') ? document.getElementById('customerPhone').value.trim() : '',
-        email: document.getElementById('customerEmail').value.trim(),
-        date: new Date().toISOString().split('T')[0]
-    };
-    customers.push(newCustomer);
+    const phone = document.getElementById('customerPhone') ? document.getElementById('customerPhone').value.trim() : '';
+    const email = document.getElementById('customerEmail').value.trim();
+    if (editingCustomerId) {
+        const customer = customers.find(c => String(c.id) === String(editingCustomerId));
+        if (!customer) {
+            showNotification('Cliente no encontrado', 'error');
+            return;
+        }
+        const previousName = String(customer.name || '').trim();
+        const previousPhone = String(customer.phone || '').trim();
+        customer.name = name;
+        customer.phone = phone;
+        customer.email = email;
+        const previousKey = previousName.toLowerCase();
+        const relatedOrders = orders.filter(order => String(order.customerName || '').trim().toLowerCase() === previousKey);
+        relatedOrders.forEach(order => {
+            order.customerName = name;
+            if (!order.customerPhone || String(order.customerPhone).trim() === previousPhone) order.customerPhone = phone;
+        });
+        coupons.forEach(coupon => {
+            if (String(coupon.customerName || '').trim().toLowerCase() === previousKey) {
+                coupon.customerName = name;
+                if (!coupon.customerPhone || String(coupon.customerPhone).trim() === previousPhone) coupon.customerPhone = phone;
+            }
+        });
+        try {
+            await Promise.all(relatedOrders.map(order => persistOrderToDatabase(order)));
+        } catch (error) {
+            console.error(error);
+            showNotification('No se pudieron actualizar los pedidos asociados en Supabase.', 'error');
+            return;
+        }
+        editingCustomerId = null;
+        showNotification('Cliente actualizado correctamente', 'success');
+    } else {
+        const newCustomer = {
+            id: Date.now(),
+            name,
+            phone,
+            email,
+            date: new Date().toISOString().split('T')[0]
+        };
+        customers.push(newCustomer);
+        showNotification('Cliente registrado', 'success');
+    }
     saveData();
     closeModal('newCustomerModal');
     document.getElementById('customerForm').reset();
+    const title = document.querySelector('#newCustomerModal .modal-header h2');
+    if (title) title.textContent = 'Nuevo Cliente';
     renderAll();
-    showNotification('Cliente registrado', 'success');
 }
 function openNewCustomerModal() { 
+    editingCustomerId = null;
+    const form = document.getElementById('customerForm');
+    if (form) form.reset();
+    const title = document.querySelector('#newCustomerModal .modal-header h2');
+    if (title) title.textContent = 'Nuevo Cliente';
     const modal = document.getElementById('newCustomerModal');
-    if (modal) modal.classList.add('active');
+    if (modal) {
+        rememberActiveModal('newCustomerModal');
+        modal.classList.add('active');
+    }
 }
 function renderFinance() {
     const totalSold = orders.reduce((s,o) => s + o.total, 0);
