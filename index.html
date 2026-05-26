@@ -897,23 +897,33 @@ function dedupeCustomersByName(customerList) {
         return true;
     });
 }
-function syncCustomersFromOrders() {
-    const mergedCustomers = [...customers];
-    const knownNames = new Set(mergedCustomers.map(customer => customer.name.toLowerCase()));
+function syncCustomersFromOrders(seedCustomers = customers) {
+    const customersByName = new Map();
+    const normalizedSeed = (Array.isArray(seedCustomers) ? seedCustomers : []).map(sanitizeCustomer).filter(Boolean);
+    normalizedSeed.forEach(customer => {
+        const key = customer.name.toLowerCase();
+        customersByName.set(key, customer);
+    });
     orders.forEach(order => {
         const normalizedName = String(order.customerName || '').trim();
+        if (!normalizedName) return;
         const key = normalizedName.toLowerCase();
-        if (!normalizedName || knownNames.has(key)) return;
-        knownNames.add(key);
-        mergedCustomers.push({
-            id: Date.now() + mergedCustomers.length,
-            name: normalizedName,
-            phone: order.customerPhone || '',
-            email: '',
-            date: order.date || new Date().toISOString().split('T')[0]
-        });
+        const existing = customersByName.get(key);
+        const orderPhone = String(order.customerPhone || '').trim();
+        if (!existing) {
+            customersByName.set(key, sanitizeCustomer({
+                id: Date.now() + customersByName.size,
+                name: normalizedName,
+                phone: orderPhone,
+                email: '',
+                date: order.date || new Date().toISOString().split('T')[0]
+            }));
+            return;
+        }
+        if (!existing.phone && orderPhone) existing.phone = orderPhone;
+        if (!existing.date && order.date) existing.date = order.date;
     });
-    customers = dedupeCustomersByName(mergedCustomers.map(sanitizeCustomer).filter(Boolean));
+    customers = Array.from(customersByName.values()).map(sanitizeCustomer).filter(Boolean);
 }
 function getStorageSnapshot(includeMedia = true) {
     const normalizedOrders = dedupeOrdersById((Array.isArray(orders) ? orders : []).map(sanitizeOrder).filter(Boolean)).map(order => (
@@ -1250,6 +1260,7 @@ async function loadDataFromDatabase(options = {}) {
         return { loaded: false, fallback: true };
     }
     const localCoupons = readStoredCouponsFallback();
+    const localCustomers = (Array.isArray(customers) ? customers : []).map(sanitizeCustomer).filter(Boolean);
     const { data: orderRows, error: ordersError } = await supabaseClient
         .from('orders')
         .select('*')
@@ -1276,7 +1287,7 @@ async function loadDataFromDatabase(options = {}) {
     const dbCoupons = await loadCouponsFromDatabase();
     coupons = mergeCoupons(dbCoupons, localCoupons);
     persistCouponsToDatabase(coupons).catch(console.error);
-    syncCustomersFromOrders();
+    syncCustomersFromOrders(localCustomers);
     saveData();
     renderAll();
     if (notify) showNotification('Pedidos cargados desde Supabase.', 'success');
