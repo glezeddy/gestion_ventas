@@ -2312,6 +2312,13 @@ function importBackup(input) {
 }
 
 // Funciones auxiliares
+function openModal(modalId) {
+    const modal = document.getElementById(modalId);
+    if (modal) {
+        rememberActiveModal(modalId);
+        modal.classList.add('active');
+    }
+}
 function closeModal(modalId) { 
     const modal = document.getElementById(modalId);
     if (modal) modal.classList.remove('active');
@@ -2672,7 +2679,8 @@ function openEditCustomerModal(id) {
     if (phoneInput) phoneInput.value = customer.phone || '';
     if (emailInput) emailInput.value = customer.email || '';
     rememberActiveModal('newCustomerModal');
-    openModal('newCustomerModal');
+    const modal = document.getElementById('newCustomerModal');
+    if (modal) modal.classList.add('active');
 }
 function deleteCustomer(id) {
     const customer = customers.find(c => String(c.id) === String(id));
