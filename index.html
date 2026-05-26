@@ -552,6 +552,7 @@ Descargar Reporte Excel
 <div><h1>Cupones de Descuento</h1><p>Genera, valida y comparte cupones personales para clientes</p></div>
 <div class="header-actions">
 <button class="btn btn-secondary" onclick="renderCoupons()">Actualizar</button>
+<button class="btn btn-danger" onclick="clearAllCoupons()">Borrar todo</button>
 </div>
 </div>
 <div class="stats-grid">
@@ -565,6 +566,24 @@ Descargar Reporte Excel
 </div>
 
 <!-- Modales (idénticos a versión funcional) -->
+<div class="modal-overlay" id="editCouponModal">
+<div class="modal">
+<div class="modal-header"><h2>Editar Cupón</h2><button class="close-btn" onclick="closeModal('editCouponModal')">&times;</button></div>
+<div class="modal-body">
+<form id="editCouponForm">
+<div class="form-grid">
+<div class="form-group"><label>Cliente</label><input type="text" id="editCouponCustomerName"></div>
+<div class="form-group"><label>Teléfono WhatsApp</label><input type="tel" id="editCouponCustomerPhone"></div>
+<div class="form-group"><label>Código</label><input type="text" id="editCouponCode" style="text-transform:uppercase;"></div>
+<div class="form-group"><label>Descuento (%)</label><input type="number" id="editCouponDiscount" min="1" max="100" step="1"></div>
+<div class="form-group"><label>Estado</label><select id="editCouponStatus"><option value="pending">Pendiente</option><option value="active">Activo</option><option value="used">Usado</option><option value="expired">Vencido</option></select></div>
+<div class="form-group"><label>Pedido relacionado</label><input type="text" id="editCouponOrderId"></div>
+</div>
+</form>
+</div>
+<div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal('editCouponModal')">Cancelar</button><button class="btn btn-primary" onclick="saveCouponEdit()">Guardar Cambios</button></div>
+</div>
+</div>
 <div class="modal-overlay" id="newOrderModal"><div class="modal"><div class="modal-header"><h2>✨ Nuevo Pedido</h2><button class="close-btn" onclick="closeModal('newOrderModal')">&times;</button></div><div class="modal-body"><form id="orderForm"><div class="form-grid"><div class="form-group full-width"><label>👤 Nombre del Cliente</label><input type="text" id="orderCustomerName" placeholder="Escribe el nombre del cliente" required></div><div class="form-group"><label>📱 Teléfono WhatsApp</label><input type="tel" id="orderCustomerPhone" placeholder="Ej. 6641234567"></div><div class="form-group"><label>🖨️ Técnica de Estampado</label><select id="orderTechnique"><option>DTF</option></select></div><div class="form-group full-width"><label>📋 Estado Inicial</label><select id="orderStatus"><option>En espera de Anticipo</option><option>Diseño Pendiente</option><option>En Producción</option><option>Listo para Entregar</option></select></div></div><div class="products-list" id="productsList"></div><button type="button" class="add-product-btn" onclick="addProductRow()">+ Agregar Producto</button><div class="form-group full-width" style="margin-top: 25px;"><div class="price-display"><div><div class="label">Total Productos</div><div class="value" id="displayTotalQty">0</div></div><div><div class="label">Subtotal</div><div class="value" id="displaySubtotal">$0</div></div><div><div class="label">Descuento Cupón</div><div class="value" id="displayCouponDiscount">$0</div></div><div><div class="label">Precio Total</div><div class="value" id="displayTotal">$0</div></div><div><div class="label">Anticipo Sugerido (70%)</div><div class="value" id="displayAdvance">$0</div></div></div></div><div class="form-grid"><div class="form-group full-width"><label>Validar cupón de descuento</label><div style="display:flex; gap:10px; flex-wrap:wrap;"><input type="text" id="orderCouponCode" placeholder="Ej. PRI10-ABC123" style="flex:1 1 220px; text-transform:uppercase;"><button type="button" class="btn btn-info" onclick="validateCouponForOrder()">Validar cupón</button><button type="button" class="btn btn-secondary" onclick="clearOrderCoupon()">Quitar</button></div><p id="couponValidationMessage" style="margin-top:8px; color:#64748b; font-size:13px;"></p></div></div><div class="form-grid"><div class="form-group"><label>🧵 Costo camiseta por pieza</label><input type="number" id="orderShirtCost" min="0" step="0.01" value="0"></div><div class="form-group"><label>🧒 Costo camiseta niño por pieza</label><input type="number" id="orderShirtCostKids" min="0" step="0.01" value="0"></div><div class="form-group"><label>🖨️ Costo DTF total</label><input type="number" id="orderDtfCost" min="0" step="0.01" value="0"></div><div class="form-group"><label>📦 Otros gastos</label><input type="number" id="orderExtraCost" min="0" step="0.01" value="0"></div></div><div class="form-grid"><div class="form-group"><label>💵 Anticipo Recibido ($)</label><input type="number" id="orderAdvance" value="0" onchange="validateAdvanceAndCalculate()"></div><div class="form-group full-width"><label>📁 Subir Diseño</label><div class="file-upload" onclick="document.getElementById('orderDesign').click()"><input type="file" id="orderDesign" accept="image/*" style="display: none;" onchange="handleFileUpload(this)"><div class="file-upload-icon">📁</div><p id="uploadText">Haz click para subir el diseño</p><img id="uploadPreview" class="file-upload-preview" style="display: none;"></div></div></div></form></div><div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal('newOrderModal')">Cancelar</button><button class="btn btn-primary" onclick="saveOrder()">Guardar Pedido</button></div></div></div>
 
 <div class="modal-overlay" id="orderDetailModal"><div class="modal"><div class="modal-header"><h2 id="detailOrderId">Pedido #</h2><button class="close-btn" onclick="closeModal('orderDetailModal')">&times;</button></div><div class="modal-body"><div id="orderDetailContent"></div></div><div class="modal-footer"><button class="btn btn-warning" onclick="markAsPaid()">Marcar como Saldado</button><button class="btn btn-secondary" onclick="printTicket()">Imprimir Ticket</button><button class="btn btn-info" onclick="downloadTicket()">Descargar Ticket</button><button class="btn btn-success" onclick="shareTicketWhatsApp()">Compartir WhatsApp</button><button class="btn btn-info" onclick="downloadProductList()">Lista Productos</button><button class="btn btn-primary" onclick="closeModal('orderDetailModal')">Cerrar</button></div></div></div>
@@ -611,6 +630,7 @@ let orders = [];
 let coupons = [];
 let currentOrderId = null;
 let currentCouponForOrder = null;
+let editingCouponId = null;
 let currentFilter = 'all';
 let uploadedDesign = null;
 let productCounter = 0;
@@ -1791,6 +1811,10 @@ function getTicketStyles() {
         .ticket-product-price strong { color: #0f172a; font-size: 12px; }
         .ticket-total-row.highlight { margin-top: 8px; padding-top: 10px; border-top: 2px solid #0f172a; font-size: 15px; }
         .ticket-total-row.highlight strong { color: #4f46e5; }
+        .ticket-total-row.discount span { color: #334155; }
+        .ticket-total-row.discount strong { color: #dc2626; }
+        .ticket-total-row.muted span, .ticket-total-row.muted strong { color: #94a3b8; }
+        .ticket-total-row.payable { font-weight: 800; }
         .ticket-terms { font-size: 10px; line-height: 1.45; color: #64748b; text-align: left; }
         .ticket-terms strong { display: block; text-align: center; color: #334155; margin-bottom: 5px; }
         .ticket-footer { text-align: center; font-size: 10px; color: #64748b; padding-top: 11px; }
@@ -1816,10 +1840,35 @@ function getTicketStyles() {
     `;
 }
 
+function getTicketTotals(order) {
+    const subtotalOriginal = Math.max(0, Number(order.subtotal) || Number(order.total) || 0);
+    const couponDiscount = Math.max(0, Number(order.couponDiscount) || 0);
+    const couponCode = String(order.couponCode || '').trim().toUpperCase();
+    const finalTotal = Math.max(0, Number(order.total) || subtotalOriginal - couponDiscount);
+    const discountPercent = subtotalOriginal > 0 && couponDiscount > 0
+        ? Math.round((couponDiscount / subtotalOriginal) * 100)
+        : 10;
+
+    return {
+        subtotalOriginal,
+        couponDiscount,
+        couponCode,
+        finalTotal,
+        discountPercent,
+        hasCoupon: Boolean(couponCode || couponDiscount > 0)
+    };
+}
+
 function buildTicketMarkup(order) {
     const logoSrc = getTicketLogoSrc();
     const safeId = ticketEscape(order.id);
     const safeDate = ticketEscape(order.date || new Date().toISOString().split('T')[0]);
+    const totals = getTicketTotals(order);
+    const discountLabel = totals.hasCoupon
+        ? `Descuento ${totals.discountPercent}% por código ${ticketEscape(totals.couponCode || 'aplicado')}`
+        : 'Descuento 10% No aplica';
+    const discountRowClass = totals.hasCoupon ? 'discount' : 'muted';
+    const discountAmount = totals.hasCoupon ? `-${formatTicketMoney(totals.couponDiscount)}` : formatTicketMoney(0);
     return `
         <article class="ticket" aria-label="Ticket de pedido ${safeId}">
             <header class="ticket-header">
@@ -1839,7 +1888,9 @@ function buildTicketMarkup(order) {
                 ${getTicketProductRows(order)}
             </section>
             <section class="ticket-section">
-                <div class="ticket-total-row"><span>Subtotal</span><strong>${formatTicketMoney(order.total)}</strong></div>
+                <div class="ticket-total-row"><span>Subtotal original</span><strong>${formatTicketMoney(totals.subtotalOriginal)}</strong></div>
+                <div class="ticket-total-row ${discountRowClass}"><span>${discountLabel}</span><strong>${discountAmount}</strong></div>
+                <div class="ticket-total-row payable"><span>Subtotal a pagar</span><strong>${formatTicketMoney(totals.finalTotal)}</strong></div>
                 <div class="ticket-total-row"><span>Anticipo</span><strong>${formatTicketMoney(order.advance)}</strong></div>
                 <div class="ticket-total-row highlight"><span>Saldo restante</span><strong>${formatTicketMoney(order.remaining)}</strong></div>
             </section>
@@ -1948,8 +1999,12 @@ function buildWhatsAppTicketMessage(order) {
     const products = Array.isArray(order.products) && order.products.length > 0
         ? order.products.map(product => `• ${product.qty || 0}x ${product.type || 'Producto'} ${product.color || ''} talla ${product.size || ''} - ${formatTicketMoney((Number(product.qty) || 0) * (Number(product.price) || 0))}`).join('\n')
         : '• Producto personalizado';
+    const totals = getTicketTotals(order);
+    const discountLine = totals.hasCoupon
+        ? `Descuento ${totals.discountPercent}% por código ${totals.couponCode || 'aplicado'}: -${formatTicketMoney(totals.couponDiscount)}`
+        : `Descuento 10% No aplica: ${formatTicketMoney(0)}`;
 
-    return `Hola ${order.customerName || ''}, te comparto el resumen de tu pedido Prin Epic:\n\nPedido: ${order.id}\nFecha: ${order.date || ''}\nEstado: ${order.status || ''}\n\nProductos:\n${products}\n\nTotal: ${formatTicketMoney(order.total)}\nAnticipo: ${formatTicketMoney(order.advance)}\nSaldo restante: ${formatTicketMoney(order.remaining)}\n\nTambién puedo enviarte la imagen del ticket si la necesitas.`;
+    return `Hola ${order.customerName || ''}, te comparto el resumen de tu pedido Prin Epic:\n\nPedido: ${order.id}\nFecha: ${order.date || ''}\nEstado: ${order.status || ''}\n\nProductos:\n${products}\n\nSubtotal original: ${formatTicketMoney(totals.subtotalOriginal)}\n${discountLine}\nSubtotal a pagar: ${formatTicketMoney(totals.finalTotal)}\nAnticipo: ${formatTicketMoney(order.advance)}\nSaldo restante: ${formatTicketMoney(order.remaining)}\n\nTambién puedo enviarte la imagen del ticket si la necesitas.`;
 }
 
 async function shareTicketWhatsApp() {
@@ -2814,6 +2869,74 @@ async function downloadCouponImage(couponId) {
         host.remove();
     }
 }
+function openEditCoupon(couponId) {
+    const coupon = coupons.find(item => item.id === couponId);
+    if (!coupon) return;
+    editingCouponId = coupon.id;
+    const setValue = (id, value) => {
+        const element = document.getElementById(id);
+        if (element) element.value = value || '';
+    };
+    setValue('editCouponCustomerName', coupon.customerName);
+    setValue('editCouponCustomerPhone', coupon.customerPhone);
+    setValue('editCouponCode', coupon.code);
+    setValue('editCouponDiscount', coupon.discountPercent || 10);
+    setValue('editCouponStatus', coupon.status || 'pending');
+    setValue('editCouponOrderId', coupon.orderId);
+    openModal('editCouponModal');
+}
+function saveCouponEdit() {
+    const coupon = coupons.find(item => item.id === editingCouponId);
+    if (!coupon) return;
+
+    const getValue = id => {
+        const element = document.getElementById(id);
+        return element ? String(element.value || '').trim() : '';
+    };
+    const nextCode = getValue('editCouponCode').toUpperCase();
+    if (!nextCode) {
+        showNotification('El cupón necesita un código válido', 'warning');
+        return;
+    }
+    if (coupons.some(item => item.id !== coupon.id && item.code === nextCode)) {
+        showNotification('Ya existe otro cupón con ese código', 'error');
+        return;
+    }
+
+    const nextStatus = getValue('editCouponStatus') || 'pending';
+    coupon.customerName = getValue('editCouponCustomerName') || coupon.customerName;
+    coupon.customerPhone = getValue('editCouponCustomerPhone');
+    coupon.code = nextCode;
+    coupon.discountPercent = Math.max(1, Math.min(100, Number(getValue('editCouponDiscount')) || 10));
+    coupon.status = ['pending', 'active', 'used', 'expired'].includes(nextStatus) ? nextStatus : 'pending';
+    coupon.orderId = getValue('editCouponOrderId');
+    coupon.used = coupon.status === 'used';
+    if (coupon.used && !coupon.usedAt) coupon.usedAt = new Date().toISOString();
+    if (!coupon.used) {
+        coupon.usedAt = null;
+        coupon.usedOrderId = '';
+    }
+
+    editingCouponId = null;
+    saveData();
+    closeModal('editCouponModal');
+    renderCoupons();
+    showNotification('Cupón actualizado correctamente', 'success');
+}
+function clearAllCoupons() {
+    if (!coupons.length) {
+        showNotification('No hay cupones para borrar', 'info');
+        return;
+    }
+    const confirmed = window.confirm('¿Seguro que quieres borrar todos los cupones? Esta acción limpiará la ventana y eliminará la lista interna de cupones guardados.');
+    if (!confirmed) return;
+    coupons = [];
+    currentCouponForOrder = null;
+    editingCouponId = null;
+    saveData();
+    renderCoupons();
+    showNotification('Todos los cupones fueron borrados', 'success');
+}
 function renderCoupons() {
     const container = document.getElementById('coupons-container');
     if (!container) return;
@@ -2842,6 +2965,7 @@ function renderCoupons() {
                 <div class="coupon-requirements">${reqHtml}</div>
                 <div class="coupon-actions">
                     <button class="btn btn-secondary btn-sm" onclick="copyCouponCode('${coupon.code}')">Copiar código</button>
+                    <button class="btn btn-secondary btn-sm" onclick="openEditCoupon('${coupon.id}')">Editar</button>
                     <button class="btn btn-info btn-sm" onclick="sendCouponInvitationWhatsApp('${coupon.id}')">Invitar WhatsApp</button>
                     <button class="btn btn-success btn-sm" onclick="activateCoupon('${coupon.id}')">Activar</button>
                     <button class="btn btn-primary btn-sm" onclick="downloadCouponImage('${coupon.id}')">Descargar cupón</button>
