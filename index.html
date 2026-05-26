@@ -789,6 +789,7 @@ function sanitizeCustomer(customer) {
     if (!name) return null;
     return {
         id: customer.id || Date.now() + Math.floor(Math.random() * 1000),
+        dbId: customer.dbId || customer.db_id || (String(customer.id || '').includes('-') ? customer.id : ''),
         name,
         phone: String(customer.phone || customer.telefono || '').trim(),
         email: String(customer.email || '').trim(),
@@ -888,42 +889,47 @@ function dedupeOrdersById(orderList) {
     });
 }
 function dedupeCustomersByName(customerList) {
-    const seen = new Set();
-    return customerList.filter(customer => {
+    const merged = new Map();
+    customerList.map(sanitizeCustomer).filter(Boolean).forEach(customer => {
         if (!customer || !customer.name) return false;
         const key = customer.name.toLowerCase();
-        if (seen.has(key)) return false;
-        seen.add(key);
-        return true;
-    });
-}
-function syncCustomersFromOrders(seedCustomers = customers) {
-    const customersByName = new Map();
-    const normalizedSeed = (Array.isArray(seedCustomers) ? seedCustomers : []).map(sanitizeCustomer).filter(Boolean);
-    normalizedSeed.forEach(customer => {
-        const key = customer.name.toLowerCase();
-        customersByName.set(key, customer);
-    });
-    orders.forEach(order => {
-        const normalizedName = String(order.customerName || '').trim();
-        if (!normalizedName) return;
-        const key = normalizedName.toLowerCase();
-        const existing = customersByName.get(key);
-        const orderPhone = String(order.customerPhone || '').trim();
+        const existing = merged.get(key);
         if (!existing) {
-            customersByName.set(key, sanitizeCustomer({
-                id: Date.now() + customersByName.size,
-                name: normalizedName,
-                phone: orderPhone,
-                email: '',
-                date: order.date || new Date().toISOString().split('T')[0]
-            }));
+            merged.set(key, customer);
             return;
         }
-        if (!existing.phone && orderPhone) existing.phone = orderPhone;
-        if (!existing.date && order.date) existing.date = order.date;
+        merged.set(key, sanitizeCustomer({
+            ...existing,
+            ...customer,
+            id: existing.id || customer.id,
+            dbId: existing.dbId || customer.dbId,
+            phone: customer.phone || existing.phone || '',
+            email: customer.email || existing.email || '',
+            date: existing.date || customer.date
+        }));
     });
-    customers = Array.from(customersByName.values()).map(sanitizeCustomer).filter(Boolean);
+    return Array.from(merged.values());
+}
+function syncCustomersFromOrders() {
+    const mergedCustomers = [...customers];
+    const knownNames = new Set(mergedCustomers.map(customer => customer.name.toLowerCase()));
+    orders.forEach(order => {
+        const normalizedName = String(order.customerName || '').trim();
+        const key = normalizedName.toLowerCase();
+        if (!normalizedName || knownNames.has(key)) return;
+        knownNames.add(key);
+        mergedCustomers.push({
+            id: Date.now() + mergedCustomers.length,
+            name: normalizedName,
+            phone: order.customerPhone || '',
+            email: '',
+            date: order.date || new Date().toISOString().split('T')[0]
+        });
+    });
+    customers = dedupeCustomersByName(mergedCustomers.map(sanitizeCustomer).filter(Boolean));
+}
+function mergeCustomers(...customerLists) {
+    return dedupeCustomersByName(customerLists.flat().map(sanitizeCustomer).filter(Boolean));
 }
 function getStorageSnapshot(includeMedia = true) {
     const normalizedOrders = dedupeOrdersById((Array.isArray(orders) ? orders : []).map(sanitizeOrder).filter(Boolean)).map(order => (
@@ -1005,6 +1011,15 @@ function readStoredCouponsFallback() {
         return savedCoupons ? JSON.parse(savedCoupons) : [];
     } catch (error) {
         return coupons;
+    }
+}
+function readStoredCustomersFallback() {
+    if (!canUseLocalStorage()) return customers;
+    try {
+        const savedCustomers = localStorage.getItem(STORAGE_KEYS.customers);
+        return savedCustomers ? JSON.parse(savedCustomers) : [];
+    } catch (error) {
+        return customers;
     }
 }
 function saveOrdersToStorage() {
@@ -1187,6 +1202,97 @@ function fromDbCoupon(row) {
         requirements: row.requirements
     });
 }
+function toDbCustomer(customer) {
+    const normalized = sanitizeCustomer(customer);
+    if (!normalized) return null;
+    return {
+        name: normalized.name,
+        phone: normalized.phone || null,
+        email: normalized.email || null,
+        updated_at: new Date().toISOString()
+    };
+}
+function fromDbCustomer(row) {
+    return sanitizeCustomer({
+        id: row.id,
+        dbId: row.id,
+        name: row.name,
+        phone: row.phone,
+        email: row.email,
+        date: row.created_at ? String(row.created_at).slice(0, 10) : row.date
+    });
+}
+async function loadCustomersFromDatabase() {
+    if (!isSupabaseReady()) return [];
+    const { data, error } = await supabaseClient
+        .from('customers')
+        .select('*')
+        .order('created_at', { ascending: false });
+    if (error) {
+        console.warn('No se pudieron cargar clientes desde Supabase. Se usará respaldo local.', error);
+        return [];
+    }
+    return (data || []).map(fromDbCustomer).filter(Boolean);
+}
+async function persistCustomerToDatabase(customer) {
+    if (!isSupabaseReady()) return { saved: false, skipped: true };
+    const normalized = sanitizeCustomer(customer);
+    const payload = toDbCustomer(normalized);
+    if (!normalized || !payload) return { saved: false, skipped: true };
+    if (normalized.dbId) {
+        const { data, error } = await supabaseClient
+            .from('customers')
+            .update(payload)
+            .eq('id', normalized.dbId)
+            .select()
+            .maybeSingle();
+        if (!error && data) {
+            const saved = fromDbCustomer(data);
+            Object.assign(customer, saved);
+            return { saved: true };
+        }
+    }
+    const { data: existingRows, error: lookupError } = await supabaseClient
+        .from('customers')
+        .select('*')
+        .eq('name', normalized.name)
+        .limit(1);
+    if (lookupError) {
+        console.warn('No se pudo buscar el cliente en Supabase.', lookupError);
+        return { saved: false, fallback: true };
+    }
+    if (existingRows && existingRows.length) {
+        const { data, error } = await supabaseClient
+            .from('customers')
+            .update(payload)
+            .eq('id', existingRows[0].id)
+            .select()
+            .maybeSingle();
+        if (error) {
+            console.warn('No se pudo actualizar el cliente en Supabase.', error);
+            return { saved: false, fallback: true };
+        }
+        const saved = fromDbCustomer(data || existingRows[0]);
+        Object.assign(customer, saved);
+        return { saved: true };
+    }
+    const { data, error } = await supabaseClient
+        .from('customers')
+        .insert(payload)
+        .select()
+        .maybeSingle();
+    if (error) {
+        console.warn('No se pudo guardar el cliente en Supabase.', error);
+        return { saved: false, fallback: true };
+    }
+    const saved = fromDbCustomer(data);
+    Object.assign(customer, saved);
+    return { saved: true };
+}
+async function persistCustomersToDatabase(customerList = customers) {
+    if (!isSupabaseReady()) return;
+    await Promise.all((Array.isArray(customerList) ? customerList : []).map(customer => persistCustomerToDatabase(customer)));
+}
 function mergeCoupons(...couponLists) {
     const merged = new Map();
     couponLists.flat().map(sanitizeCoupon).filter(Boolean).forEach(coupon => {
@@ -1260,7 +1366,7 @@ async function loadDataFromDatabase(options = {}) {
         return { loaded: false, fallback: true };
     }
     const localCoupons = readStoredCouponsFallback();
-    const localCustomers = (Array.isArray(customers) ? customers : []).map(sanitizeCustomer).filter(Boolean);
+    const localCustomers = readStoredCustomersFallback();
     const { data: orderRows, error: ordersError } = await supabaseClient
         .from('orders')
         .select('*')
@@ -1286,8 +1392,11 @@ async function loadDataFromDatabase(options = {}) {
     orders = (orderRows || []).map(order => fromDbOrder(order, itemsByOrder[order.id] || [])).filter(Boolean);
     const dbCoupons = await loadCouponsFromDatabase();
     coupons = mergeCoupons(dbCoupons, localCoupons);
+    const dbCustomers = await loadCustomersFromDatabase();
+    customers = mergeCustomers(dbCustomers, localCustomers);
     persistCouponsToDatabase(coupons).catch(console.error);
-    syncCustomersFromOrders(localCustomers);
+    syncCustomersFromOrders();
+    persistCustomersToDatabase(customers).catch(console.error);
     saveData();
     renderAll();
     if (notify) showNotification('Pedidos cargados desde Supabase.', 'success');
@@ -2946,9 +3055,10 @@ async function saveCustomer() {
         });
         try {
             await Promise.all(relatedOrders.map(order => persistOrderToDatabase(order)));
+            await persistCustomerToDatabase(customer);
         } catch (error) {
             console.error(error);
-            showNotification('No se pudieron actualizar los pedidos asociados en Supabase.', 'error');
+            showNotification('No se pudieron actualizar los datos del cliente en Supabase.', 'error');
             return;
         }
         editingCustomerId = null;
@@ -2962,6 +3072,7 @@ async function saveCustomer() {
             date: new Date().toISOString().split('T')[0]
         };
         customers.push(newCustomer);
+        await persistCustomerToDatabase(newCustomer);
         showNotification('Cliente registrado', 'success');
     }
     saveData();
