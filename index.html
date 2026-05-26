@@ -1668,7 +1668,7 @@ function getTicketStyles() {
         * { box-sizing: border-box; }
         body { margin: 0; font-family: 'Segoe UI', Arial, sans-serif; color: #0f172a; background: #eef2f7; }
         .ticket-export-page { min-height: 100vh; padding: 18px; display: flex; align-items: flex-start; justify-content: center; background: #eef2f7; }
-        .ticket { width: min(100%, 110mm); max-width: 100%; background: #fff; border: 1px solid #e2e8f0; border-radius: 14px; padding: 18px; box-shadow: 0 14px 30px rgba(15,23,42,0.13); overflow-wrap: anywhere; }
+        .ticket { width: min(100%, 190mm); max-width: 100%; background: #fff; border: 1px solid #e2e8f0; border-radius: 14px; padding: 18px; box-shadow: 0 14px 30px rgba(15,23,42,0.13); overflow-wrap: anywhere; }
         .ticket-header { text-align: center; padding-bottom: 12px; border-bottom: 2px solid #e2e8f0; }
         .ticket-logo { display: block; width: 104px; max-width: 48%; height: auto; max-height: 104px; object-fit: contain; margin: 0 auto 8px; }
         .ticket-brand { margin: 0; font-size: 22px; line-height: 1.1; letter-spacing: 0; color: #111827; }
@@ -1692,11 +1692,22 @@ function getTicketStyles() {
         .ticket-terms strong { display: block; text-align: center; color: #334155; margin-bottom: 5px; }
         .ticket-footer { text-align: center; font-size: 10px; color: #64748b; padding-top: 11px; }
         @media print {
-            html, body { width: auto; min-width: 0; background: #fff; }
-            body { display: flex; justify-content: center; align-items: flex-start; }
-            .ticket-export-page { width: 100%; min-height: auto; padding: 0; background: #fff; display: flex; justify-content: center; align-items: flex-start; }
-            .ticket { width: min(100%, 110mm); margin: 0 auto; border: 0; border-radius: 0; box-shadow: none; padding: 6mm; }
-            .ticket-logo { width: 104px; max-height: 104px; }
+            @page { size: auto; margin: 6mm; }
+            html, body { width: 100%; min-width: 0; background: #fff; }
+            body { display: block; margin: 0; }
+            .ticket-export-page { width: 100%; min-height: auto; padding: 0; background: #fff; display: block; }
+            .ticket { width: 100%; max-width: none; margin: 0; border: 0; border-radius: 0; box-shadow: none; padding: 8mm; }
+            .ticket-header { padding-bottom: 14px; }
+            .ticket-logo { width: 120px; max-height: 120px; }
+            .ticket-brand { font-size: 26px; }
+            .ticket-section { padding: 14px 0; }
+            .ticket-product-row { grid-template-columns: minmax(0, 1fr) 120px; gap: 18px; padding: 12px 0; }
+            .ticket-product-main { font-size: 13px; }
+            .ticket-product-main span { font-size: 12px; }
+            .ticket-product-price { min-width: 120px; font-size: 12px; }
+            .ticket-product-price strong { font-size: 13px; }
+            .ticket-info-row, .ticket-total-row { font-size: 13px; }
+            .ticket-total-row.highlight { font-size: 16px; }
             .ticket-product-row, .ticket-section { break-inside: avoid; page-break-inside: avoid; }
         }
     `;
