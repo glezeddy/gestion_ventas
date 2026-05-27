@@ -1,3 +1,5 @@
+const CALCULATOR_INPUT_IDS = ['tipo', 'cantidad', 'precio', 'dtf', 'camiseta', 'otros'];
+
 function getCalculatorElement(id) {
     return document.getElementById(id);
 }
