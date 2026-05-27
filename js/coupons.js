@@ -695,6 +695,22 @@ function deleteCoupon(couponId) {
     renderCoupons();
     showNotification('Cupón eliminado de la lista local', 'success');
 }
+function markCouponUsedManually(couponId) {
+    const coupon = coupons.find(item => item.id === couponId);
+    if (!coupon) return;
+    if (coupon.used || coupon.status === 'used') {
+        showNotification('Este cupón ya está marcado como usado', 'info');
+        return;
+    }
+    const code = String(coupon.code || 'sin código');
+    if (!window.confirm(`¿Marcar el cupón ${code} como usado? Esta acción no modifica ningún pedido.`)) return;
+    coupon.status = 'used';
+    coupon.used = true;
+    coupon.usedAt = new Date().toISOString();
+    saveData();
+    renderCoupons();
+    showNotification('Cupón marcado como usado', 'success');
+}
 function clearAllCoupons() {
     if (!coupons.length) {
         showNotification('No hay cupones para borrar', 'info');
@@ -753,11 +769,12 @@ function renderCoupons() {
                 <div class="coupon-actions">
                     <button class="btn btn-secondary btn-sm" onclick="copyCouponCode('${safeCouponCode}')">Copiar código</button>
                     <button class="btn btn-secondary btn-sm" onclick="openEditCoupon('${safeCouponId}')">Editar</button>
+                    ${coupon.status !== 'used' && !coupon.used ? `<button class="btn btn-secondary btn-sm" onclick="markCouponUsedManually('${safeCouponId}')">Marcar usado</button>` : ''}
+                    <button class="btn btn-danger btn-sm" onclick="deleteCoupon('${safeCouponId}')">Eliminar</button>
                     <button class="btn btn-info btn-sm" onclick="showCouponInvitationMessage('${safeCouponId}')">Generar mensaje</button>
                     <button class="btn btn-success btn-sm" onclick="activateCoupon('${safeCouponId}')">Activar</button>
                     <button class="btn btn-primary btn-sm" onclick="downloadCouponImage('${safeCouponId}')">Descargar cupón</button>
                     <button class="btn btn-warning btn-sm" onclick="sendCouponWhatsApp('${safeCouponId}')">Enviar cupón</button>
-                    <button class="btn btn-danger btn-sm" onclick="deleteCoupon('${safeCouponId}')">Eliminar</button>
                 </div>
             </article>
         `;
