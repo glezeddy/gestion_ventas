@@ -508,6 +508,10 @@ function sendCouponWhatsApp(couponId) {
         showNotification('El cupón debe estar activo antes de enviarlo', 'warning');
         return;
     }
+    if (!normalizePhoneForWhatsApp(coupon.customerPhone)) {
+        showNotification('Este cupón no tiene teléfono registrado para WhatsApp', 'warning');
+        return;
+    }
     openWhatsAppMessage(coupon.customerPhone, buildCouponWhatsAppMessage(coupon));
 }
 function buildCouponArt(coupon) {
@@ -608,6 +612,89 @@ function saveCouponEdit() {
     renderCoupons();
     showNotification('Cupón actualizado correctamente', 'success');
 }
+function openManualCouponModal() {
+    const form = document.getElementById('manualCouponForm');
+    if (form) form.reset();
+    const discount = document.getElementById('manualCouponDiscount');
+    const minimum = document.getElementById('manualCouponMinPurchase');
+    const stackable = document.getElementById('manualCouponNoStackable');
+    const status = document.getElementById('manualCouponStatus');
+    if (discount) discount.value = COUPON_FIXED_AMOUNT;
+    if (minimum) minimum.value = COUPON_MIN_PURCHASE;
+    if (stackable) stackable.checked = true;
+    if (status) status.value = 'active';
+    openModal('manualCouponModal');
+}
+function saveManualCoupon() {
+    const getValue = id => {
+        const element = document.getElementById(id);
+        return element ? String(element.value || '').trim() : '';
+    };
+    const customerName = getValue('manualCouponCustomerName');
+    const customerPhone = getValue('manualCouponCustomerPhone');
+    const reason = getValue('manualCouponReason');
+    const discountAmount = Number(getValue('manualCouponDiscount'));
+    const minPurchase = Number(getValue('manualCouponMinPurchase'));
+    const expiresAt = getValue('manualCouponExpiresAt');
+    const notStackableElement = document.getElementById('manualCouponNoStackable');
+    const status = getValue('manualCouponStatus') || 'active';
+
+    if (!customerName) {
+        showNotification('Escribe el nombre del cliente para crear el cupón', 'warning');
+        return;
+    }
+    if (!Number.isFinite(discountAmount) || discountAmount <= 0) {
+        showNotification('El descuento debe ser mayor a cero', 'warning');
+        return;
+    }
+    if (!Number.isFinite(minPurchase) || minPurchase <= 0) {
+        showNotification('La compra mínima debe ser mayor a cero', 'warning');
+        return;
+    }
+
+    const coupon = sanitizeCoupon({
+        id: `CP-MANUAL-${Date.now()}`,
+        code: generateCouponCode(),
+        customerName,
+        customerPhone,
+        orderId: '',
+        reason,
+        source: 'manual',
+        discountType: 'fixed',
+        discountAmount,
+        minPurchase,
+        notStackableWithWholesale: notStackableElement ? notStackableElement.checked : true,
+        expiresAt,
+        status: ['pending', 'active', 'used', 'expired'].includes(status) ? status : 'active',
+        createdAt: new Date().toISOString(),
+        requirements: Object.fromEntries(Object.keys(getDefaultCouponRequirements()).map(key => [key, true])),
+        used: status === 'used'
+    });
+    if (coupon.used && !coupon.usedAt) coupon.usedAt = new Date().toISOString();
+
+    coupons.unshift(coupon);
+    saveData();
+    closeModal('manualCouponModal');
+    renderCoupons();
+    showNotification('Cupón manual creado correctamente', 'success');
+}
+function deleteCoupon(couponId) {
+    const coupon = coupons.find(item => item.id === couponId);
+    if (!coupon) return;
+    const code = String(coupon.code || 'sin código');
+    const used = coupon.used || coupon.status === 'used';
+    const message = used
+        ? `Este cupón ya fue usado. Si lo eliminas, solo se quitará de la lista de cupones, pero no modificará pedidos ya registrados. ¿Deseas continuar?\n\nCupón: ${code}`
+        : `¿Seguro que deseas eliminar el cupón ${code}? Esta acción no se puede deshacer.`;
+    if (!window.confirm(message)) return;
+
+    coupons = coupons.filter(item => item.id !== couponId);
+    if (currentCouponForOrder && currentCouponForOrder.id === couponId) currentCouponForOrder = null;
+    if (editingCouponId === couponId) editingCouponId = null;
+    saveData();
+    renderCoupons();
+    showNotification('Cupón eliminado de la lista local', 'success');
+}
 function clearAllCoupons() {
     if (!coupons.length) {
         showNotification('No hay cupones para borrar', 'info');
@@ -619,9 +706,8 @@ function clearAllCoupons() {
     currentCouponForOrder = null;
     editingCouponId = null;
     saveData();
-    deleteAllCouponsFromDatabase().catch(console.error);
     renderCoupons();
-    showNotification('Todos los cupones fueron borrados', 'success');
+    showNotification('Todos los cupones locales fueron borrados', 'success');
 }
 function renderCoupons() {
     const container = document.getElementById('coupons-container');
@@ -652,6 +738,9 @@ function renderCoupons() {
                     <div><strong>Teléfono</strong>${ticketEscape(coupon.customerPhone || '-')}</div>
                     <div><strong>Generado</strong>${new Date(coupon.createdAt).toLocaleDateString('es-MX')}</div>
                     <div><strong>Usado</strong>${coupon.usedAt ? new Date(coupon.usedAt).toLocaleDateString('es-MX') : 'No'}</div>
+                    ${coupon.source === 'manual' ? `<div><strong>Origen</strong>Manual</div>` : ''}
+                    ${coupon.reason ? `<div><strong>Motivo</strong>${ticketEscape(coupon.reason)}</div>` : ''}
+                    ${coupon.expiresAt ? `<div><strong>Vence</strong>${ticketEscape(coupon.expiresAt)}</div>` : ''}
                 </div>
                 <div class="coupon-requirements">${reqHtml}</div>
                 <div class="coupon-message-box" id="coupon-invitation-${couponBoxId}" hidden>
@@ -668,6 +757,7 @@ function renderCoupons() {
                     <button class="btn btn-success btn-sm" onclick="activateCoupon('${safeCouponId}')">Activar</button>
                     <button class="btn btn-primary btn-sm" onclick="downloadCouponImage('${safeCouponId}')">Descargar cupón</button>
                     <button class="btn btn-warning btn-sm" onclick="sendCouponWhatsApp('${safeCouponId}')">Enviar cupón</button>
+                    <button class="btn btn-danger btn-sm" onclick="deleteCoupon('${safeCouponId}')">Eliminar</button>
                 </div>
             </article>
         `;

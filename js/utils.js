@@ -95,12 +95,17 @@ function hasWholesalePricing(products) {
 function hasCustomPromotionalPricing(products) {
     return (Array.isArray(products) ? products : []).some(product => Boolean(product.customPrice || product.priceMode === 'custom'));
 }
+function isCouponExpiredByDate(coupon) {
+    if (!coupon || !coupon.expiresAt) return false;
+    const expires = new Date(`${coupon.expiresAt}T23:59:59`);
+    return !Number.isNaN(expires.getTime()) && expires < new Date();
+}
 function getCouponValidation(coupon, products, options = {}) {
     const code = String(coupon && coupon.code || '').trim().toUpperCase();
     if (!coupon || !code) return { valid: false, message: 'El código de cupón no es válido.', discount: 0 };
     if ((coupon.status === 'used' || coupon.used) && !options.allowHistoricalCoupon) return { valid: false, message: 'Este cupón ya fue utilizado.', discount: 0 };
     if (coupon.status === 'pending') return { valid: false, message: 'Este cupón todavía no está activo.', discount: 0 };
-    if (coupon.status === 'expired') return { valid: false, message: 'Este cupón está vencido.', discount: 0 };
+    if (coupon.status === 'expired' || isCouponExpiredByDate(coupon)) return { valid: false, message: 'Este cupón está vencido.', discount: 0 };
     if (coupon.status !== 'active' && !options.allowHistoricalCoupon) return { valid: false, message: 'Este cupón todavía no está activo.', discount: 0 };
 
     const subtotal = (Array.isArray(products) ? products : []).reduce((sum, product) => sum + ((Number(product.qty) || 0) * (Number(product.price) || 0)), 0);

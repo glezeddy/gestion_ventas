@@ -93,21 +93,25 @@ function sanitizeCoupon(coupon) {
     const code = String(coupon.code || '').trim().toUpperCase();
     if (!code) return null;
     const defaults = getDefaultCouponRequirements();
+    const status = ['pending', 'active', 'used', 'expired'].includes(coupon.status) ? coupon.status : 'pending';
     return {
         id: coupon.id || `CP-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
         code,
         customerName: String(coupon.customerName || '').trim(),
         customerPhone: String(coupon.customerPhone || '').trim(),
         orderId: String(coupon.orderId || '').trim(),
+        reason: String(coupon.reason || '').trim(),
+        source: String(coupon.source || '').trim(),
         discountType: 'fixed',
         discountAmount: getCouponAmount(coupon),
         minPurchase: getCouponMinimum(coupon),
         notStackableWithWholesale: coupon.notStackableWithWholesale !== false,
-        status: ['pending', 'active', 'used', 'expired'].includes(coupon.status) ? coupon.status : 'pending',
+        status,
         createdAt: coupon.createdAt || new Date().toISOString(),
+        expiresAt: coupon.expiresAt || '',
         usedAt: coupon.usedAt || null,
         usedOrderId: coupon.usedOrderId || '',
-        used: Boolean(coupon.used),
+        used: Boolean(coupon.used || status === 'used'),
         requirements: { ...defaults, ...(coupon.requirements || {}) }
     };
 }
