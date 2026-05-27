@@ -3227,11 +3227,6 @@ function viewOrder(orderId) {
             </div>
         `).join('');
     }
-    const mockupButton = order.designImage ? 
-        `<button class="btn btn-info" onclick="openMockupGenerator()" style="margin-top:10px;">🎨 Generar Mockup</button>` : 
-        `<p style="color:#f59e0b; margin-top:10px;">⚠️ No hay diseño subido. Edita el pedido para subir un diseño.</p>`;
-    const mockupPreview = order.mockup ? 
-        `<div style="margin-top:20px;"><h4>Mockup Generado:</h4><img src="${order.mockup}" style="max-width:200px; border-radius:10px; border:2px solid #e2e8f0;"><br><button class="btn btn-secondary btn-sm" onclick="downloadExistingMockup()" style="margin-top:10px;">📥 Descargar Mockup</button></div>` : '';
     const relatedCoupon = coupons.find(coupon => coupon.orderId === order.id);
     const couponButton = getOrderCouponEligibility(order)
         ? `<button class="btn btn-success" onclick="generateCouponForCurrentOrder()" style="margin-top:10px;">${relatedCoupon ? 'Ver cupón generado' : 'Generar cupón $100'}</button>`
@@ -3250,23 +3245,10 @@ function viewOrder(orderId) {
             <p>Estado: ${order.status}</p>
             <h4>Productos:</h4>
             ${productsHTML}
-            ${order.designImage ? `<h4>Diseño Original:</h4><img src="${order.designImage}" style="max-width:150px; border-radius:10px; margin-top:10px;">` : ''}
-            ${mockupButton}
-            ${mockupPreview}
             ${couponButton}
         </div>
     `;
     document.getElementById('orderDetailModal').classList.add('active');
-}
-function downloadExistingMockup() {
-    const order = orders.find(o => o.id === currentOrderId);
-    if (order && order.mockup) {
-        const link = document.createElement('a');
-        link.download = `mockup-${order.id}.png`;
-        link.href = order.mockup;
-        link.click();
-        showNotification('📥 Mockup descargado', 'success');
-    }
 }
 async function markAsPaid() {
     const order = orders.find(o => o.id === currentOrderId);
