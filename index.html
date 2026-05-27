@@ -2202,6 +2202,10 @@ function getOrderStatusClass(status) {
     return 'pending';
 }
 
+function isCancelledOrder(order) {
+    return normalizeOrderStatus(order && order.status) === 'Cancelado';
+}
+
 function formatTicketMoney(value) {
     return '$' + (Number(value) || 0).toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
@@ -2981,22 +2985,23 @@ function renderDashboard() {
         const date = normalizeDateValue(order.date, '');
         return date >= range.start && date <= range.end;
     });
-    const periodNet = periodOrders.reduce((sum, order) => sum + getOrderCollectedNet(order), 0);
+    const financialPeriodOrders = periodOrders.filter(order => !isCancelledOrder(order));
+    const periodNet = financialPeriodOrders.reduce((sum, order) => sum + getOrderCollectedNet(order), 0);
     const periodCustomers = new Set(periodOrders.map(order => String(order.customerName || '').trim().toLowerCase()).filter(Boolean));
     const filterLabel = document.getElementById('dashboardFilterLabel');
     if (filterLabel) filterLabel.textContent = range.label;
     const currentDateEl = document.getElementById('currentDate');
     if (currentDateEl) currentDateEl.textContent = range.label.replace(/^Ventas de\s*/i, '').replace(/^Ventas del\s*/i, '');
     document.getElementById('daily-orders').textContent = periodOrders.length;
-    document.getElementById('daily-sales').textContent = '$' + periodOrders.reduce((s,o) => s + Number(o.total || 0), 0).toLocaleString();
-    document.getElementById('daily-advance').textContent = '$' + periodOrders.reduce((s,o) => s + Number(o.advance || 0), 0).toLocaleString();
+    document.getElementById('daily-sales').textContent = '$' + financialPeriodOrders.reduce((s,o) => s + Number(o.total || 0), 0).toLocaleString();
+    document.getElementById('daily-advance').textContent = '$' + financialPeriodOrders.reduce((s,o) => s + Number(o.advance || 0), 0).toLocaleString();
     document.getElementById('daily-net').textContent = '$' + Math.round(periodNet).toLocaleString();
     document.getElementById('stat-new').textContent = periodOrders.length;
     document.getElementById('stat-pending').textContent = periodOrders.filter(o => isPendingOrderStatus(o.status) || ['En Producción', 'Listo para Entregar'].includes(normalizeOrderStatus(o.status))).length;
     document.getElementById('stat-delivered').textContent = periodOrders.filter(o => normalizeOrderStatus(o.status) === 'Entregado').length;
-    document.getElementById('stat-income').textContent = '$' + periodOrders.reduce((s,o) => s + Number(o.advance || 0), 0).toLocaleString();
+    document.getElementById('stat-income').textContent = '$' + financialPeriodOrders.reduce((s,o) => s + Number(o.advance || 0), 0).toLocaleString();
     document.getElementById('stat-net').textContent = '$' + Math.round(periodNet).toLocaleString();
-    document.getElementById('stat-remaining').textContent = '$' + periodOrders.reduce((s,o) => s + Number(o.remaining || 0), 0).toLocaleString();
+    document.getElementById('stat-remaining').textContent = '$' + financialPeriodOrders.reduce((s,o) => s + Number(o.remaining || 0), 0).toLocaleString();
     document.getElementById('stat-customers').textContent = periodCustomers.size;
     const tbody = document.getElementById('dashboard-orders');
     if (tbody) {
@@ -3262,20 +3267,21 @@ function openNewCustomerModal() {
     }
 }
 function renderFinance() {
-    const totalSold = orders.reduce((s,o) => s + o.total, 0);
-    const totalAdvance = orders.reduce((s,o) => s + o.advance, 0);
-    const pending = orders.reduce((s,o) => s + o.remaining, 0);
-    const paidCount = orders.filter(o => o.paid).length;
+    const financeOrders = orders.filter(order => !isCancelledOrder(order));
+    const totalSold = financeOrders.reduce((s,o) => s + o.total, 0);
+    const totalAdvance = financeOrders.reduce((s,o) => s + o.advance, 0);
+    const pending = financeOrders.reduce((s,o) => s + o.remaining, 0);
+    const paidCount = financeOrders.filter(o => o.paid).length;
     document.getElementById('finance-total').textContent = '$' + totalSold.toLocaleString();
     document.getElementById('finance-advance').textContent = '$' + totalAdvance.toLocaleString();
     document.getElementById('finance-pending').textContent = '$' + pending.toLocaleString();
     document.getElementById('finance-paid').textContent = paidCount;
     const tbody = document.getElementById('finance-table');
     if (tbody) {
-        if (orders.length === 0) {
+        if (financeOrders.length === 0) {
             tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:40px;">No hay movimientos registrados</td></tr>';
         } else {
-            tbody.innerHTML = orders.map(order => `
+            tbody.innerHTML = financeOrders.map(order => `
                 <tr>
                     <td>${ticketEscape(order.date)}</td>
                     <td><strong>${ticketEscape(order.id)}</strong></td>
@@ -3291,9 +3297,10 @@ function renderFinance() {
 function renderCharts() {
     const techniqueContainer = document.getElementById('technique-chart');
     const paymentContainer = document.getElementById('payment-chart');
+    const chartOrders = orders.filter(order => !isCancelledOrder(order));
     if (techniqueContainer) {
         const techniques = {};
-        orders.forEach(o => { techniques[o.technique] = (techniques[o.technique] || 0) + (o.products ? o.products.reduce((s,p)=>s+p.qty,0) : 1); });
+        chartOrders.forEach(o => { techniques[o.technique] = (techniques[o.technique] || 0) + (o.products ? o.products.reduce((s,p)=>s+p.qty,0) : 1); });
         const total = Object.values(techniques).reduce((a,b) => a + b, 0);
         if (total === 0) {
             techniqueContainer.innerHTML = '<div class="chart-placeholder">No hay datos suficientes</div>';
@@ -3305,10 +3312,10 @@ function renderCharts() {
         }
     }
     if (paymentContainer) {
-        const paid = orders.filter(o => o.paid).length;
-        const partial = orders.filter(o => !o.paid && o.advance > 0).length;
-        const pending = orders.filter(o => o.advance === 0).length;
-        const total = orders.length;
+        const paid = chartOrders.filter(o => o.paid).length;
+        const partial = chartOrders.filter(o => !o.paid && o.advance > 0).length;
+        const pending = chartOrders.filter(o => o.advance === 0).length;
+        const total = chartOrders.length;
         if (total === 0) {
             paymentContainer.innerHTML = '<div class="chart-placeholder">No hay datos suficientes</div>';
         } else {
