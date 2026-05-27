@@ -1,4 +1,6 @@
 const CALCULATOR_INPUT_IDS = ['tipo', 'cantidad', 'precio', 'dtf', 'camiseta', 'otros'];
+const margenMinimoDeseado = 30;
+const ANTICIPO_BASE = 70;
 
 function getCalculatorElement(id) {
     return document.getElementById(id);
