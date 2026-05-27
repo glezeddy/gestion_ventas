@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 <head>
 <meta charset="UTF-8">
@@ -139,6 +139,11 @@ tr:hover { background: linear-gradient(90deg, #f8fafc, #fafafa); }
 .daily-stat { background: rgba(255,255,255,0.15); padding: 20px; border-radius: 15px; backdrop-filter: blur(10px); }
 .daily-stat .value { font-size: 32px; font-weight: 700; margin-top: 5px; }
 .daily-stat .label { font-size: 13px; opacity: 0.9; text-transform: uppercase; letter-spacing: 0.5px; }
+.dashboard-date-filter { display: grid; grid-template-columns: repeat(auto-fit, minmax(155px, 1fr)); gap: 12px; margin: 18px 0 22px; padding: 16px; background: rgba(255,255,255,0.14); border: 1px solid rgba(255,255,255,0.22); border-radius: 16px; backdrop-filter: blur(10px); }
+.dashboard-date-filter label { display: flex; flex-direction: column; gap: 7px; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.4px; color: rgba(255,255,255,0.86); }
+.dashboard-date-filter select, .dashboard-date-filter input { width: 100%; min-height: 42px; border: 1px solid rgba(255,255,255,0.35); border-radius: 10px; padding: 9px 11px; background: rgba(255,255,255,0.92); color: #1e293b; font-weight: 700; outline: none; }
+.dashboard-date-filter .filter-action { align-self: end; min-height: 42px; justify-content: center; background: rgba(255,255,255,0.22); color: white; border: 1px solid rgba(255,255,255,0.35); box-shadow: none; }
+.dashboard-filter-label { margin: -8px 0 18px; color: rgba(255,255,255,0.86); font-size: 13px; font-weight: 600; }
 .charts-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 25px; margin-bottom: 30px; }
 .chart-card { background: white; padding: 25px; border-radius: 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
 .chart-card h3 { font-size: 18px; margin-bottom: 20px; color: var(--dark); display: flex; align-items: center; gap: 10px; }
@@ -454,8 +459,38 @@ Cerrar Sesión
 </div>
 <div class="daily-summary">
 <h3><svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>Resumen del Día - <span id="currentDate"></span></h3>
+<div class="dashboard-date-filter">
+<label>Periodo
+<select id="dashboardDatePreset" onchange="handleDashboardDatePresetChange()">
+<option value="today">Hoy</option>
+<option value="yesterday">Ayer</option>
+<option value="last7">Últimos 7 días</option>
+<option value="last30">Últimos 30 días</option>
+<option value="month">Mes seleccionado</option>
+<option value="day">Día seleccionado</option>
+<option value="custom">Personalizado</option>
+</select>
+</label>
+<label>Mes
+<select id="dashboardMonth" onchange="handleDashboardDatePartsChange()"></select>
+</label>
+<label>Año
+<select id="dashboardYear" onchange="handleDashboardDatePartsChange()"></select>
+</label>
+<label>Día
+<select id="dashboardDay" onchange="handleDashboardDatePartsChange()"></select>
+</label>
+<label>Desde
+<input type="date" id="dashboardDateFrom" onchange="handleDashboardCustomRangeChange()">
+</label>
+<label>Hasta
+<input type="date" id="dashboardDateTo" onchange="handleDashboardCustomRangeChange()">
+</label>
+<button class="btn filter-action" onclick="applyDashboardDateFilter()">Actualizar</button>
+</div>
+<p class="dashboard-filter-label" id="dashboardFilterLabel">Mostrando ventas de hoy</p>
 <div class="daily-summary-grid">
-<div class="daily-stat"><div class="label">Pedidos Hoy</div><div class="value" id="daily-orders">0</div></div>
+<div class="daily-stat"><div class="label">Pedidos</div><div class="value" id="daily-orders">0</div></div>
 <div class="daily-stat"><div class="label">Ventas Totales</div><div class="value" id="daily-sales">$0</div></div>
 <div class="daily-stat"><div class="label">Anticipos</div><div class="value" id="daily-advance">$0</div></div>
 <div class="daily-stat"><div class="label">Neto Para Ti</div><div class="value" id="daily-net">$0</div></div>
@@ -2743,6 +2778,109 @@ function formatDateTitle(dateValue) {
     const date = new Date(dateValue + 'T00:00:00');
     return date.toLocaleDateString('es-MX', { day: 'numeric', month: 'long', year: 'numeric' });
 }
+function toDateInputValue(dateValue) {
+    const date = new Date(dateValue);
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+}
+function addDays(dateValue, days) {
+    const date = new Date(dateValue);
+    date.setDate(date.getDate() + days);
+    return date;
+}
+function getTodayDateString() {
+    return toDateInputValue(new Date());
+}
+function getMonthName(monthIndex) {
+    return new Date(2026, monthIndex, 1).toLocaleDateString('es-MX', { month: 'long' });
+}
+function initDashboardDateControls() {
+    const monthSelect = document.getElementById('dashboardMonth');
+    const yearSelect = document.getElementById('dashboardYear');
+    if (!monthSelect || !yearSelect) return;
+    const today = new Date();
+    monthSelect.innerHTML = Array.from({ length: 12 }, (_, index) => `<option value="${index}">${getMonthName(index)}</option>`).join('');
+    const years = new Set([today.getFullYear() - 1, today.getFullYear(), today.getFullYear() + 1]);
+    orders.forEach(order => {
+        const year = Number(String(order.date || '').slice(0, 4));
+        if (year) years.add(year);
+    });
+    yearSelect.innerHTML = Array.from(years).sort((a, b) => b - a).map(year => `<option value="${year}">${year}</option>`).join('');
+    monthSelect.value = String(today.getMonth());
+    yearSelect.value = String(today.getFullYear());
+    updateDashboardDayOptions(today.getDate());
+    const fromInput = document.getElementById('dashboardDateFrom');
+    const toInput = document.getElementById('dashboardDateTo');
+    if (fromInput) fromInput.value = getTodayDateString();
+    if (toInput) toInput.value = getTodayDateString();
+}
+function updateDashboardDayOptions(selectedDay) {
+    const daySelect = document.getElementById('dashboardDay');
+    const monthSelect = document.getElementById('dashboardMonth');
+    const yearSelect = document.getElementById('dashboardYear');
+    if (!daySelect || !monthSelect || !yearSelect) return;
+    const year = Number(yearSelect.value) || new Date().getFullYear();
+    const month = Number(monthSelect.value) || 0;
+    const totalDays = new Date(year, month + 1, 0).getDate();
+    const safeDay = Math.min(Number(selectedDay) || Number(daySelect.value) || 1, totalDays);
+    daySelect.innerHTML = Array.from({ length: totalDays }, (_, index) => `<option value="${index + 1}">${index + 1}</option>`).join('');
+    daySelect.value = String(safeDay);
+}
+function getDashboardDateRange() {
+    const preset = document.getElementById('dashboardDatePreset')?.value || 'today';
+    const today = new Date();
+    const todayValue = getTodayDateString();
+    let start = todayValue;
+    let end = todayValue;
+    let label = 'Ventas de hoy';
+    if (preset === 'yesterday') {
+        start = end = toDateInputValue(addDays(today, -1));
+        label = `Ventas de ayer (${formatDateTitle(start)})`;
+    } else if (preset === 'last7') {
+        start = toDateInputValue(addDays(today, -6));
+        label = `Ventas de los últimos 7 días (${formatDateTitle(start)} - ${formatDateTitle(end)})`;
+    } else if (preset === 'last30') {
+        start = toDateInputValue(addDays(today, -29));
+        label = `Ventas de los últimos 30 días (${formatDateTitle(start)} - ${formatDateTitle(end)})`;
+    } else if (preset === 'month') {
+        const year = Number(document.getElementById('dashboardYear')?.value) || today.getFullYear();
+        const month = Number(document.getElementById('dashboardMonth')?.value) || today.getMonth();
+        start = toDateInputValue(new Date(year, month, 1));
+        end = toDateInputValue(new Date(year, month + 1, 0));
+        label = `Ventas de ${getMonthName(month)} ${year}`;
+    } else if (preset === 'day') {
+        const year = Number(document.getElementById('dashboardYear')?.value) || today.getFullYear();
+        const month = Number(document.getElementById('dashboardMonth')?.value) || today.getMonth();
+        const day = Number(document.getElementById('dashboardDay')?.value) || today.getDate();
+        start = end = toDateInputValue(new Date(year, month, day));
+        label = `Ventas del ${formatDateTitle(start)}`;
+    } else if (preset === 'custom') {
+        start = document.getElementById('dashboardDateFrom')?.value || todayValue;
+        end = document.getElementById('dashboardDateTo')?.value || start;
+        if (start > end) [start, end] = [end, start];
+        label = `Ventas de ${formatDateTitle(start)} a ${formatDateTitle(end)}`;
+    }
+    return { start, end, label, preset };
+}
+function handleDashboardDatePresetChange() {
+    applyDashboardDateFilter();
+}
+function handleDashboardDatePartsChange() {
+    updateDashboardDayOptions();
+    const preset = document.getElementById('dashboardDatePreset');
+    if (preset && !['month', 'day'].includes(preset.value)) preset.value = 'day';
+    applyDashboardDateFilter();
+}
+function handleDashboardCustomRangeChange() {
+    const preset = document.getElementById('dashboardDatePreset');
+    if (preset) preset.value = 'custom';
+    applyDashboardDateFilter();
+}
+function applyDashboardDateFilter() {
+    renderDashboard();
+}
 function renderHistory() {
     const container = document.getElementById('history-container');
     if (!container) return;
@@ -2787,32 +2925,41 @@ function renderHistory() {
     `).join('');
 }
 function renderDashboard() {
-    const today = new Date().toISOString().split('T')[0];
-    const todaysOrders = orders.filter(o => o.date === today);
-    const todaysNet = todaysOrders.reduce((sum, order) => sum + getOrderCollectedNet(order), 0);
-    const totalNet = orders.reduce((sum, order) => sum + getOrderCollectedNet(order), 0);
-    document.getElementById('daily-orders').textContent = todaysOrders.length;
-    document.getElementById('daily-sales').textContent = '$' + todaysOrders.reduce((s,o) => s + o.total, 0).toLocaleString();
-    document.getElementById('daily-advance').textContent = '$' + todaysOrders.reduce((s,o) => s + o.advance, 0).toLocaleString();
-    document.getElementById('daily-net').textContent = '$' + Math.round(todaysNet).toLocaleString();
-    document.getElementById('stat-new').textContent = todaysOrders.length;
-    document.getElementById('stat-pending').textContent = orders.filter(o => ['En espera de Anticipo', 'Diseño Pendiente', 'En Producción', 'Listo para Entregar'].includes(o.status)).length;
-    document.getElementById('stat-delivered').textContent = orders.filter(o => o.status === 'Entregado').length;
-    document.getElementById('stat-income').textContent = '$' + orders.reduce((s,o) => s + o.advance, 0).toLocaleString();
-    document.getElementById('stat-net').textContent = '$' + Math.round(totalNet).toLocaleString();
-    document.getElementById('stat-remaining').textContent = '$' + orders.reduce((s,o) => s + o.remaining, 0).toLocaleString();
-    document.getElementById('stat-customers').textContent = customers.length;
+    const range = getDashboardDateRange();
+    const periodOrders = orders.filter(order => {
+        const date = order.date || '';
+        return date >= range.start && date <= range.end;
+    });
+    const periodNet = periodOrders.reduce((sum, order) => sum + getOrderCollectedNet(order), 0);
+    const periodCustomers = new Set(periodOrders.map(order => String(order.customerName || '').trim().toLowerCase()).filter(Boolean));
+    const filterLabel = document.getElementById('dashboardFilterLabel');
+    if (filterLabel) filterLabel.textContent = range.label;
+    const currentDateEl = document.getElementById('currentDate');
+    if (currentDateEl) currentDateEl.textContent = range.label.replace(/^Ventas de\s*/i, '').replace(/^Ventas del\s*/i, '');
+    document.getElementById('daily-orders').textContent = periodOrders.length;
+    document.getElementById('daily-sales').textContent = '$' + periodOrders.reduce((s,o) => s + Number(o.total || 0), 0).toLocaleString();
+    document.getElementById('daily-advance').textContent = '$' + periodOrders.reduce((s,o) => s + Number(o.advance || 0), 0).toLocaleString();
+    document.getElementById('daily-net').textContent = '$' + Math.round(periodNet).toLocaleString();
+    document.getElementById('stat-new').textContent = periodOrders.length;
+    document.getElementById('stat-pending').textContent = periodOrders.filter(o => ['En espera de Anticipo', 'Diseño Pendiente', 'En Producción', 'Listo para Entregar'].includes(o.status)).length;
+    document.getElementById('stat-delivered').textContent = periodOrders.filter(o => o.status === 'Entregado').length;
+    document.getElementById('stat-income').textContent = '$' + periodOrders.reduce((s,o) => s + Number(o.advance || 0), 0).toLocaleString();
+    document.getElementById('stat-net').textContent = '$' + Math.round(periodNet).toLocaleString();
+    document.getElementById('stat-remaining').textContent = '$' + periodOrders.reduce((s,o) => s + Number(o.remaining || 0), 0).toLocaleString();
+    document.getElementById('stat-customers').textContent = periodCustomers.size;
     const tbody = document.getElementById('dashboard-orders');
     if (tbody) {
         if (orders.length === 0) {
             tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:40px;">No hay pedidos registrados</td></tr>';
+        } else if (periodOrders.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:40px;">No hay pedidos en el periodo seleccionado</td></tr>';
         } else {
-            tbody.innerHTML = orders.slice(0,5).map(order => `
+            tbody.innerHTML = periodOrders.slice().sort((a, b) => String(b.date || '').localeCompare(String(a.date || ''))).slice(0,5).map(order => `
                 <tr onclick="viewOrder('${order.id}')" style="cursor:pointer;">
                     <td><strong>${order.id}</strong><br><small>${order.date}</small></td>
                     <td>${order.customerName}</td>
                     <td>${order.products ? order.products.map(p=>`${p.qty}x ${p.type}`).join(', ') : ''}</td>
-                    <td>$${order.total.toLocaleString()}</td>
+                    <td>$${Number(order.total || 0).toLocaleString()}</td>
                     <td><span class="payment-badge payment-${order.paid?'paid':order.advance>0?'partial':'pending'}">${order.paid?'Saldado':order.advance>0?'Con Anticipo':'Pendiente'}</span></td>
                     <td><span class="status-badge status-${order.status==='Entregado'?'completed':order.status==='En Producción'||order.status==='Listo para Entregar'?'production':'pending'}">${order.status}</span></td>
                     <td><button onclick="event.stopPropagation(); viewOrder('${order.id}')" class="btn btn-primary btn-sm">Ver</button></td>
@@ -3619,7 +3766,11 @@ Esperamos que estés disfrutando tu prenda de Prin Epic 👕🔥
 
 Queremos agradecerte por tu compra y además darte la oportunidad de obtener un cupón de $100 MXN de descuento para tu próxima orden 🎉
 
-Para participar solo necesitas entrar a nuestra pagina de Facebook: https://www.facebook.com/printepic494
+Para participar solo necesitas entrar a nuestra página de Facebook:
+
+https://www.facebook.com/printepic494
+
+Y realizar los siguientes pasos:
 
 ✅ Subir una foto usando tu camiseta, hoodie o prenda de Prin Epic en nuestra página.
 ✅ Darle like a una publicación de la página.
@@ -4172,6 +4323,7 @@ document.addEventListener('DOMContentLoaded', function() {
     if (currentDateEl) {
         currentDateEl.textContent = new Date().toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
     }
+    initDashboardDateControls();
     const loginPassword = document.getElementById('loginPassword');
     const loginUsername = document.getElementById('loginUsername');
     if (loginPassword) loginPassword.addEventListener('keypress', function(e) { if (e.key === 'Enter') attemptLogin(); });
