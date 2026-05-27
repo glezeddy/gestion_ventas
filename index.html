@@ -63,6 +63,7 @@ tr:hover { background: linear-gradient(90deg, #f8fafc, #fafafa); }
 .status-pending { background: linear-gradient(135deg, #fef3c7, #fde68a); color: #92400e; }
 .status-production { background: linear-gradient(135deg, #dbeafe, #bfdbfe); color: #1e40af; }
 .status-completed { background: linear-gradient(135deg, #dcfce7, #bbf7d0); color: #166534; }
+.status-cancelled { background: linear-gradient(135deg, #fee2e2, #fecaca); color: #991b1b; }
 .btn { padding: 14px 28px; border-radius: 12px; font-weight: 600; cursor: pointer; border: none; display: inline-flex; align-items: center; gap: 10px; transition: all 0.3s; font-size: 14px; position: relative; overflow: hidden; }
 .btn::before { content: ''; position: absolute; top: 50%; left: 50%; width: 0; height: 0; background: rgba(255,255,255,0.2); border-radius: 50%; transform: translate(-50%, -50%); transition: width 0.4s, height 0.4s; }
 .btn:hover::before { width: 300px; height: 300px; }
@@ -456,7 +457,7 @@ Datos del pedido
 </div>
 <button class="btn btn-danger" onclick="clearAllData()">
 <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
-Limpiar Todo
+Limpiar datos locales
 </button>
 <button class="btn btn-secondary" onclick="logout()" style="background: linear-gradient(135deg, #ef4444, #dc2626);">
 <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
@@ -525,7 +526,7 @@ Cerrar Sesión
 <div class="daily-stat"><div class="label">Neto Para Ti</div><div class="value" id="daily-net">$0</div></div>
 </div>
 <div class="dashboard-shortcuts">
-<button class="shortcut-card" onclick="showSection('orders', document.querySelectorAll('.nav-item')[1]); setTimeout(openNewOrderModal, 300)">
+<button class="shortcut-card" onclick="showSection('orders'); setTimeout(openNewOrderModal, 300)">
 <svg width="26" height="26" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg>
 <span>Nuevo Pedido</span>
 </button>
@@ -575,6 +576,7 @@ Descargar Reporte Excel
 <div class="tab" onclick="filterOrders('production', this)">En Producción</div>
 <div class="tab" onclick="filterOrders('completed', this)">Entregados</div>
 <div class="tab" onclick="filterOrders('paid', this)">Saldados</div>
+<div class="tab" onclick="filterOrders('cancelled', this)">Cancelados</div>
 </div>
 <div class="table-container">
 <table>
@@ -669,11 +671,11 @@ Descargar Reporte Excel
 <div class="modal-footer"><button class="btn btn-secondary" onclick="goHome()">Home</button><button class="btn btn-secondary" onclick="closeModal('editCouponModal')">Cancelar</button><button class="btn btn-primary" onclick="saveCouponEdit()">Guardar Cambios</button></div>
 </div>
 </div>
-<div class="modal-overlay" id="newOrderModal"><div class="modal"><div class="modal-header"><h2>✨ Nuevo Pedido</h2><button class="close-btn" onclick="closeModal('newOrderModal')">&times;</button></div><div class="modal-body"><form id="orderForm"><div class="form-grid"><div class="form-group full-width"><label>👤 Nombre del Cliente</label><input type="text" id="orderCustomerName" placeholder="Escribe el nombre del cliente" required></div><div class="form-group"><label>📱 Teléfono WhatsApp</label><input type="tel" id="orderCustomerPhone" placeholder="Ej. 6641234567"></div><div class="form-group"><label>🖨️ Técnica de Estampado</label><select id="orderTechnique"><option>DTF</option></select></div><div class="form-group full-width"><label>📋 Estado Inicial</label><select id="orderStatus"><option>En espera de Anticipo</option><option>Diseño Pendiente</option><option>En Producción</option><option>Listo para Entregar</option></select></div></div><div class="products-list" id="productsList"></div><button type="button" class="add-product-btn" onclick="addProductRow()">+ Agregar Producto</button><div class="form-group full-width" style="margin-top: 25px;"><div class="price-display"><div><div class="label">Total Productos</div><div class="value" id="displayTotalQty">0</div></div><div><div class="label">Subtotal</div><div class="value" id="displaySubtotal">$0</div></div><div><div class="label">Descuento Cupón</div><div class="value" id="displayCouponDiscount">$0</div></div><div><div class="label">Precio Total</div><div class="value" id="displayTotal">$0</div></div><div><div class="label">Anticipo Sugerido (70%)</div><div class="value" id="displayAdvance">$0</div></div></div></div><div class="form-grid"><div class="form-group full-width"><label>Validar cupón de descuento</label><div style="display:flex; gap:10px; flex-wrap:wrap;"><input type="text" id="orderCouponCode" placeholder="Ej. PRI100-ABC123" style="flex:1 1 220px; text-transform:uppercase;"><button type="button" class="btn btn-info" onclick="validateCouponForOrder()">Validar cupón</button><button type="button" class="btn btn-secondary" onclick="clearOrderCoupon()">Quitar</button></div><p id="couponValidationMessage" style="margin-top:8px; color:#64748b; font-size:13px;"></p></div></div><div class="form-grid"><div class="form-group"><label>🧵 Costo camiseta por pieza</label><input type="number" id="orderShirtCost" min="0" step="0.01" value="0"></div><div class="form-group"><label>🧒 Costo camiseta niño por pieza</label><input type="number" id="orderShirtCostKids" min="0" step="0.01" value="0"></div><div class="form-group"><label>🖨️ Costo DTF total</label><input type="number" id="orderDtfCost" min="0" step="0.01" value="0"></div><div class="form-group"><label>📦 Otros gastos</label><input type="number" id="orderExtraCost" min="0" step="0.01" value="0"></div></div><div class="form-grid"><div class="form-group"><label>💵 Anticipo Recibido ($)</label><input type="number" id="orderAdvance" value="0" onchange="validateAdvanceAndCalculate()"></div></div></form></div><div class="modal-footer"><button class="btn btn-secondary" onclick="goHome()">Home</button><button class="btn btn-secondary" onclick="closeModal('newOrderModal')">Cancelar</button><button class="btn btn-primary" onclick="saveOrder()">Guardar Pedido</button></div></div></div>
+<div class="modal-overlay" id="newOrderModal"><div class="modal"><div class="modal-header"><h2>✨ Nuevo Pedido</h2><button class="close-btn" onclick="closeModal('newOrderModal')">&times;</button></div><div class="modal-body"><form id="orderForm"><div class="form-grid"><div class="form-group full-width"><label>👤 Nombre del Cliente</label><input type="text" id="orderCustomerName" placeholder="Escribe el nombre del cliente" required></div><div class="form-group"><label>📱 Teléfono WhatsApp</label><input type="tel" id="orderCustomerPhone" placeholder="Ej. 6641234567"></div><div class="form-group"><label>🖨️ Técnica de Estampado</label><select id="orderTechnique"><option>DTF</option></select></div><div class="form-group full-width"><label>📋 Estado Inicial</label><select id="orderStatus"><option>En espera de Anticipo</option><option>Pendiente</option><option>En Producción</option><option>Listo para Entregar</option></select></div></div><div class="products-list" id="productsList"></div><button type="button" class="add-product-btn" onclick="addProductRow()">+ Agregar Producto</button><div class="form-group full-width" style="margin-top: 25px;"><div class="price-display"><div><div class="label">Total Productos</div><div class="value" id="displayTotalQty">0</div></div><div><div class="label">Subtotal</div><div class="value" id="displaySubtotal">$0</div></div><div><div class="label">Descuento Cupón</div><div class="value" id="displayCouponDiscount">$0</div></div><div><div class="label">Precio Total</div><div class="value" id="displayTotal">$0</div></div><div><div class="label">Anticipo Sugerido (70%)</div><div class="value" id="displayAdvance">$0</div></div></div></div><div class="form-grid"><div class="form-group full-width"><label>Validar cupón de descuento</label><div style="display:flex; gap:10px; flex-wrap:wrap;"><input type="text" id="orderCouponCode" placeholder="Ej. PRI100-ABC123" style="flex:1 1 220px; text-transform:uppercase;"><button type="button" class="btn btn-info" onclick="validateCouponForOrder()">Validar cupón</button><button type="button" class="btn btn-secondary" onclick="clearOrderCoupon()">Quitar</button></div><p id="couponValidationMessage" style="margin-top:8px; color:#64748b; font-size:13px;"></p></div></div><div class="form-grid"><div class="form-group"><label>🧵 Costo camiseta por pieza</label><input type="number" id="orderShirtCost" min="0" step="0.01" value="0"></div><div class="form-group"><label>🧒 Costo camiseta niño por pieza</label><input type="number" id="orderShirtCostKids" min="0" step="0.01" value="0"></div><div class="form-group"><label>🖨️ Costo DTF total</label><input type="number" id="orderDtfCost" min="0" step="0.01" value="0"></div><div class="form-group"><label>📦 Otros gastos</label><input type="number" id="orderExtraCost" min="0" step="0.01" value="0"></div></div><div class="form-grid"><div class="form-group"><label>💵 Anticipo Recibido ($)</label><input type="number" id="orderAdvance" value="0" onchange="validateAdvanceAndCalculate()"></div></div></form></div><div class="modal-footer"><button class="btn btn-secondary" onclick="goHome()">Home</button><button class="btn btn-secondary" onclick="closeModal('newOrderModal')">Cancelar</button><button class="btn btn-primary" onclick="saveOrder()">Guardar Pedido</button></div></div></div>
 
 <div class="modal-overlay" id="orderDetailModal"><div class="modal"><div class="modal-header"><h2 id="detailOrderId">Pedido #</h2><button class="close-btn" onclick="closeModal('orderDetailModal')">&times;</button></div><div class="modal-body"><div id="orderDetailContent"></div></div><div class="modal-footer"><button class="btn btn-secondary" onclick="goHome()">Home</button><button class="btn btn-warning" onclick="markAsPaid()">Marcar como Saldado</button><button class="btn btn-secondary" onclick="printTicket()">Imprimir Ticket</button><button class="btn btn-info" onclick="downloadTicket()">Descargar Ticket</button><button class="btn btn-success" onclick="shareTicketWhatsApp()">Compartir WhatsApp</button><button class="btn btn-info" onclick="downloadProductList()">Lista Productos</button><button class="btn btn-primary" onclick="closeModal('orderDetailModal')">Cerrar</button></div></div></div>
 
-<div class="modal-overlay" id="editOrderModal"><div class="modal"><div class="modal-header"><h2>✏️ Editar Pedido</h2><button class="close-btn" onclick="closeModal('editOrderModal')">&times;</button></div><div class="modal-body"><form id="editOrderForm"><input type="hidden" id="editOrderId"><div class="form-grid"><div class="form-group full-width"><label>Nombre del Cliente</label><input type="text" id="editCustomerName" required></div><div class="form-group"><label>Fecha del Pedido</label><input type="date" id="editOrderDate" required></div><div class="form-group"><label>Técnica</label><select id="editTechnique"><option>DTF</option></select></div><div class="form-group full-width"><label>Estado</label><select id="editStatus"><option>En espera de Anticipo</option><option>Diseño Pendiente</option><option>En Producción</option><option>Listo para Entregar</option><option>Entregado</option></select></div></div><div class="form-group full-width"><label>Productos</label><div id="editProductsList"></div><button type="button" class="add-product-btn" onclick="addEditProductRow()">+ Agregar Producto</button></div><div class="form-group full-width"><div class="price-display"><div><div class="label">Subtotal</div><div class="value" id="editDisplaySubtotal">$0</div></div><div><div class="label">Descuento Cupón</div><div class="value" id="editDisplayCouponDiscount">$0</div></div><div><div class="label">Total</div><div class="value" id="editDisplayTotal">$0</div></div><div><div class="label">Saldo restante</div><div class="value" id="editDisplayRemaining">$0</div></div></div></div><div class="form-grid"><div class="form-group"><label>Anticipo recibido ($)</label><input type="number" id="editAdvance" min="0" step="0.01" value="0" onchange="calculateEditPrices()" oninput="calculateEditPrices()"></div><div class="form-group"><label>Costo camiseta por pieza</label><input type="number" id="editShirtCost" min="0" step="0.01" value="0"></div><div class="form-group"><label>Costo camiseta niño por pieza</label><input type="number" id="editShirtCostKids" min="0" step="0.01" value="0"></div><div class="form-group"><label>Costo DTF total</label><input type="number" id="editDtfCost" min="0" step="0.01" value="0"></div><div class="form-group"><label>Otros gastos</label><input type="number" id="editExtraCost" min="0" step="0.01" value="0"></div></div></form></div><div class="modal-footer"><button class="btn btn-secondary" onclick="goHome()">Home</button><button class="btn btn-secondary" onclick="closeModal('editOrderModal')">Cancelar</button><button class="btn btn-primary" onclick="saveEditOrder()">Guardar Cambios</button></div></div></div>
+<div class="modal-overlay" id="editOrderModal"><div class="modal"><div class="modal-header"><h2>✏️ Editar Pedido</h2><button class="close-btn" onclick="closeModal('editOrderModal')">&times;</button></div><div class="modal-body"><form id="editOrderForm"><input type="hidden" id="editOrderId"><div class="form-grid"><div class="form-group full-width"><label>Nombre del Cliente</label><input type="text" id="editCustomerName" required></div><div class="form-group"><label>Fecha del Pedido</label><input type="date" id="editOrderDate" required></div><div class="form-group"><label>Técnica</label><select id="editTechnique"><option>DTF</option></select></div><div class="form-group full-width"><label>Estado</label><select id="editStatus"><option>En espera de Anticipo</option><option>Pendiente</option><option>En Producción</option><option>Listo para Entregar</option><option>Entregado</option><option>Cancelado</option></select></div></div><div class="form-group full-width"><label>Productos</label><div id="editProductsList"></div><button type="button" class="add-product-btn" onclick="addEditProductRow()">+ Agregar Producto</button></div><div class="form-group full-width"><div class="price-display"><div><div class="label">Subtotal</div><div class="value" id="editDisplaySubtotal">$0</div></div><div><div class="label">Descuento Cupón</div><div class="value" id="editDisplayCouponDiscount">$0</div></div><div><div class="label">Total</div><div class="value" id="editDisplayTotal">$0</div></div><div><div class="label">Saldo restante</div><div class="value" id="editDisplayRemaining">$0</div></div></div></div><div class="form-grid"><div class="form-group"><label>Anticipo recibido ($)</label><input type="number" id="editAdvance" min="0" step="0.01" value="0" onchange="calculateEditPrices()" oninput="calculateEditPrices()"></div><div class="form-group"><label>Costo camiseta por pieza</label><input type="number" id="editShirtCost" min="0" step="0.01" value="0"></div><div class="form-group"><label>Costo camiseta niño por pieza</label><input type="number" id="editShirtCostKids" min="0" step="0.01" value="0"></div><div class="form-group"><label>Costo DTF total</label><input type="number" id="editDtfCost" min="0" step="0.01" value="0"></div><div class="form-group"><label>Otros gastos</label><input type="number" id="editExtraCost" min="0" step="0.01" value="0"></div></div></form></div><div class="modal-footer"><button class="btn btn-secondary" onclick="goHome()">Home</button><button class="btn btn-secondary" onclick="closeModal('editOrderModal')">Cancelar</button><button class="btn btn-primary" onclick="saveEditOrder()">Guardar Cambios</button></div></div></div>
 
 <div class="modal-overlay" id="newCustomerModal"><div class="modal"><div class="modal-header"><h2>Nuevo Cliente</h2><button class="close-btn" onclick="closeModal('newCustomerModal')">&times;</button></div><div class="modal-body"><form id="customerForm"><div class="form-group"><label>Nombre</label><input type="text" id="customerName" required></div><div class="form-group"><label>Teléfono WhatsApp</label><input type="tel" id="customerPhone" placeholder="Ej. 6641234567"></div><div class="form-group"><label>Email</label><input type="email" id="customerEmail"></div></form></div><div class="modal-footer"><button class="btn btn-secondary" onclick="goHome()">Home</button><button class="btn btn-secondary" onclick="closeModal('newCustomerModal')">Cancelar</button><button class="btn btn-primary" onclick="saveCustomer()">Guardar</button></div></div></div>
 
@@ -877,7 +879,7 @@ function sanitizeOrder(order) {
         totalQty,
         advance,
         remaining,
-        status: order.status || 'En espera de Anticipo',
+        status: normalizeOrderStatus(order.status),
         paid: Boolean(order.paid || advance >= total),
         shirtCost,
         shirtCostKids,
@@ -1903,7 +1905,7 @@ function openEditOrderModal(orderId) {
     document.getElementById('editCustomerName').value = order.customerName;
     document.getElementById('editOrderDate').value = order.date;
     document.getElementById('editTechnique').value = order.technique;
-    document.getElementById('editStatus').value = order.status;
+    document.getElementById('editStatus').value = normalizeOrderStatus(order.status);
     document.getElementById('editAdvance').value = order.advance || 0;
     document.getElementById('editShirtCost').value = order.shirtCost || 0;
     const editShirtCostKids = document.getElementById('editShirtCostKids');
@@ -2172,6 +2174,32 @@ function ticketEscape(value) {
         "'": '&#39;',
         '"': '&quot;'
     }[char]));
+}
+
+function jsStringEscape(value) {
+    return String(value ?? '')
+        .replace(/\\/g, '\\\\')
+        .replace(/'/g, "\\'")
+        .replace(/\r/g, '')
+        .replace(/\n/g, '\\n');
+}
+
+function normalizeOrderStatus(status) {
+    const value = String(status || '').trim();
+    if (value === 'Diseño Pendiente') return 'Pendiente';
+    return value || 'En espera de Anticipo';
+}
+
+function isPendingOrderStatus(status) {
+    return ['En espera de Anticipo', 'Pendiente', 'Diseño Pendiente'].includes(String(status || '').trim());
+}
+
+function getOrderStatusClass(status) {
+    const normalizedStatus = normalizeOrderStatus(status);
+    if (normalizedStatus === 'Entregado') return 'completed';
+    if (normalizedStatus === 'Cancelado') return 'cancelled';
+    if (['En Producción', 'Listo para Entregar'].includes(normalizedStatus)) return 'production';
+    return 'pending';
 }
 
 function formatTicketMoney(value) {
@@ -2918,29 +2946,32 @@ function renderHistory() {
     container.innerHTML = sortedDates.map(date => `
         <div class="history-date-group">
             <h2 class="history-date-title">${formatDateTitle(date)}</h2>
-            ${grouped[date].map(order => `
+            ${grouped[date].map(order => {
+                const safeOrderId = jsStringEscape(order.id);
+                const normalizedStatus = normalizeOrderStatus(order.status);
+                return `
                 <div class="history-order-card">
                     <div class="history-order-header">
                         <div>
-                            <h3>${order.customerName}</h3>
-                            <p style="color:#64748b; margin-top:4px;">${order.id} · ${order.technique || '-'}</p>
+                            <h3>${ticketEscape(order.customerName)}</h3>
+                            <p style="color:#64748b; margin-top:4px;">${ticketEscape(order.id)} · ${ticketEscape(order.technique || '-')}</p>
                         </div>
                         <div class="action-buttons">
-                            <button onclick="viewOrder('${order.id}')" class="btn btn-primary btn-sm">Ver</button>
-                            <button onclick="openEditOrderModal('${order.id}')" class="btn btn-info btn-sm">Editar</button>
+                            <button onclick="viewOrder('${safeOrderId}')" class="btn btn-primary btn-sm">Ver</button>
+                            <button onclick="openEditOrderModal('${safeOrderId}')" class="btn btn-info btn-sm">Editar</button>
                         </div>
                     </div>
                     <div class="history-order-grid">
                         <div><strong>Total</strong>$${(Number(order.total) || 0).toLocaleString()}</div>
                         <div><strong>Anticipo</strong>$${(Number(order.advance) || 0).toLocaleString()}</div>
                         <div><strong>Restante</strong>$${(Number(order.remaining) || 0).toLocaleString()}</div>
-                        <div><strong>Estado</strong><span class="status-badge status-${order.status==='Entregado'?'completed':order.status==='En Producción'||order.status==='Listo para Entregar'?'production':'pending'}">${order.status}</span></div>
+                        <div><strong>Estado</strong><span class="status-badge status-${getOrderStatusClass(normalizedStatus)}">${ticketEscape(normalizedStatus)}</span></div>
                     </div>
                     <div class="history-products">
-                        ${(order.products || []).map(product => `${product.qty}x ${product.type} ${product.color || ''} talla ${product.size || ''} - $${(Number(product.price) || 0).toLocaleString()}`).join('<br>')}
+                        ${(order.products || []).map(product => `${ticketEscape(product.qty)}x ${ticketEscape(product.type)} ${ticketEscape(product.color || '')} talla ${ticketEscape(product.size || '')} - $${(Number(product.price) || 0).toLocaleString()}`).join('<br>')}
                     </div>
                 </div>
-            `).join('')}
+            `}).join('')}
         </div>
     `).join('');
 }
@@ -2961,8 +2992,8 @@ function renderDashboard() {
     document.getElementById('daily-advance').textContent = '$' + periodOrders.reduce((s,o) => s + Number(o.advance || 0), 0).toLocaleString();
     document.getElementById('daily-net').textContent = '$' + Math.round(periodNet).toLocaleString();
     document.getElementById('stat-new').textContent = periodOrders.length;
-    document.getElementById('stat-pending').textContent = periodOrders.filter(o => ['En espera de Anticipo', 'Diseño Pendiente', 'En Producción', 'Listo para Entregar'].includes(o.status)).length;
-    document.getElementById('stat-delivered').textContent = periodOrders.filter(o => o.status === 'Entregado').length;
+    document.getElementById('stat-pending').textContent = periodOrders.filter(o => isPendingOrderStatus(o.status) || ['En Producción', 'Listo para Entregar'].includes(normalizeOrderStatus(o.status))).length;
+    document.getElementById('stat-delivered').textContent = periodOrders.filter(o => normalizeOrderStatus(o.status) === 'Entregado').length;
     document.getElementById('stat-income').textContent = '$' + periodOrders.reduce((s,o) => s + Number(o.advance || 0), 0).toLocaleString();
     document.getElementById('stat-net').textContent = '$' + Math.round(periodNet).toLocaleString();
     document.getElementById('stat-remaining').textContent = '$' + periodOrders.reduce((s,o) => s + Number(o.remaining || 0), 0).toLocaleString();
@@ -2972,19 +3003,22 @@ function renderDashboard() {
         if (orders.length === 0) {
             tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:40px;">No hay pedidos registrados</td></tr>';
         } else if (periodOrders.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; padding:40px;">No hay pedidos en este periodo: ${ticketEscape(range.label)}. Revisa las fechas disponibles arriba o elige otro rango.</td></tr>`;
+            tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; padding:40px;">No hay pedidos en este periodo: ${ticketEscape(range.label)}. Elige otro rango en el selector de fechas.</td></tr>`;
         } else {
-            tbody.innerHTML = periodOrders.slice().sort((a, b) => String(b.date || '').localeCompare(String(a.date || ''))).slice(0,5).map(order => `
-                <tr onclick="viewOrder('${order.id}')" style="cursor:pointer;">
-                    <td><strong>${order.id}</strong><br><small>${order.date}</small></td>
-                    <td>${order.customerName}</td>
-                    <td>${order.products ? order.products.map(p=>`${p.qty}x ${p.type}`).join(', ') : ''}</td>
+            tbody.innerHTML = periodOrders.slice().sort((a, b) => String(b.date || '').localeCompare(String(a.date || ''))).slice(0,5).map(order => {
+                const safeOrderId = jsStringEscape(order.id);
+                const normalizedStatus = normalizeOrderStatus(order.status);
+                return `
+                <tr onclick="viewOrder('${safeOrderId}')" style="cursor:pointer;">
+                    <td><strong>${ticketEscape(order.id)}</strong><br><small>${ticketEscape(order.date)}</small></td>
+                    <td>${ticketEscape(order.customerName)}</td>
+                    <td>${order.products ? order.products.map(p=>`${ticketEscape(p.qty)}x ${ticketEscape(p.type)}`).join(', ') : ''}</td>
                     <td>$${Number(order.total || 0).toLocaleString()}</td>
                     <td><span class="payment-badge payment-${order.paid?'paid':order.advance>0?'partial':'pending'}">${order.paid?'Saldado':order.advance>0?'Con Anticipo':'Pendiente'}</span></td>
-                    <td><span class="status-badge status-${order.status==='Entregado'?'completed':order.status==='En Producción'||order.status==='Listo para Entregar'?'production':'pending'}">${order.status}</span></td>
-                    <td><button onclick="event.stopPropagation(); viewOrder('${order.id}')" class="btn btn-primary btn-sm">Ver</button></td>
+                    <td><span class="status-badge status-${getOrderStatusClass(normalizedStatus)}">${ticketEscape(normalizedStatus)}</span></td>
+                    <td><button onclick="event.stopPropagation(); viewOrder('${safeOrderId}')" class="btn btn-primary btn-sm">Ver</button></td>
                 </tr>
-            `).join('');
+            `}).join('');
         }
     }
 }
@@ -2997,7 +3031,7 @@ function viewOrder(orderId) {
     if (order.products && order.products.length > 0) {
         productsHTML = order.products.map(p => `
             <div style="background:#f8fafc; padding:15px; border-radius:10px; margin-bottom:10px;">
-                <strong>${p.qty}x ${p.type}</strong> - ${p.color} - Talla ${p.size} - Género: ${p.gender || 'No especificado'}<br>
+                <strong>${ticketEscape(p.qty)}x ${ticketEscape(p.type)}</strong> - ${ticketEscape(p.color)} - Talla ${ticketEscape(p.size)} - Género: ${ticketEscape(p.gender || 'No especificado')}<br>
                 Precio unitario: $${p.price}
             </div>
         `).join('');
@@ -3008,16 +3042,16 @@ function viewOrder(orderId) {
         : '';
     document.getElementById('orderDetailContent').innerHTML = `
         <div>
-            <h3>Cliente: ${order.customerName}</h3>
-            <p>Teléfono: ${order.customerPhone || '-'}</p>
-            <p>Fecha: ${order.date}</p>
-            <p>Técnica: ${order.technique}</p>
+            <h3>Cliente: ${ticketEscape(order.customerName)}</h3>
+            <p>Teléfono: ${ticketEscape(order.customerPhone || '-')}</p>
+            <p>Fecha: ${ticketEscape(order.date)}</p>
+            <p>Técnica: ${ticketEscape(order.technique)}</p>
             <p>Total: $${order.total.toLocaleString()}</p>
             <p>Anticipo: $${order.advance.toLocaleString()}</p>
             <p>Restante: $${order.remaining.toLocaleString()}</p>
             <p>Costo total: $${(order.costTotal || 0).toLocaleString()}</p>
             <p>Neto para ti: $${(order.netProfit || Math.max(0, order.total - (order.costTotal || 0))).toLocaleString()}</p>
-            <p>Estado: ${order.status}</p>
+            <p>Estado: ${ticketEscape(normalizeOrderStatus(order.status))}</p>
             <h4>Productos:</h4>
             ${productsHTML}
             ${couponButton}
@@ -3057,25 +3091,29 @@ function renderOrders() {
     const tbody = document.getElementById('orders-table');
     if (!tbody) return;
     let filtered = orders;
-    if (currentFilter === 'pending') filtered = orders.filter(o => ['En espera de Anticipo', 'Diseño Pendiente'].includes(o.status));
+    if (currentFilter === 'pending') filtered = orders.filter(o => isPendingOrderStatus(o.status));
     else if (currentFilter === 'production') filtered = orders.filter(o => ['En Producción', 'Listo para Entregar'].includes(o.status));
-    else if (currentFilter === 'completed') filtered = orders.filter(o => o.status === 'Entregado');
+    else if (currentFilter === 'completed') filtered = orders.filter(o => normalizeOrderStatus(o.status) === 'Entregado');
     else if (currentFilter === 'paid') filtered = orders.filter(o => o.paid === true);
+    else if (currentFilter === 'cancelled') filtered = orders.filter(o => normalizeOrderStatus(o.status) === 'Cancelado');
     if (filtered.length === 0) {
         tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; padding:40px;">No hay pedidos en esta categoría</td></tr>';
     } else {
-        tbody.innerHTML = filtered.map(order => `
+        tbody.innerHTML = filtered.map(order => {
+            const safeOrderId = jsStringEscape(order.id);
+            const normalizedStatus = normalizeOrderStatus(order.status);
+            return `
             <tr>
-                <td><strong>${order.id}</strong><br><small>${order.date}</small></td>
-                <td>${order.customerName}</td>
-                <td>${order.products ? order.products.map(p=>`${p.qty}x ${p.type}`).join(', ') : ''}</td>
+                <td><strong>${ticketEscape(order.id)}</strong><br><small>${ticketEscape(order.date)}</small></td>
+                <td>${ticketEscape(order.customerName)}</td>
+                <td>${order.products ? order.products.map(p=>`${ticketEscape(p.qty)}x ${ticketEscape(p.type)}`).join(', ') : ''}</td>
                 <td>$${order.total.toLocaleString()}</td>
                 <td>$${order.advance.toLocaleString()}</td>
                 <td>$${order.remaining.toLocaleString()}</td>
-                <td><span class="status-badge status-${order.status==='Entregado'?'completed':order.status==='En Producción'||order.status==='Listo para Entregar'?'production':'pending'}">${order.status}</span></td>
-                <td><div class="action-buttons"><button onclick="viewOrder('${order.id}')" class="btn btn-primary btn-sm">Ver</button><button onclick="openEditOrderModal('${order.id}')" class="btn btn-info btn-sm">Editar</button><button onclick="deleteOrder('${order.id}')" class="btn btn-danger btn-sm">Eliminar</button></div></td>
+                <td><span class="status-badge status-${getOrderStatusClass(normalizedStatus)}">${ticketEscape(normalizedStatus)}</span></td>
+                <td><div class="action-buttons"><button onclick="viewOrder('${safeOrderId}')" class="btn btn-primary btn-sm">Ver</button><button onclick="openEditOrderModal('${safeOrderId}')" class="btn btn-info btn-sm">Editar</button><button onclick="deleteOrder('${safeOrderId}')" class="btn btn-danger btn-sm">Eliminar</button></div></td>
             </tr>
-        `).join('');
+        `}).join('');
     }
 }
 async function deleteOrder(orderId) {
@@ -3239,9 +3277,9 @@ function renderFinance() {
         } else {
             tbody.innerHTML = orders.map(order => `
                 <tr>
-                    <td>${order.date}</td>
-                    <td><strong>${order.id}</strong></td>
-                    <td>${order.customerName}</td>
+                    <td>${ticketEscape(order.date)}</td>
+                    <td><strong>${ticketEscape(order.id)}</strong></td>
+                    <td>${ticketEscape(order.customerName)}</td>
                     <td>Anticipo - Pedido</td>
                     <td style="color:#10b981;">+$${order.advance.toLocaleString()}</td>
                     <td><span class="payment-badge payment-${order.paid?'paid':order.advance>0?'partial':'pending'}">${order.paid?'Saldado':order.advance>0?'Con Anticipo':'Pendiente'}</span></td>
@@ -3262,7 +3300,7 @@ function renderCharts() {
         } else {
             techniqueContainer.innerHTML = Object.entries(techniques).map(([tech, qty]) => {
                 const percent = Math.round((qty / total) * 100);
-                return `<div class="report-progress"><div class="label"><span>${tech}</span><span>${qty} prendas (${percent}%)</span></div><div class="bar"><div class="fill" style="width: ${percent}%; background: linear-gradient(135deg, #6366f1, #8b5cf6);"></div></div></div>`;
+                return `<div class="report-progress"><div class="label"><span>${ticketEscape(tech)}</span><span>${qty} prendas (${percent}%)</span></div><div class="bar"><div class="fill" style="width: ${percent}%; background: linear-gradient(135deg, #6366f1, #8b5cf6);"></div></div></div>`;
             }).join('');
         }
     }
@@ -3285,7 +3323,9 @@ function renderCharts() {
 function exportToExcel() {
     let csv = 'Fecha,Pedido,Cliente,Total,Anticipo,Restante,Estado,Pago\n';
     orders.forEach(order => {
-        csv += `"${order.date}","${order.id}","${order.customerName}","${order.total}","${order.advance}","${order.remaining}","${order.status}","${order.paid ? 'Saldado' : 'Pendiente'}"\n`;
+        csv += [order.date, order.id, order.customerName, order.total, order.advance, order.remaining, normalizeOrderStatus(order.status), order.paid ? 'Saldado' : 'Pendiente']
+            .map(value => `"${String(value ?? '').replace(/"/g, '""')}"`)
+            .join(',') + '\n';
     });
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
     const link = document.createElement('a');
@@ -3295,12 +3335,14 @@ function exportToExcel() {
     showNotification('Reporte descargado', 'success');
 }
 function clearAllData() {
-    if (confirm('⚠️ ¿Eliminar TODOS los datos? Esta acción no se puede deshacer.')) {
+    if (confirm('⚠️ ¿Eliminar los datos locales de este navegador? Esto NO borra registros guardados en Supabase y podrían volver a cargarse al sincronizar.')) {
         orders = [];
         customers = [];
+        coupons = [];
+        currentCouponForOrder = null;
         saveData();
         renderAll();
-        showNotification('Todos los datos han sido eliminados', 'warning');
+        showNotification('Datos locales eliminados en este navegador. Supabase no fue modificado.', 'warning');
     }
 }
 function isTestOrder(order) {
@@ -3374,7 +3416,7 @@ function buildTestOrders() {
     const today = getTodayDateString();
     return [
         buildTestOrder({ id: 'TEST-001', customerName: 'Cliente TEST 01', customerPhone: '+5216640000001', status: 'En espera de Anticipo', advanceRate: 0, products: [{ type: 'Playera Básica', qty: 1, color: 'Blanco', size: 'M' }], date: today }),
-        buildTestOrder({ id: 'TEST-002', customerName: 'Cliente TEST 02', customerPhone: '+5216640000002', status: 'Diseño Pendiente', advanceRate: 0.5, products: [{ type: 'Playera Básica', qty: 5, color: 'Negro', size: 'L' }], date: today }),
+        buildTestOrder({ id: 'TEST-002', customerName: 'Cliente TEST 02', customerPhone: '+5216640000002', status: 'Pendiente', advanceRate: 0.5, products: [{ type: 'Playera Básica', qty: 5, color: 'Negro', size: 'L' }], date: today }),
         buildTestOrder({ id: 'TEST-003', customerName: 'Cliente TEST 03', customerPhone: '+5216640000003', status: 'En Producción', advanceRate: 0.7, products: [{ type: 'Playera Básica', qty: 6, color: 'Botella', size: 'M' }], date: today }),
         buildTestOrder({ id: 'TEST-004', customerName: 'Cliente TEST 04', customerPhone: '+5216640000004', status: 'Listo para Entregar', advanceRate: 0.4, products: [{ type: 'Playera Básica', qty: 11, color: 'Marino', size: 'XL' }], date: today }),
         buildTestOrder({ id: 'TEST-005', customerName: 'Cliente TEST 05', customerPhone: '+5216640000005', status: 'Entregado', paid: false, advanceRate: 0.7, couponCode: 'TEST100-APLICADO', couponId: 'TEST-CP-APLICADO', products: [{ type: 'Playera Básica', qty: 3, color: 'Rojo', size: 'M' }], date: today }),
@@ -3445,7 +3487,7 @@ async function seedTestData() {
     syncCustomersFromOrders();
     saveData();
     renderAll();
-    showSection('orders', document.querySelectorAll('.nav-item')[1]);
+    showSection('orders');
     showNotification(`${testOrders.length} pedidos TEST cargados correctamente`, 'success');
 }
 async function deleteTestData() {
@@ -3639,7 +3681,7 @@ function generateCouponForCurrentOrder() {
     maybeCreateCouponFromOrder(order);
     saveData();
     renderAll();
-    showSection('coupons', document.querySelectorAll('.nav-item')[6]);
+    showSection('coupons');
     closeModal('orderDetailModal');
 }
 function validateCouponForOrder() {
@@ -3940,8 +3982,11 @@ function renderCoupons() {
     }
     container.innerHTML = coupons.map(coupon => {
         const req = { ...getDefaultCouponRequirements(), ...(coupon.requirements || {}) };
+        const safeCouponId = jsStringEscape(coupon.id);
+        const safeCouponCode = jsStringEscape(coupon.code);
+        const couponBoxId = ticketEscape(coupon.id);
         const reqHtml = Object.entries(COUPON_REQUIREMENT_LABELS).map(([key, label]) => `
-            <label class="coupon-req"><input type="checkbox" ${req[key] ? 'checked' : ''} onchange="toggleCouponRequirement('${coupon.id}', '${key}', this.checked)"> ${label}</label>
+            <label class="coupon-req"><input type="checkbox" ${req[key] ? 'checked' : ''} onchange="toggleCouponRequirement('${safeCouponId}', '${jsStringEscape(key)}', this.checked)"> ${ticketEscape(label)}</label>
         `).join('');
         return `
             <article class="coupon-card">
@@ -3956,20 +4001,20 @@ function renderCoupons() {
                     <div><strong>Usado</strong>${coupon.usedAt ? new Date(coupon.usedAt).toLocaleDateString('es-MX') : 'No'}</div>
                 </div>
                 <div class="coupon-requirements">${reqHtml}</div>
-                <div class="coupon-message-box" id="coupon-invitation-${ticketEscape(coupon.id)}" hidden>
+                <div class="coupon-message-box" id="coupon-invitation-${couponBoxId}" hidden>
                     <h4>Mensaje de invitación</h4>
                     <div class="coupon-message-text">${ticketEscape(buildCouponInvitationMessage(coupon))}</div>
                     <div class="coupon-message-actions">
-                        <button class="btn btn-secondary btn-sm" onclick="copyCouponInvitationMessage('${coupon.id}')">Copiar mensaje</button>
+                        <button class="btn btn-secondary btn-sm" onclick="copyCouponInvitationMessage('${safeCouponId}')">Copiar mensaje</button>
                     </div>
                 </div>
                 <div class="coupon-actions">
-                    <button class="btn btn-secondary btn-sm" onclick="copyCouponCode('${coupon.code}')">Copiar código</button>
-                    <button class="btn btn-secondary btn-sm" onclick="openEditCoupon('${coupon.id}')">Editar</button>
-                    <button class="btn btn-info btn-sm" onclick="showCouponInvitationMessage('${coupon.id}')">Generar mensaje</button>
-                    <button class="btn btn-success btn-sm" onclick="activateCoupon('${coupon.id}')">Activar</button>
-                    <button class="btn btn-primary btn-sm" onclick="downloadCouponImage('${coupon.id}')">Descargar cupón</button>
-                    <button class="btn btn-warning btn-sm" onclick="sendCouponWhatsApp('${coupon.id}')">Enviar cupón</button>
+                    <button class="btn btn-secondary btn-sm" onclick="copyCouponCode('${safeCouponCode}')">Copiar código</button>
+                    <button class="btn btn-secondary btn-sm" onclick="openEditCoupon('${safeCouponId}')">Editar</button>
+                    <button class="btn btn-info btn-sm" onclick="showCouponInvitationMessage('${safeCouponId}')">Generar mensaje</button>
+                    <button class="btn btn-success btn-sm" onclick="activateCoupon('${safeCouponId}')">Activar</button>
+                    <button class="btn btn-primary btn-sm" onclick="downloadCouponImage('${safeCouponId}')">Descargar cupón</button>
+                    <button class="btn btn-warning btn-sm" onclick="sendCouponWhatsApp('${safeCouponId}')">Enviar cupón</button>
                 </div>
             </article>
         `;
