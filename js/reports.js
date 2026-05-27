@@ -678,7 +678,7 @@ function openEditCustomerModal(id) {
     const modal = document.getElementById('newCustomerModal');
     if (modal) modal.classList.add('active');
 }
-function deleteCustomer(id) {
+async function deleteCustomer(id) {
     const customer = customers.find(c => String(c.id) === String(id));
     if (!customer) {
         showNotification('Cliente no encontrado', 'error');
@@ -687,10 +687,15 @@ function deleteCustomer(id) {
     const normalizedName = String(customer.name || '').trim().toLowerCase();
     const relatedOrders = orders.filter(o => String(o.customerName || '').trim().toLowerCase() === normalizedName);
     if (relatedOrders.length > 0) {
-        showNotification('No puedes eliminar este cliente mientras tenga pedidos asociados.', 'warning');
+        showNotification('Este cliente tiene pedidos asociados. Para conservar el historial, no se puede eliminar directamente.', 'warning');
         return;
     }
     if (confirm('¿Eliminar este cliente?')) {
+        const result = await deleteCustomerFromDatabase(customer);
+        if (result && result.error) {
+            showNotification('No se pudo eliminar el cliente en Supabase. Intenta de nuevo.', 'error');
+            return;
+        }
         customers = customers.filter(c => String(c.id) !== String(id));
         saveData();
         renderAll();

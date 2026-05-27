@@ -520,6 +520,36 @@ async function persistCustomersToDatabase(customerList = customers) {
     if (!isSupabaseReady()) return;
     await Promise.all((Array.isArray(customerList) ? customerList : []).map(customer => persistCustomerToDatabase(customer)));
 }
+async function deleteCustomerFromDatabase(customer) {
+    if (!isSupabaseReady()) return { deleted: false, skipped: true };
+    const normalized = sanitizeCustomer(customer);
+    if (!normalized || !normalized.name) return { deleted: false, skipped: true };
+
+    let customerId = normalized.dbId || normalized.id;
+    if (!customerId || String(customerId).length < 20) {
+        const { data, error } = await supabaseClient
+            .from('customers')
+            .select('id')
+            .eq('name', normalized.name)
+            .limit(1);
+        if (error) {
+            console.warn('No se pudo buscar el cliente para eliminar en Supabase.', error);
+            return { deleted: false, error };
+        }
+        customerId = data && data[0] ? data[0].id : null;
+    }
+    if (!customerId) return { deleted: true, missing: true };
+
+    const { error } = await supabaseClient
+        .from('customers')
+        .delete()
+        .eq('id', customerId);
+    if (error) {
+        console.warn('No se pudo eliminar el cliente en Supabase.', error);
+        return { deleted: false, error };
+    }
+    return { deleted: true };
+}
 function mergeCoupons(...couponLists) {
     const merged = new Map();
     couponLists.flat().map(sanitizeCoupon).filter(Boolean).forEach(coupon => {
