@@ -124,11 +124,6 @@ tr:hover { background: linear-gradient(90deg, #f8fafc, #fafafa); }
 .color-swatch:hover { transform: scale(1.25); box-shadow: 0 2px 8px rgba(0,0,0,0.25); z-index: 2; }
 .color-swatch.selected { border-color: #1e293b; box-shadow: 0 0 0 2px white, 0 0 0 4px #6366f1; transform: scale(1.15); }
 .color-swatch.heather { background-image: radial-gradient(circle at 2px 2px, rgba(255,255,255,0.35) 1px, transparent 1px), radial-gradient(circle at 5px 5px, rgba(0,0,0,0.2) 1px, transparent 1px); background-size: 7px 7px; }
-.gallery-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 25px; }
-.gallery-item { background: white; border-radius: 20px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.08); transition: all 0.3s; cursor: pointer; }
-.gallery-item:hover { transform: translateY(-8px); box-shadow: 0 12px 35px rgba(0,0,0,0.15); }
-.gallery-image { width: 100%; height: 280px; object-fit: cover; background: linear-gradient(135deg, #f1f5f9, #e2e8f0); }
-.gallery-info { padding: 25px; }
 .tabs { display: flex; gap: 12px; margin-bottom: 25px; flex-wrap: wrap; }
 .tab { padding: 12px 24px; border-radius: 12px; cursor: pointer; font-weight: 600; border: 2px solid #e2e8f0; background: white; transition: all 0.3s; font-size: 14px; }
 .tab:hover { border-color: #6366f1; color: #6366f1; }
@@ -366,10 +361,6 @@ tr:hover { background: linear-gradient(90deg, #f8fafc, #fafafa); }
 <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3M5 11h14M5 5h14a2 2 0 012 2v12a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2z"/></svg>
 <span>Historial</span>
 </div>
-<div class="nav-item" onclick="showSection('gallery', this)">
-<svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-<span>Galería</span>
-</div>
 <div class="nav-item" onclick="showSection('customers', this)">
 <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
 <span>Clientes</span>
@@ -570,11 +561,6 @@ Descargar Reporte Excel
 </div>
 </div>
 <div id="history-container"></div>
-</section>
-
-<section id="gallery" class="section">
-<div class="header"><div><h1>Galería de Mockups</h1><p>Visualiza los mockups generados para cada pedido</p></div></div>
-<div class="gallery-grid" id="gallery-container"></div>
 </section>
 
 <section id="customers" class="section">
@@ -2773,7 +2759,6 @@ function renderAll() {
     renderDashboard(); 
     renderOrders(); 
     renderHistory();
-    renderGallery(); 
     renderCustomers(); 
     renderFinance(); 
     renderCoupons();
@@ -3128,26 +3113,6 @@ async function deleteOrder(orderId) {
         saveData();
         renderAll();
         showNotification('🗑️ Pedido eliminado', 'success');
-    }
-}
-function renderGallery() {
-    const container = document.getElementById('gallery-container');
-    if (container) {
-        const ordersWithMockup = orders.filter(o => o.mockup);
-        if (ordersWithMockup.length === 0) {
-            container.innerHTML = '<div class="empty-state"><h3>No hay mockups generados aún</h3><p>Crea un pedido, sube un diseño y genera el mockup desde la vista del pedido</p></div>';
-        } else {
-            container.innerHTML = ordersWithMockup.map(order => `
-                <div class="gallery-item" onclick="viewOrder('${order.id}')">
-                    <img src="${order.mockup}" class="gallery-image">
-                    <div class="gallery-info">
-                        <h4>${order.customerName}</h4>
-                        <p>${order.id} - ${order.date}</p>
-                        <p>${order.technique}</p>
-                    </div>
-                </div>
-            `).join('');
-        }
     }
 }
 function renderCustomers() {
