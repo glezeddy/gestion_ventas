@@ -831,7 +831,7 @@ function sanitizeCustomer(customer) {
         name,
         phone: String(customer.phone || customer.telefono || '').trim(),
         email: String(customer.email || '').trim(),
-        date: customer.date || new Date().toISOString().split('T')[0]
+        date: normalizeDateValue(customer.date)
     };
 }
 function sanitizeProduct(product) {
@@ -872,7 +872,7 @@ function sanitizeOrder(order) {
         id,
         customerName,
         customerPhone: String(order.customerPhone || order.phone || '').trim(),
-        date: order.date || new Date().toISOString().split('T')[0],
+        date: normalizeOrderDateForLocalTimezone(order.date),
         products,
         technique: order.technique || 'Serigrafía',
         subtotal: Math.max(0, Number(order.subtotal) || total),
@@ -959,7 +959,7 @@ function syncCustomersFromOrders() {
             name: normalizedName,
             phone: order.customerPhone || '',
             email: '',
-            date: order.date || new Date().toISOString().split('T')[0]
+            date: normalizeDateValue(order.date)
         });
     });
     customers = dedupeCustomersByName(mergedCustomers.map(sanitizeCustomer).filter(Boolean));
@@ -1856,7 +1856,7 @@ async function saveOrder() {
         id: orderId,
         customerName,
         customerPhone,
-        date: new Date().toISOString().split('T')[0],
+        date: getTodayDateString(),
         products,
         technique,
         subtotal,
@@ -2298,7 +2298,7 @@ function getTicketTotals(order) {
 function buildTicketMarkup(order) {
     const logoSrc = getTicketLogoSrc();
     const safeId = ticketEscape(order.id);
-    const safeDate = ticketEscape(order.date || new Date().toISOString().split('T')[0]);
+    const safeDate = ticketEscape(normalizeDateValue(order.date));
     const totals = getTicketTotals(order);
     const discountLabel = totals.hasCoupon
         ? 'Cupón $100 MXN aplicado'
@@ -2612,8 +2612,26 @@ function renderAll() {
     renderCharts(); 
     saveData(); 
 }
+function normalizeDateValue(dateValue, fallback = '') {
+    if (dateValue instanceof Date && !Number.isNaN(dateValue.getTime())) return toDateInputValue(dateValue);
+    const raw = String(dateValue || '').trim();
+    const isoMatch = raw.match(/^(\d{4})-(\d{2})-(\d{2})/);
+    if (isoMatch) return `${isoMatch[1]}-${isoMatch[2]}-${isoMatch[3]}`;
+    const parsed = raw ? new Date(raw) : null;
+    if (parsed && !Number.isNaN(parsed.getTime())) return toDateInputValue(parsed);
+    return fallback || getTodayDateString();
+}
+function getUtcDateString(dateValue = new Date()) {
+    return new Date(dateValue).toISOString().slice(0, 10);
+}
+function normalizeOrderDateForLocalTimezone(dateValue) {
+    const normalized = normalizeDateValue(dateValue);
+    const localToday = getTodayDateString();
+    const utcToday = getUtcDateString();
+    return normalized === utcToday && utcToday !== localToday ? localToday : normalized;
+}
 function formatDateTitle(dateValue) {
-    const date = new Date(dateValue + 'T00:00:00');
+    const date = new Date(normalizeDateValue(dateValue) + 'T00:00:00');
     return date.toLocaleDateString('es-MX', { day: 'numeric', month: 'long', year: 'numeric' });
 }
 function toDateInputValue(dateValue) {
@@ -2653,7 +2671,7 @@ function initDashboardDateControls() {
     monthSelect.innerHTML = Array.from({ length: 12 }, (_, index) => `<option value="${index}">${getMonthName(index)}</option>`).join('');
     const years = new Set([today.getFullYear() - 1, today.getFullYear(), today.getFullYear() + 1]);
     orders.forEach(order => {
-        const year = Number(String(order.date || '').slice(0, 4));
+        const year = Number(normalizeDateValue(order.date, '').slice(0, 4));
         if (year) years.add(year);
     });
     yearSelect.innerHTML = Array.from(years).sort((a, b) => b - a).map(year => `<option value="${year}">${year}</option>`).join('');
@@ -2708,8 +2726,8 @@ function getDashboardDateRange() {
         start = end = toDateInputValue(new Date(year, month, day));
         label = `Ventas del ${formatDateTitle(start)}`;
     } else if (preset === 'custom') {
-        start = document.getElementById('dashboardDateFrom')?.value || todayValue;
-        end = document.getElementById('dashboardDateTo')?.value || start;
+        start = normalizeDateValue(document.getElementById('dashboardDateFrom')?.value, todayValue);
+        end = normalizeDateValue(document.getElementById('dashboardDateTo')?.value, start);
         if (start > end) [start, end] = [end, start];
         label = `Ventas de ${formatDateTitle(start)} a ${formatDateTitle(end)}`;
     }
@@ -2769,8 +2787,8 @@ function syncDashboardInputsFromPreset() {
         const day = Number(document.getElementById('dashboardDay')?.value) || today.getDate();
         start = end = toDateInputValue(new Date(year, month, day));
     } else if (preset === 'custom') {
-        start = document.getElementById('dashboardDateFrom')?.value || start;
-        end = document.getElementById('dashboardDateTo')?.value || start;
+        start = normalizeDateValue(document.getElementById('dashboardDateFrom')?.value, start);
+        end = normalizeDateValue(document.getElementById('dashboardDateTo')?.value, start);
         if (start > end) [start, end] = [end, start];
     }
     const fromInput = document.getElementById('dashboardDateFrom');
@@ -2899,7 +2917,7 @@ function renderDashboardAvailableDates() {
     const container = document.getElementById('dashboardAvailableDates');
     if (!container) return;
     const grouped = orders.reduce((map, order) => {
-        const date = order.date || '';
+        const date = normalizeDateValue(order.date, '');
         if (!date) return map;
         map[date] = (map[date] || 0) + 1;
         return map;
@@ -2929,7 +2947,7 @@ function renderHistory() {
         return;
     }
     const grouped = orders.reduce((map, order) => {
-        const date = order.date || new Date().toISOString().split('T')[0];
+        const date = normalizeDateValue(order.date);
         if (!map[date]) map[date] = [];
         map[date].push(order);
         return map;
@@ -2967,7 +2985,7 @@ function renderHistory() {
 function renderDashboard() {
     const range = getDashboardDateRange();
     const periodOrders = orders.filter(order => {
-        const date = order.date || '';
+        const date = normalizeDateValue(order.date, '');
         return date >= range.start && date <= range.end;
     });
     const periodNet = periodOrders.reduce((sum, order) => sum + getOrderCollectedNet(order), 0);
@@ -3219,7 +3237,7 @@ async function saveCustomer() {
             name,
             phone,
             email,
-            date: new Date().toISOString().split('T')[0]
+            date: getTodayDateString()
         };
         customers.push(newCustomer);
         await persistCustomerToDatabase(newCustomer);
@@ -3311,7 +3329,7 @@ function exportToExcel() {
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
     const link = document.createElement('a');
     link.href = URL.createObjectURL(blob);
-    link.download = `reporte-${new Date().toISOString().split('T')[0]}.csv`;
+    link.download = `reporte-${getTodayDateString()}.csv`;
     link.click();
     showNotification('Reporte descargado', 'success');
 }
@@ -3371,7 +3389,7 @@ function buildTestOrder(config) {
         id: config.id,
         customerName: config.customerName,
         customerPhone: config.customerPhone,
-        date: config.date || new Date().toISOString().split('T')[0],
+        date: normalizeDateValue(config.date),
         products,
         technique: 'DTF',
         subtotal,
@@ -3392,7 +3410,7 @@ function buildTestOrder(config) {
     });
 }
 function buildTestOrders() {
-    const today = new Date().toISOString().split('T')[0];
+    const today = getTodayDateString();
     return [
         buildTestOrder({ id: 'TEST-001', customerName: 'Cliente TEST 01', customerPhone: '+5216640000001', status: 'En espera de Anticipo', advanceRate: 0, products: [{ type: 'Playera Básica', qty: 1, color: 'Blanco', size: 'M' }], date: today }),
         buildTestOrder({ id: 'TEST-002', customerName: 'Cliente TEST 02', customerPhone: '+5216640000002', status: 'Diseño Pendiente', advanceRate: 0.5, products: [{ type: 'Playera Básica', qty: 5, color: 'Negro', size: 'L' }], date: today }),
