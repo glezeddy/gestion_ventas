@@ -179,11 +179,6 @@ tr:hover { background: linear-gradient(90deg, #f8fafc, #fafafa); }
 .payment-pending { background: linear-gradient(135deg, #fef3c7, #fde68a); color: #92400e; }
 .payment-partial { background: linear-gradient(135deg, #dbeafe, #bfdbfe); color: #1e40af; }
 .payment-paid { background: linear-gradient(135deg, #dcfce7, #bbf7d0); color: #166534; }
-.file-upload { border: 3px dashed #e2e8f0; border-radius: 15px; padding: 40px; text-align: center; cursor: pointer; transition: all 0.3s; background: #f8fafc; }
-.file-upload:hover { border-color: #6366f1; background: #eff6ff; }
-.file-upload.has-file { border-color: #10b981; background: #f0fdf4; }
-.file-upload-icon { width: 60px; height: 60px; margin: 0 auto 15px; background: linear-gradient(135deg, #6366f1, #8b5cf6); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 30px; }
-.file-upload-preview { max-width: 200px; max-height: 200px; border-radius: 10px; margin: 15px auto; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
 .empty-state { text-align: center; padding: 80px 20px; background: white; border-radius: 20px; }
 .empty-state svg { width: 100px; height: 100px; margin: 0 auto 20px; color: #cbd5e1; }
 .empty-state h3 { color: #475569; margin-bottom: 10px; }
@@ -239,7 +234,6 @@ tr:hover { background: linear-gradient(90deg, #f8fafc, #fafafa); }
     .dashboard-date-presets { grid-template-columns: 1fr; }
     .dashboard-calendars { grid-template-columns: 1fr; }
     .dashboard-date-fields { grid-template-columns: 1fr; }
-    .file-upload { padding: 26px 16px; }
     .modal-overlay { padding: 8px; }
     .modal-header, .modal-body, .modal-footer { padding: 16px; }
     .close-btn { width: 40px; height: 40px; flex: 0 0 40px; }
@@ -257,13 +251,6 @@ tr:hover { background: linear-gradient(90deg, #f8fafc, #fafafa); }
 .section.active { display: block; animation: fadeInSection 0.4s ease; }
 @keyframes fadeInSection { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 .action-buttons { display: flex; gap: 8px; flex-wrap: wrap; }
-.mockup-container { position: relative; width: min(100%, 500px); margin: 0 auto; background: white; border-radius: 20px; padding: clamp(16px, 4vw, 30px); box-shadow: 0 4px 20px rgba(0,0,0,0.1); overflow: hidden; }
-.mockup-base { width: 100%; height: auto; max-height: 68vh; display: block; border-radius: 15px; object-fit: contain; }
-.mockup-design { position: absolute; top: 30%; left: 50%; transform: translate(-50%, -50%); width: auto; max-width: min(150px, 36%); height: auto; max-height: 32%; cursor: move; border: 2px dashed #6366f1; border-radius: 10px; transition: all 0.1s ease; }
-.mockup-controls { margin-top: 25px; padding: 25px; background: linear-gradient(135deg, #f8fafc, #f1f5f9); border-radius: 15px; }
-.mockup-controls label { display: block; margin-bottom: 10px; font-weight: 600; color: var(--dark); font-size: 14px; }
-.mockup-controls input[type="range"] { width: 100%; margin-bottom: 20px; height: 8px; border-radius: 4px; background: #e2e8f0; outline: none; -webkit-appearance: none; }
-.mockup-controls input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 20px; height: 20px; border-radius: 50%; background: linear-gradient(135deg, #6366f1, #8b5cf6); cursor: pointer; }
 .calc-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 25px; margin-bottom: 30px; }
 .calc-stack { display: flex; flex-direction: column; gap: 25px; }
 .calc-card { height: auto; min-width: 0; overflow: hidden; }
@@ -688,7 +675,7 @@ Descargar Reporte Excel
 <div class="modal-footer"><button class="btn btn-secondary" onclick="goHome()">Home</button><button class="btn btn-secondary" onclick="closeModal('editCouponModal')">Cancelar</button><button class="btn btn-primary" onclick="saveCouponEdit()">Guardar Cambios</button></div>
 </div>
 </div>
-<div class="modal-overlay" id="newOrderModal"><div class="modal"><div class="modal-header"><h2>✨ Nuevo Pedido</h2><button class="close-btn" onclick="closeModal('newOrderModal')">&times;</button></div><div class="modal-body"><form id="orderForm"><div class="form-grid"><div class="form-group full-width"><label>👤 Nombre del Cliente</label><input type="text" id="orderCustomerName" placeholder="Escribe el nombre del cliente" required></div><div class="form-group"><label>📱 Teléfono WhatsApp</label><input type="tel" id="orderCustomerPhone" placeholder="Ej. 6641234567"></div><div class="form-group"><label>🖨️ Técnica de Estampado</label><select id="orderTechnique"><option>DTF</option></select></div><div class="form-group full-width"><label>📋 Estado Inicial</label><select id="orderStatus"><option>En espera de Anticipo</option><option>Diseño Pendiente</option><option>En Producción</option><option>Listo para Entregar</option></select></div></div><div class="products-list" id="productsList"></div><button type="button" class="add-product-btn" onclick="addProductRow()">+ Agregar Producto</button><div class="form-group full-width" style="margin-top: 25px;"><div class="price-display"><div><div class="label">Total Productos</div><div class="value" id="displayTotalQty">0</div></div><div><div class="label">Subtotal</div><div class="value" id="displaySubtotal">$0</div></div><div><div class="label">Descuento Cupón</div><div class="value" id="displayCouponDiscount">$0</div></div><div><div class="label">Precio Total</div><div class="value" id="displayTotal">$0</div></div><div><div class="label">Anticipo Sugerido (70%)</div><div class="value" id="displayAdvance">$0</div></div></div></div><div class="form-grid"><div class="form-group full-width"><label>Validar cupón de descuento</label><div style="display:flex; gap:10px; flex-wrap:wrap;"><input type="text" id="orderCouponCode" placeholder="Ej. PRI100-ABC123" style="flex:1 1 220px; text-transform:uppercase;"><button type="button" class="btn btn-info" onclick="validateCouponForOrder()">Validar cupón</button><button type="button" class="btn btn-secondary" onclick="clearOrderCoupon()">Quitar</button></div><p id="couponValidationMessage" style="margin-top:8px; color:#64748b; font-size:13px;"></p></div></div><div class="form-grid"><div class="form-group"><label>🧵 Costo camiseta por pieza</label><input type="number" id="orderShirtCost" min="0" step="0.01" value="0"></div><div class="form-group"><label>🧒 Costo camiseta niño por pieza</label><input type="number" id="orderShirtCostKids" min="0" step="0.01" value="0"></div><div class="form-group"><label>🖨️ Costo DTF total</label><input type="number" id="orderDtfCost" min="0" step="0.01" value="0"></div><div class="form-group"><label>📦 Otros gastos</label><input type="number" id="orderExtraCost" min="0" step="0.01" value="0"></div></div><div class="form-grid"><div class="form-group"><label>💵 Anticipo Recibido ($)</label><input type="number" id="orderAdvance" value="0" onchange="validateAdvanceAndCalculate()"></div><div class="form-group full-width"><label>📁 Subir Diseño</label><div class="file-upload" onclick="document.getElementById('orderDesign').click()"><input type="file" id="orderDesign" accept="image/*" style="display: none;" onchange="handleFileUpload(this)"><div class="file-upload-icon">📁</div><p id="uploadText">Haz click para subir el diseño</p><img id="uploadPreview" class="file-upload-preview" style="display: none;"></div></div></div></form></div><div class="modal-footer"><button class="btn btn-secondary" onclick="goHome()">Home</button><button class="btn btn-secondary" onclick="closeModal('newOrderModal')">Cancelar</button><button class="btn btn-primary" onclick="saveOrder()">Guardar Pedido</button></div></div></div>
+<div class="modal-overlay" id="newOrderModal"><div class="modal"><div class="modal-header"><h2>✨ Nuevo Pedido</h2><button class="close-btn" onclick="closeModal('newOrderModal')">&times;</button></div><div class="modal-body"><form id="orderForm"><div class="form-grid"><div class="form-group full-width"><label>👤 Nombre del Cliente</label><input type="text" id="orderCustomerName" placeholder="Escribe el nombre del cliente" required></div><div class="form-group"><label>📱 Teléfono WhatsApp</label><input type="tel" id="orderCustomerPhone" placeholder="Ej. 6641234567"></div><div class="form-group"><label>🖨️ Técnica de Estampado</label><select id="orderTechnique"><option>DTF</option></select></div><div class="form-group full-width"><label>📋 Estado Inicial</label><select id="orderStatus"><option>En espera de Anticipo</option><option>Diseño Pendiente</option><option>En Producción</option><option>Listo para Entregar</option></select></div></div><div class="products-list" id="productsList"></div><button type="button" class="add-product-btn" onclick="addProductRow()">+ Agregar Producto</button><div class="form-group full-width" style="margin-top: 25px;"><div class="price-display"><div><div class="label">Total Productos</div><div class="value" id="displayTotalQty">0</div></div><div><div class="label">Subtotal</div><div class="value" id="displaySubtotal">$0</div></div><div><div class="label">Descuento Cupón</div><div class="value" id="displayCouponDiscount">$0</div></div><div><div class="label">Precio Total</div><div class="value" id="displayTotal">$0</div></div><div><div class="label">Anticipo Sugerido (70%)</div><div class="value" id="displayAdvance">$0</div></div></div></div><div class="form-grid"><div class="form-group full-width"><label>Validar cupón de descuento</label><div style="display:flex; gap:10px; flex-wrap:wrap;"><input type="text" id="orderCouponCode" placeholder="Ej. PRI100-ABC123" style="flex:1 1 220px; text-transform:uppercase;"><button type="button" class="btn btn-info" onclick="validateCouponForOrder()">Validar cupón</button><button type="button" class="btn btn-secondary" onclick="clearOrderCoupon()">Quitar</button></div><p id="couponValidationMessage" style="margin-top:8px; color:#64748b; font-size:13px;"></p></div></div><div class="form-grid"><div class="form-group"><label>🧵 Costo camiseta por pieza</label><input type="number" id="orderShirtCost" min="0" step="0.01" value="0"></div><div class="form-group"><label>🧒 Costo camiseta niño por pieza</label><input type="number" id="orderShirtCostKids" min="0" step="0.01" value="0"></div><div class="form-group"><label>🖨️ Costo DTF total</label><input type="number" id="orderDtfCost" min="0" step="0.01" value="0"></div><div class="form-group"><label>📦 Otros gastos</label><input type="number" id="orderExtraCost" min="0" step="0.01" value="0"></div></div><div class="form-grid"><div class="form-group"><label>💵 Anticipo Recibido ($)</label><input type="number" id="orderAdvance" value="0" onchange="validateAdvanceAndCalculate()"></div></div></form></div><div class="modal-footer"><button class="btn btn-secondary" onclick="goHome()">Home</button><button class="btn btn-secondary" onclick="closeModal('newOrderModal')">Cancelar</button><button class="btn btn-primary" onclick="saveOrder()">Guardar Pedido</button></div></div></div>
 
 <div class="modal-overlay" id="orderDetailModal"><div class="modal"><div class="modal-header"><h2 id="detailOrderId">Pedido #</h2><button class="close-btn" onclick="closeModal('orderDetailModal')">&times;</button></div><div class="modal-body"><div id="orderDetailContent"></div></div><div class="modal-footer"><button class="btn btn-secondary" onclick="goHome()">Home</button><button class="btn btn-warning" onclick="markAsPaid()">Marcar como Saldado</button><button class="btn btn-secondary" onclick="printTicket()">Imprimir Ticket</button><button class="btn btn-info" onclick="downloadTicket()">Descargar Ticket</button><button class="btn btn-success" onclick="shareTicketWhatsApp()">Compartir WhatsApp</button><button class="btn btn-info" onclick="downloadProductList()">Lista Productos</button><button class="btn btn-primary" onclick="closeModal('orderDetailModal')">Cerrar</button></div></div></div>
 
@@ -696,30 +683,6 @@ Descargar Reporte Excel
 
 <div class="modal-overlay" id="newCustomerModal"><div class="modal"><div class="modal-header"><h2>Nuevo Cliente</h2><button class="close-btn" onclick="closeModal('newCustomerModal')">&times;</button></div><div class="modal-body"><form id="customerForm"><div class="form-group"><label>Nombre</label><input type="text" id="customerName" required></div><div class="form-group"><label>Teléfono WhatsApp</label><input type="tel" id="customerPhone" placeholder="Ej. 6641234567"></div><div class="form-group"><label>Email</label><input type="email" id="customerEmail"></div></form></div><div class="modal-footer"><button class="btn btn-secondary" onclick="goHome()">Home</button><button class="btn btn-secondary" onclick="closeModal('newCustomerModal')">Cancelar</button><button class="btn btn-primary" onclick="saveCustomer()">Guardar</button></div></div></div>
 
-<div class="modal-overlay" id="mockupModal">
-    <div class="modal">
-        <div class="modal-header"><h2>🎨 Generador de Mockup</h2><button class="close-btn" onclick="closeModal('mockupModal')">&times;</button></div>
-        <div class="modal-body">
-            <div class="mockup-container" id="mockupContainer">
-                <img src="https://i.imgur.com/6q9zQ5L.png" alt="Camiseta Base" class="mockup-base" id="mockupBase">
-                <img src="" alt="Diseño" class="mockup-design" id="mockupDesign" style="display: none;">
-            </div>
-            <div class="mockup-controls">
-                <div><label>📏 Tamaño</label><input type="range" id="designScale" min="0.1" max="1.2" step="0.01" value="0.35"></div>
-                <div><label>⬆️ Posición Vertical</label><input type="range" id="designPositionY" min="15" max="55" step="1" value="32"></div>
-                <div><label>🔄 Rotación</label><input type="range" id="designRotation" min="-30" max="30" step="1" value="0"></div>
-                <div style="display: flex; gap: 10px; margin-top: 15px;">
-                    <button class="btn btn-primary" onclick="resetMockupPosition()" style="flex:1;">↺ Restablecer</button>
-                    <button class="btn btn-success" onclick="generateFinalMockup()" style="flex:2;">✨ Generar y Guardar</button>
-                </div>
-            </div>
-        </div>
-        <div class="modal-footer">
-            <button class="btn btn-secondary" onclick="closeModal('mockupModal')">Cancelar</button>
-            <button class="btn btn-primary" onclick="downloadMockup()">📥 Descargar Mockup</button>
-        </div>
-    </div>
-</div>
 
 <div class="notification" id="notification"></div>
 
@@ -737,11 +700,8 @@ let currentCouponForOrder = null;
 let editingCouponId = null;
 let editingCustomerId = null;
 let currentFilter = 'all';
-let uploadedDesign = null;
 let productCounter = 0;
 let editProductCounter = 0;
-let isDragging = false;
-let dragStartX, dragStartY, startLeft, startTop;
 const STORAGE_KEYS = { orders: 'estampados_orders', customers: 'estampados_customers', coupons: 'estampados_coupons' };
 const SUPABASE_URL = 'https://caubwxywjiuzrevdbnlt.supabase.co';
 const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_y9VdK2iRlUx7Wu9NFQJlJg_M5Ehe38N';
@@ -930,9 +890,7 @@ function sanitizeOrder(order) {
         dtfCost,
         extraCosts,
         costTotal,
-        netProfit: Number.isFinite(parsedNetProfit) ? parsedNetProfit : Math.max(0, total - costTotal),
-        mockup: order.mockup || null,
-        designImage: order.designImage || null
+        netProfit: Number.isFinite(parsedNetProfit) ? parsedNetProfit : Math.max(0, total - costTotal)
     };
 }
 function sanitizeCoupon(coupon) {
@@ -1010,9 +968,7 @@ function mergeCustomers(...customerLists) {
     return dedupeCustomersByName(customerLists.flat().map(sanitizeCustomer).filter(Boolean));
 }
 function getStorageSnapshot(includeMedia = true) {
-    const normalizedOrders = dedupeOrdersById((Array.isArray(orders) ? orders : []).map(sanitizeOrder).filter(Boolean)).map(order => (
-        includeMedia ? order : { ...order, mockup: null, designImage: null }
-    ));
+    const normalizedOrders = dedupeOrdersById((Array.isArray(orders) ? orders : []).map(sanitizeOrder).filter(Boolean));
     orders = normalizedOrders;
     syncCustomersFromOrders();
     customers = dedupeCustomersByName((Array.isArray(customers) ? customers : []).map(sanitizeCustomer).filter(Boolean));
@@ -1151,8 +1107,6 @@ function toDbOrder(order) {
         extra_costs: Number(order.extraCosts) || 0,
         cost_total: Number(order.costTotal) || 0,
         net_profit: Number(order.netProfit) || 0,
-        mockup: order.mockup || null,
-        design_image: order.designImage || null,
         updated_at: new Date().toISOString()
     };
 }
@@ -1173,8 +1127,6 @@ function toLegacyDbOrder(order) {
         extra_costs: Number(order.extraCosts) || 0,
         cost_total: Number(order.costTotal) || 0,
         net_profit: Number(order.netProfit) || 0,
-        mockup: order.mockup || null,
-        design_image: order.designImage || null,
         updated_at: new Date().toISOString()
     };
 }
@@ -1234,9 +1186,7 @@ function fromDbOrder(row, items = []) {
         dtfCost: Number(row.dtf_cost) || 0,
         extraCosts: Number(row.extra_costs) || 0,
         costTotal: Number(row.cost_total) || 0,
-        netProfit: Number(row.net_profit) || 0,
-        mockup: row.mockup,
-        designImage: row.design_image
+        netProfit: Number(row.net_profit) || 0
     });
 }
 function toDbCoupon(coupon) {
@@ -1855,46 +1805,10 @@ function openNewOrderModal() {
     const couponMessage = document.getElementById('couponValidationMessage');
     if (couponInput) couponInput.value = '';
     if (couponMessage) couponMessage.textContent = '';
-    uploadedDesign = null;
-    const preview = document.getElementById('uploadPreview');
-    const uploadText = document.getElementById('uploadText');
-    const fileUpload = document.querySelector('.file-upload');
-    if (preview) preview.style.display = 'none';
-    if (uploadText) uploadText.textContent = 'Haz click para subir el diseño';
-    if (fileUpload) fileUpload.classList.remove('has-file');
     calculatePrices();
     syncDatosPedido();
     rememberActiveModal('newOrderModal');
     document.getElementById('newOrderModal').classList.add('active');
-}
-function handleFileUpload(input) {
-    const file = input.files[0];
-    if (!file) return;
-    const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
-    if (!allowedTypes.includes(file.type)) {
-        showNotification('❌ Formato no válido. Usa JPG, PNG, GIF o WEBP.', 'error');
-        input.value = '';
-        return;
-    }
-    if (file.size > 500 * 1024) {
-        showNotification('⚠️ La imagen es demasiado grande. Máximo 500 KB.', 'error');
-        input.value = '';
-        return;
-    }
-    const reader = new FileReader();
-    reader.onload = function(e) {
-        uploadedDesign = e.target.result;
-        const preview = document.getElementById('uploadPreview');
-        const uploadText = document.getElementById('uploadText');
-        const fileUpload = document.querySelector('.file-upload');
-        if (preview) {
-            preview.src = e.target.result;
-            preview.style.display = 'block';
-        }
-        if (uploadText) uploadText.textContent = file.name;
-        if (fileUpload) fileUpload.classList.add('has-file');
-    };
-    reader.readAsDataURL(file);
 }
 async function saveOrder() {
     const customerName = document.getElementById('orderCustomerName').value.trim();
@@ -1960,9 +1874,7 @@ async function saveOrder() {
         dtfCost,
         extraCosts: extraCost,
         costTotal: orderCosts.costTotal,
-        netProfit: total - orderCosts.costTotal,
-        mockup: null,
-        designImage: uploadedDesign
+        netProfit: total - orderCosts.costTotal
     };
     orders.unshift(newOrder);
     const couponToUse = currentCouponForOrder;
@@ -1978,7 +1890,6 @@ async function saveOrder() {
     const saveResult = saveData();
     closeModal('newOrderModal');
     currentCouponForOrder = null;
-    uploadedDesign = null;
     renderAll();
     if (saveResult.strippedMedia) {
         showNotification(`✅ Pedido ${orderId} guardado. Las imágenes pesadas se omitieron para evitar llenar localStorage.`, 'warning');
@@ -2256,121 +2167,6 @@ async function saveEditOrder() {
         return;
     }
     showNotification('✅ Pedido actualizado exitosamente', 'success');
-}
-
-// Mockup
-function openMockupGenerator() {
-    const order = orders.find(o => o.id === currentOrderId);
-    if (!order || !order.designImage) {
-        showNotification('⚠️ Primero debes subir un diseño para el pedido', 'warning');
-        return;
-    }
-    const mockupDesign = document.getElementById('mockupDesign');
-    mockupDesign.src = order.designImage;
-    mockupDesign.style.display = 'block';
-    mockupDesign.style.position = 'absolute';
-    mockupDesign.style.maxWidth = '180px';
-    mockupDesign.style.width = 'auto';
-    mockupDesign.style.height = 'auto';
-    document.getElementById('designScale').value = '0.35';
-    document.getElementById('designPositionY').value = '32';
-    document.getElementById('designRotation').value = '0';
-    updateMockupTransform();
-    setupDragEvents();
-    document.getElementById('mockupModal').classList.add('active');
-}
-function setupDragEvents() {
-    const design = document.getElementById('mockupDesign');
-    if (!design) return;
-    design.removeEventListener('mousedown', onMouseDown);
-    design.addEventListener('mousedown', onMouseDown);
-}
-function onMouseDown(e) {
-    e.preventDefault();
-    isDragging = true;
-    const design = document.getElementById('mockupDesign');
-    const container = document.getElementById('mockupContainer');
-    dragStartX = e.clientX;
-    dragStartY = e.clientY;
-    startLeft = parseFloat(design.style.left) || 50;
-    startTop = parseFloat(design.style.top) || 32;
-    document.addEventListener('mousemove', onMouseMove);
-    document.addEventListener('mouseup', onMouseUp);
-}
-function onMouseMove(e) {
-    if (!isDragging) return;
-    e.preventDefault();
-    const container = document.getElementById('mockupContainer');
-    const design = document.getElementById('mockupDesign');
-    const containerRect = container.getBoundingClientRect();
-    const deltaX = e.clientX - dragStartX;
-    const deltaY = e.clientY - dragStartY;
-    const percentX = (deltaX / containerRect.width) * 100;
-    const percentY = (deltaY / containerRect.height) * 100;
-    let newLeft = startLeft + percentX;
-    let newTop = startTop + percentY;
-    newLeft = Math.min(80, Math.max(20, newLeft));
-    newTop = Math.min(55, Math.max(20, newTop));
-    design.style.left = newLeft + '%';
-    design.style.top = newTop + '%';
-    document.getElementById('designPositionY').value = newTop;
-}
-function onMouseUp(e) {
-    isDragging = false;
-    document.removeEventListener('mousemove', onMouseMove);
-    document.removeEventListener('mouseup', onMouseUp);
-}
-function updateMockupTransform() {
-    const design = document.getElementById('mockupDesign');
-    const scale = document.getElementById('designScale').value;
-    const rotation = document.getElementById('designRotation').value;
-    const posY = document.getElementById('designPositionY').value;
-    if (design) {
-        design.style.transform = `translate(-50%, -50%) scale(${scale}) rotate(${rotation}deg)`;
-        design.style.top = posY + '%';
-        design.style.left = '50%';
-    }
-}
-function resetMockupPosition() {
-    document.getElementById('designScale').value = '0.35';
-    document.getElementById('designPositionY').value = '32';
-    document.getElementById('designRotation').value = '0';
-    updateMockupTransform();
-    showNotification('Posición restablecida', 'success');
-}
-async function generateFinalMockup() {
-    const container = document.getElementById('mockupContainer');
-    if (!container) return;
-    showNotification('🎨 Generando mockup...', 'success');
-    try {
-        const canvas = await html2canvas(container, { scale: 2, backgroundColor: null, useCORS: true, logging: false });
-        const mockupImage = canvas.toDataURL('image/png', 1.0);
-        const order = orders.find(o => o.id === currentOrderId);
-        if (order) {
-            order.mockup = mockupImage;
-            await persistOrderToDatabase(order);
-            saveData();
-            renderAll();
-            showNotification('✅ Mockup generado y guardado', 'success');
-            closeModal('mockupModal');
-            viewOrder(currentOrderId);
-        }
-    } catch (error) {
-        console.error('Error:', error);
-        showNotification('Error al generar mockup', 'error');
-    }
-}
-function downloadMockup() {
-    const order = orders.find(o => o.id === currentOrderId);
-    if (order && order.mockup) {
-        const link = document.createElement('a');
-        link.download = `mockup-${order.id}.png`;
-        link.href = order.mockup;
-        link.click();
-        showNotification('📥 Mockup descargado', 'success');
-    } else {
-        showNotification('Primero genera el mockup', 'warning');
-    }
 }
 
 // Ticket profesional: impresión, descarga y WhatsApp
@@ -3592,9 +3388,7 @@ function buildTestOrder(config) {
         dtfCost,
         extraCosts,
         costTotal: orderCosts.costTotal,
-        netProfit: total - orderCosts.costTotal,
-        mockup: null,
-        designImage: null
+        netProfit: total - orderCosts.costTotal
     });
 }
 function buildTestOrders() {
@@ -4536,13 +4330,6 @@ document.addEventListener('DOMContentLoaded', function() {
     if (loginPassword) loginPassword.addEventListener('keypress', function(e) { if (e.key === 'Enter') attemptLogin(); });
     if (loginUsername) loginUsername.addEventListener('keypress', function(e) { if (e.key === 'Enter') attemptLogin(); });
     
-    const scaleInput = document.getElementById('designScale');
-    const posYInput = document.getElementById('designPositionY');
-    const rotInput = document.getElementById('designRotation');
-    if (scaleInput) scaleInput.addEventListener('input', updateMockupTransform);
-    if (posYInput) posYInput.addEventListener('input', updateMockupTransform);
-    if (rotInput) rotInput.addEventListener('input', updateMockupTransform);
-
     CALCULATOR_INPUT_IDS.forEach(id => {
         const element = getCalculatorElement(id);
         if (!element) return;
