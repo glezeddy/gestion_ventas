@@ -162,11 +162,6 @@ tr:hover { background: linear-gradient(90deg, #f8fafc, #fafafa); }
 .dashboard-date-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 16px; }
 .dashboard-date-actions .btn { width: auto; padding: 10px 18px; }
 .dashboard-hidden-controls { display: none; }
-.dashboard-available-dates { margin-top: 18px; padding: 14px 16px; border-radius: 14px; background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.2); color: rgba(255,255,255,0.92); font-size: 13px; }
-.dashboard-available-dates strong { display: block; margin-bottom: 9px; }
-.dashboard-date-chips { display: flex; flex-wrap: wrap; gap: 8px; }
-.dashboard-date-chip { border: 1px solid rgba(255,255,255,0.35); background: rgba(255,255,255,0.18); color: white; padding: 7px 10px; border-radius: 999px; font-weight: 700; cursor: pointer; transition: all 0.2s; }
-.dashboard-date-chip:hover { background: rgba(255,255,255,0.28); transform: translateY(-1px); }
 .charts-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 25px; margin-bottom: 30px; }
 .chart-card { background: white; padding: 25px; border-radius: 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
 .chart-card h3 { font-size: 18px; margin-bottom: 20px; color: var(--dark); display: flex; align-items: center; gap: 10px; }
@@ -529,7 +524,6 @@ Cerrar Sesión
 <div class="daily-stat"><div class="label">Anticipos</div><div class="value" id="daily-advance">$0</div></div>
 <div class="daily-stat"><div class="label">Neto Para Ti</div><div class="value" id="daily-net">$0</div></div>
 </div>
-<div class="dashboard-available-dates" id="dashboardAvailableDates"></div>
 <div class="dashboard-shortcuts">
 <button class="shortcut-card" onclick="showSection('orders', document.querySelectorAll('.nav-item')[1]); setTimeout(openNewOrderModal, 300)">
 <svg width="26" height="26" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg>
@@ -2902,38 +2896,6 @@ function renderDashboardCalendarMonth(monthDate, range) {
         </div>
     `;
 }
-function selectDashboardDate(dateValue) {
-    const date = new Date(`${dateValue}T00:00:00`);
-    const preset = document.getElementById('dashboardDatePreset');
-    const monthSelect = document.getElementById('dashboardMonth');
-    const yearSelect = document.getElementById('dashboardYear');
-    if (preset) preset.value = 'day';
-    if (monthSelect) monthSelect.value = String(date.getMonth());
-    if (yearSelect) yearSelect.value = String(date.getFullYear());
-    updateDashboardDayOptions(date.getDate());
-    applyDashboardDateFilter();
-}
-function renderDashboardAvailableDates() {
-    const container = document.getElementById('dashboardAvailableDates');
-    if (!container) return;
-    const grouped = orders.reduce((map, order) => {
-        const date = normalizeDateValue(order.date, '');
-        if (!date) return map;
-        map[date] = (map[date] || 0) + 1;
-        return map;
-    }, {});
-    const dates = Object.keys(grouped).sort((a, b) => b.localeCompare(a)).slice(0, 8);
-    if (!dates.length) {
-        container.innerHTML = '<strong>Fechas con ventas disponibles</strong><span>No hay pedidos registrados todavía.</span>';
-        return;
-    }
-    container.innerHTML = `
-        <strong>Fechas con ventas disponibles</strong>
-        <div class="dashboard-date-chips">
-            ${dates.map(date => `<button class="dashboard-date-chip" onclick="selectDashboardDate('${date}')">${formatDateTitle(date)} (${grouped[date]})</button>`).join('')}
-        </div>
-    `;
-}
 function applyDashboardDateFilter(closePanelAfterApply = false) {
     renderDashboard();
     renderDashboardDatePicker();
@@ -3005,7 +2967,6 @@ function renderDashboard() {
     document.getElementById('stat-net').textContent = '$' + Math.round(periodNet).toLocaleString();
     document.getElementById('stat-remaining').textContent = '$' + periodOrders.reduce((s,o) => s + Number(o.remaining || 0), 0).toLocaleString();
     document.getElementById('stat-customers').textContent = periodCustomers.size;
-    renderDashboardAvailableDates();
     const tbody = document.getElementById('dashboard-orders');
     if (tbody) {
         if (orders.length === 0) {
