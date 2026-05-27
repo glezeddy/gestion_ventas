@@ -22,6 +22,7 @@ const TEST_CUSTOMER_PREFIX = 'Cliente TEST';
 const TEST_COUPON_PREFIX = 'TEST100-';
 const COUPON_FIXED_AMOUNT = 100;
 const COUPON_MIN_PURCHASE = 600;
+const COUPONS_DATABASE_ENABLED = false;
 let warnedMissingCouponTable = false;
 let warnedMissingOrderColumns = false;
 

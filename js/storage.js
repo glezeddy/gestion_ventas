@@ -542,7 +542,7 @@ function mergeCoupons(...couponLists) {
     return Array.from(merged.values());
 }
 async function loadCouponsFromDatabase() {
-    if (!isSupabaseReady()) return [];
+    if (!COUPONS_DATABASE_ENABLED || !isSupabaseReady()) return [];
     const { data, error } = await supabaseClient
         .from('coupons')
         .select('*')
@@ -557,7 +557,7 @@ async function loadCouponsFromDatabase() {
     return (data || []).map(fromDbCoupon).filter(Boolean);
 }
 async function persistCouponToDatabase(coupon) {
-    if (!isSupabaseReady()) return { saved: false, skipped: true };
+    if (!COUPONS_DATABASE_ENABLED || !isSupabaseReady()) return { saved: false, skipped: true };
     const payload = toDbCoupon(coupon);
     if (!payload) return { saved: false, skipped: true };
     const { error } = await supabaseClient.from('coupons').upsert(payload);
@@ -571,11 +571,11 @@ async function persistCouponToDatabase(coupon) {
     return { saved: true };
 }
 async function persistCouponsToDatabase(couponList = coupons) {
-    if (!isSupabaseReady()) return;
+    if (!COUPONS_DATABASE_ENABLED || !isSupabaseReady()) return;
     await Promise.all((Array.isArray(couponList) ? couponList : []).map(coupon => persistCouponToDatabase(coupon)));
 }
 async function deleteAllCouponsFromDatabase() {
-    if (!isSupabaseReady()) return { deleted: false, skipped: true };
+    if (!COUPONS_DATABASE_ENABLED || !isSupabaseReady()) return { deleted: false, skipped: true };
     const { error } = await supabaseClient.from('coupons').delete().neq('id', '');
     if (error) {
         if (!warnedMissingCouponTable) {
@@ -617,11 +617,11 @@ async function loadDataFromDatabase(options = {}) {
         return map;
     }, {});
     orders = (orderRows || []).map(order => fromDbOrder(order, itemsByOrder[order.id] || [])).filter(Boolean);
-    const dbCoupons = await loadCouponsFromDatabase();
+    const dbCoupons = COUPONS_DATABASE_ENABLED ? await loadCouponsFromDatabase() : [];
     coupons = mergeCoupons(dbCoupons, localCoupons);
     const dbCustomers = await loadCustomersFromDatabase();
     customers = mergeCustomers(dbCustomers, localCustomers);
-    persistCouponsToDatabase(coupons).catch(console.error);
+    if (COUPONS_DATABASE_ENABLED) persistCouponsToDatabase(coupons).catch(console.error);
     syncCustomersFromOrders();
     persistCustomersToDatabase(customers).catch(console.error);
     saveData();
