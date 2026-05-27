@@ -144,6 +144,11 @@ tr:hover { background: linear-gradient(90deg, #f8fafc, #fafafa); }
 .dashboard-date-filter select, .dashboard-date-filter input { width: 100%; min-height: 42px; border: 1px solid rgba(255,255,255,0.35); border-radius: 10px; padding: 9px 11px; background: rgba(255,255,255,0.92); color: #1e293b; font-weight: 700; outline: none; }
 .dashboard-date-filter .filter-action { align-self: end; min-height: 42px; justify-content: center; background: rgba(255,255,255,0.22); color: white; border: 1px solid rgba(255,255,255,0.35); box-shadow: none; }
 .dashboard-filter-label { margin: -8px 0 18px; color: rgba(255,255,255,0.86); font-size: 13px; font-weight: 600; }
+.dashboard-available-dates { margin-top: 18px; padding: 14px 16px; border-radius: 14px; background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.2); color: rgba(255,255,255,0.92); font-size: 13px; }
+.dashboard-available-dates strong { display: block; margin-bottom: 9px; }
+.dashboard-date-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.dashboard-date-chip { border: 1px solid rgba(255,255,255,0.35); background: rgba(255,255,255,0.18); color: white; padding: 7px 10px; border-radius: 999px; font-weight: 700; cursor: pointer; transition: all 0.2s; }
+.dashboard-date-chip:hover { background: rgba(255,255,255,0.28); transform: translateY(-1px); }
 .charts-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 25px; margin-bottom: 30px; }
 .chart-card { background: white; padding: 25px; border-radius: 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
 .chart-card h3 { font-size: 18px; margin-bottom: 20px; color: var(--dark); display: flex; align-items: center; gap: 10px; }
@@ -495,6 +500,7 @@ Cerrar Sesión
 <div class="daily-stat"><div class="label">Anticipos</div><div class="value" id="daily-advance">$0</div></div>
 <div class="daily-stat"><div class="label">Neto Para Ti</div><div class="value" id="daily-net">$0</div></div>
 </div>
+<div class="dashboard-available-dates" id="dashboardAvailableDates"></div>
 <div class="dashboard-shortcuts">
 <button class="shortcut-card" onclick="showSection('orders', document.querySelectorAll('.nav-item')[1]); setTimeout(openNewOrderModal, 300)">
 <svg width="26" height="26" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg>
@@ -2878,6 +2884,38 @@ function handleDashboardCustomRangeChange() {
     if (preset) preset.value = 'custom';
     applyDashboardDateFilter();
 }
+function selectDashboardDate(dateValue) {
+    const date = new Date(`${dateValue}T00:00:00`);
+    const preset = document.getElementById('dashboardDatePreset');
+    const monthSelect = document.getElementById('dashboardMonth');
+    const yearSelect = document.getElementById('dashboardYear');
+    if (preset) preset.value = 'day';
+    if (monthSelect) monthSelect.value = String(date.getMonth());
+    if (yearSelect) yearSelect.value = String(date.getFullYear());
+    updateDashboardDayOptions(date.getDate());
+    applyDashboardDateFilter();
+}
+function renderDashboardAvailableDates() {
+    const container = document.getElementById('dashboardAvailableDates');
+    if (!container) return;
+    const grouped = orders.reduce((map, order) => {
+        const date = order.date || '';
+        if (!date) return map;
+        map[date] = (map[date] || 0) + 1;
+        return map;
+    }, {});
+    const dates = Object.keys(grouped).sort((a, b) => b.localeCompare(a)).slice(0, 8);
+    if (!dates.length) {
+        container.innerHTML = '<strong>Fechas con ventas disponibles</strong><span>No hay pedidos registrados todavía.</span>';
+        return;
+    }
+    container.innerHTML = `
+        <strong>Fechas con ventas disponibles</strong>
+        <div class="dashboard-date-chips">
+            ${dates.map(date => `<button class="dashboard-date-chip" onclick="selectDashboardDate('${date}')">${formatDateTitle(date)} (${grouped[date]})</button>`).join('')}
+        </div>
+    `;
+}
 function applyDashboardDateFilter() {
     renderDashboard();
 }
@@ -2947,12 +2985,13 @@ function renderDashboard() {
     document.getElementById('stat-net').textContent = '$' + Math.round(periodNet).toLocaleString();
     document.getElementById('stat-remaining').textContent = '$' + periodOrders.reduce((s,o) => s + Number(o.remaining || 0), 0).toLocaleString();
     document.getElementById('stat-customers').textContent = periodCustomers.size;
+    renderDashboardAvailableDates();
     const tbody = document.getElementById('dashboard-orders');
     if (tbody) {
         if (orders.length === 0) {
             tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:40px;">No hay pedidos registrados</td></tr>';
         } else if (periodOrders.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:40px;">No hay pedidos en el periodo seleccionado</td></tr>';
+            tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; padding:40px;">No hay pedidos en este periodo: ${ticketEscape(range.label)}. Revisa las fechas disponibles arriba o elige otro rango.</td></tr>`;
         } else {
             tbody.innerHTML = periodOrders.slice().sort((a, b) => String(b.date || '').localeCompare(String(a.date || ''))).slice(0,5).map(order => `
                 <tr onclick="viewOrder('${order.id}')" style="cursor:pointer;">
