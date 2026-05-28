@@ -692,6 +692,10 @@ async function deleteCustomer(id) {
     }
     if (confirm('¿Eliminar este cliente?')) {
         const result = await deleteCustomerFromDatabase(customer);
+        if (result && result.ambiguous) {
+            showNotification('No se pudo eliminar con seguridad porque hay datos duplicados o falta identificador. Revisa el cliente en Supabase o actualiza la información antes de eliminar.', 'warning');
+            return;
+        }
         if (result && result.error) {
             showNotification('No se pudo eliminar el cliente en Supabase. Intenta de nuevo.', 'error');
             return;

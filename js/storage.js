@@ -525,18 +525,29 @@ async function deleteCustomerFromDatabase(customer) {
     const normalized = sanitizeCustomer(customer);
     if (!normalized || !normalized.name) return { deleted: false, skipped: true };
 
-    let customerId = normalized.dbId || normalized.id;
-    if (!customerId || String(customerId).length < 20) {
+    let customerId = normalized.dbId || '';
+    if (!customerId) {
         const { data, error } = await supabaseClient
             .from('customers')
-            .select('id')
-            .eq('name', normalized.name)
-            .limit(1);
+            .select('id,name,phone')
+            .eq('name', normalized.name);
         if (error) {
             console.warn('No se pudo buscar el cliente para eliminar en Supabase.', error);
             return { deleted: false, error };
         }
-        customerId = data && data[0] ? data[0].id : null;
+        const rows = Array.isArray(data) ? data : [];
+        if (!rows.length) return { deleted: true, missing: true };
+        const targetPhone = String(normalized.phone || '').replace(/\D/g, '');
+        const matches = targetPhone
+            ? rows.filter(row => String(row.phone || '').replace(/\D/g, '') === targetPhone)
+            : rows;
+        if (matches.length !== 1) {
+            return { deleted: false, ambiguous: true };
+        }
+        if (!targetPhone && rows.length !== 1) {
+            return { deleted: false, ambiguous: true };
+        }
+        customerId = matches[0].id;
     }
     if (!customerId) return { deleted: true, missing: true };
 
