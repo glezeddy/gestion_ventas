@@ -25,6 +25,10 @@ Sistema web para administrar pedidos, clientes, cupones, tickets y reportes de v
 - LocalStorage
 - GitHub Pages
 
+## Enlace del sistema
+
+https://glezeddy.github.io/gestion_ventas/
+
 ## Estado del proyecto
 
 Proyecto en desarrollo y mejora continua.
