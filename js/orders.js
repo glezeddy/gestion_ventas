@@ -1,3 +1,15 @@
+let orderAdvanceManual = false;
+let editAdvanceManual = false;
+
+function getAutomaticAdvance(total) {
+    return Math.round(Math.max(0, Number(total) || 0) * 0.7);
+}
+function markOrderAdvanceManual() {
+    orderAdvanceManual = true;
+}
+function markEditAdvanceManual() {
+    editAdvanceManual = true;
+}
 function addProductRow() {
     productCounter++;
     const productsList = document.getElementById('productsList');
@@ -96,20 +108,22 @@ function calculatePrices() {
         couponMessage.style.color = '#10b981';
     }
     const total = Math.max(0, subtotal - couponDiscount);
-    const advance70 = Math.round(total * 0.7);
+    const advanceInput = document.getElementById('orderAdvance');
+    const advance = orderAdvanceManual
+        ? Math.max(0, getSafeOrderMoney(advanceInput ? advanceInput.value : 0, 0))
+        : getAutomaticAdvance(total);
     const displayTotalQty = document.getElementById('displayTotalQty');
     const displaySubtotal = document.getElementById('displaySubtotal');
     const displayCouponDiscount = document.getElementById('displayCouponDiscount');
     const displayTotal = document.getElementById('displayTotal');
     const displayAdvance = document.getElementById('displayAdvance');
-    const advanceInput = document.getElementById('orderAdvance');
     if (displayTotalQty) displayTotalQty.textContent = totalQty;
     if (displaySubtotal) displaySubtotal.textContent = '$' + subtotal.toLocaleString();
     if (displayCouponDiscount) displayCouponDiscount.textContent = '-$' + couponDiscount.toLocaleString();
     if (displayTotal) displayTotal.textContent = '$' + total.toLocaleString();
-    if (displayAdvance) displayAdvance.textContent = '$' + advance70.toLocaleString();
-    if (advanceInput && (parseInt(advanceInput.value) || 0) === 0) advanceInput.value = advance70;
-    return { totalQty, subtotal, couponDiscount, total, advance70, couponValidation };
+    if (advanceInput && !orderAdvanceManual) advanceInput.value = advance;
+    if (displayAdvance) displayAdvance.textContent = '$' + advance.toLocaleString();
+    return { totalQty, subtotal, couponDiscount, total, advance, couponValidation };
 }
 function calculateOrderCosts(totalQty, shirtCost, dtfCost, extraCost, shirtCostKids = 0, products = []) {
     const qty = Number(totalQty) || 0;
@@ -194,6 +208,7 @@ function validateAdvanceAndCalculate() {
 
 // Crear pedido
 function openNewOrderModal() {
+    orderAdvanceManual = false;
     document.getElementById('productsList').innerHTML = '';
     productCounter = 0;
     addProductRow();
@@ -317,7 +332,9 @@ function openEditOrderModal(orderId) {
     document.getElementById('editOrderDate').value = order.date;
     document.getElementById('editTechnique').value = order.technique;
     document.getElementById('editStatus').value = normalizeOrderStatus(order.status);
-    document.getElementById('editAdvance').value = order.advance || 0;
+    const storedAdvance = getSafeOrderMoney(order.advance, 0);
+    editAdvanceManual = false;
+    document.getElementById('editAdvance').value = storedAdvance;
     document.getElementById('editShirtCost').value = order.shirtCost || 0;
     const editShirtCostKids = document.getElementById('editShirtCostKids');
     if (editShirtCostKids) editShirtCostKids.value = order.shirtCostKids || 0;
@@ -332,6 +349,9 @@ function openEditOrderModal(orderId) {
         addEditProductRow();
     }
     refreshEditProductPrices();
+    document.getElementById('editAdvance').value = editAdvanceManual
+        ? storedAdvance
+        : getAutomaticAdvance(calculateEditTotalsFromProducts(getEditProductsFromForm().products, order).total);
     calculateEditPrices();
     document.getElementById('editOrderModal').classList.add('active');
 }
@@ -473,19 +493,22 @@ function getEditProductsFromForm() {
     });
     return { products, valid };
 }
+function getSafeOrderMoney(value, fallback = 0) {
+    const parsed = Number(value);
+    return Number.isFinite(parsed) ? parsed : fallback;
+}
 function calculateEditPrices() {
     const orderId = document.getElementById('editOrderId') ? document.getElementById('editOrderId').value : '';
     const existingOrder = orders.find(order => order.id === orderId) || {};
     const { products } = getEditProductsFromForm();
     const totals = calculateEditTotalsFromProducts(products, existingOrder);
     const advanceInput = document.getElementById('editAdvance');
-    let advance = parseFloat(advanceInput ? advanceInput.value : 0) || 0;
+    let advance = editAdvanceManual
+        ? getSafeOrderMoney(advanceInput ? advanceInput.value : 0, 0)
+        : getAutomaticAdvance(totals.total);
     if (advance < 0) advance = 0;
-    if (advance > totals.total) {
-        advance = totals.total;
-        if (advanceInput) advanceInput.value = advance;
-    }
-    const remaining = Math.max(0, totals.total - advance);
+    if (advanceInput && !editAdvanceManual) advanceInput.value = advance;
+    const remaining = totals.total - advance;
     const displaySubtotal = document.getElementById('editDisplaySubtotal');
     const displayCouponDiscount = document.getElementById('editDisplayCouponDiscount');
     const displayTotal = document.getElementById('editDisplayTotal');
@@ -528,9 +551,8 @@ async function saveEditOrder() {
     }
     const previousOrder = orders[orderIndex];
     const editTotals = calculateEditTotalsFromProducts(products, previousOrder);
-    let advance = parseFloat(document.getElementById('editAdvance').value) || 0;
+    let advance = getSafeOrderMoney(document.getElementById('editAdvance').value, 0);
     if (advance < 0) advance = 0;
-    if (advance > editTotals.total) advance = editTotals.total;
     const updatedOrder = {
         ...previousOrder,
         customerName,

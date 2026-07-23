@@ -44,6 +44,16 @@ function sanitizeProduct(product) {
         customPrice: Boolean(product.customPrice || product.priceMode === 'custom')
     };
 }
+function getFiniteNumber(value, fallback = 0) {
+    const parsed = Number(value);
+    return Number.isFinite(parsed) ? parsed : fallback;
+}
+function getStoredOrderAdvance(order) {
+    return Math.max(0, getFiniteNumber(
+        order.advance ?? order.monto_pagado ?? order.amount_paid ?? order.deposito ?? order.deposit,
+        0
+    ));
+}
 function sanitizeOrder(order) {
     if (!order || typeof order !== 'object') return null;
     const id = String(order.id || '').trim();
@@ -51,10 +61,12 @@ function sanitizeOrder(order) {
     if (!id || !customerName) return null;
     const products = Array.isArray(order.products) ? order.products.map(sanitizeProduct).filter(Boolean) : [];
     const totalFromProducts = products.reduce((sum, product) => sum + (product.qty * product.price), 0);
-    const total = Math.max(0, Number(order.total) || totalFromProducts);
+    const parsedTotal = Number(order.total);
+    const hasStoredTotal = order.total !== null && order.total !== undefined && order.total !== '';
+    const total = Math.max(0, hasStoredTotal && Number.isFinite(parsedTotal) ? parsedTotal : totalFromProducts);
     const totalQty = products.length ? products.reduce((sum, product) => sum + product.qty, 0) : Math.max(0, Number(order.totalQty) || 0);
-    const advance = Math.min(total, Math.max(0, Number(order.advance) || 0));
-    const remaining = Math.max(0, total - advance);
+    const advance = getStoredOrderAdvance(order);
+    const remaining = total - advance;
     const shirtCost = Math.max(0, Number(order.shirtCost) || 0);
     const shirtCostKids = Math.max(0, Number(order.shirtCostKids) || Number(order.kidsShirtCost) || 0);
     const dtfCost = Math.max(0, Number(order.dtfCost) || 0);
@@ -70,7 +82,7 @@ function sanitizeOrder(order) {
         date: normalizeOrderDateForLocalTimezone(order.date),
         products,
         technique: order.technique || 'Serigrafía',
-        subtotal: Math.max(0, Number(order.subtotal) || total),
+        subtotal: Math.max(0, getFiniteNumber(order.subtotal, total)),
         couponCode: order.couponCode || '',
         couponId: order.couponId || '',
         couponDiscount: Math.max(0, Number(order.couponDiscount) || 0),
@@ -284,48 +296,52 @@ function isSupabaseReady() {
     return Boolean(supabaseClient);
 }
 function toDbOrder(order) {
+    const normalized = sanitizeOrder(order);
+    const safeOrder = normalized || order || {};
     return {
-        id: order.id,
-        customer_name: order.customerName,
-        customer_phone: order.customerPhone || '',
-        order_date: order.date,
-        technique: order.technique,
-        status: order.status,
-        subtotal: Number(order.subtotal) || Number(order.total) || 0,
-        coupon_code: order.couponCode || '',
-        coupon_id: order.couponId || '',
-        coupon_discount: Number(order.couponDiscount) || 0,
-        total: Number(order.total) || 0,
-        total_qty: Number(order.totalQty) || 0,
-        advance: Number(order.advance) || 0,
-        remaining: Number(order.remaining) || 0,
-        paid: Boolean(order.paid),
-        shirt_cost: Number(order.shirtCost) || 0,
-        shirt_cost_kids: Number(order.shirtCostKids) || 0,
-        dtf_cost: Number(order.dtfCost) || 0,
-        extra_costs: Number(order.extraCosts) || 0,
-        cost_total: Number(order.costTotal) || 0,
-        net_profit: Number(order.netProfit) || 0,
+        id: safeOrder.id,
+        customer_name: safeOrder.customerName,
+        customer_phone: safeOrder.customerPhone || '',
+        order_date: safeOrder.date,
+        technique: safeOrder.technique,
+        status: safeOrder.status,
+        subtotal: getFiniteNumber(safeOrder.subtotal, safeOrder.total),
+        coupon_code: safeOrder.couponCode || '',
+        coupon_id: safeOrder.couponId || '',
+        coupon_discount: getFiniteNumber(safeOrder.couponDiscount, 0),
+        total: getFiniteNumber(safeOrder.total, 0),
+        total_qty: getFiniteNumber(safeOrder.totalQty, 0),
+        advance: getStoredOrderAdvance(safeOrder),
+        remaining: getFiniteNumber(safeOrder.total, 0) - getStoredOrderAdvance(safeOrder),
+        paid: Boolean(safeOrder.paid),
+        shirt_cost: getFiniteNumber(safeOrder.shirtCost, 0),
+        shirt_cost_kids: getFiniteNumber(safeOrder.shirtCostKids, 0),
+        dtf_cost: getFiniteNumber(safeOrder.dtfCost, 0),
+        extra_costs: getFiniteNumber(safeOrder.extraCosts, 0),
+        cost_total: getFiniteNumber(safeOrder.costTotal, 0),
+        net_profit: getFiniteNumber(safeOrder.netProfit, 0),
         updated_at: new Date().toISOString()
     };
 }
 function toLegacyDbOrder(order) {
+    const normalized = sanitizeOrder(order);
+    const safeOrder = normalized || order || {};
     return {
-        id: order.id,
-        customer_name: order.customerName,
-        order_date: order.date,
-        technique: order.technique,
-        status: order.status,
-        total: Number(order.total) || 0,
-        total_qty: Number(order.totalQty) || 0,
-        advance: Number(order.advance) || 0,
-        remaining: Number(order.remaining) || 0,
-        paid: Boolean(order.paid),
-        shirt_cost: Number(order.shirtCost) || 0,
-        dtf_cost: Number(order.dtfCost) || 0,
-        extra_costs: Number(order.extraCosts) || 0,
-        cost_total: Number(order.costTotal) || 0,
-        net_profit: Number(order.netProfit) || 0,
+        id: safeOrder.id,
+        customer_name: safeOrder.customerName,
+        order_date: safeOrder.date,
+        technique: safeOrder.technique,
+        status: safeOrder.status,
+        total: getFiniteNumber(safeOrder.total, 0),
+        total_qty: getFiniteNumber(safeOrder.totalQty, 0),
+        advance: getStoredOrderAdvance(safeOrder),
+        remaining: getFiniteNumber(safeOrder.total, 0) - getStoredOrderAdvance(safeOrder),
+        paid: Boolean(safeOrder.paid),
+        shirt_cost: getFiniteNumber(safeOrder.shirtCost, 0),
+        dtf_cost: getFiniteNumber(safeOrder.dtfCost, 0),
+        extra_costs: getFiniteNumber(safeOrder.extraCosts, 0),
+        cost_total: getFiniteNumber(safeOrder.costTotal, 0),
+        net_profit: getFiniteNumber(safeOrder.netProfit, 0),
         updated_at: new Date().toISOString()
     };
 }
@@ -370,14 +386,14 @@ function fromDbOrder(row, items = []) {
             customPrice: Boolean(item.custom_price)
         })),
         technique: row.technique,
-        subtotal: Number(row.subtotal) || 0,
+        subtotal: row.subtotal,
         couponCode: row.coupon_code || '',
         couponId: row.coupon_id || '',
         couponDiscount: Number(row.coupon_discount) || 0,
-        total: Number(row.total) || 0,
-        totalQty: Number(row.total_qty) || 0,
-        advance: Number(row.advance) || 0,
-        remaining: Number(row.remaining) || 0,
+        total: row.total,
+        totalQty: row.total_qty,
+        advance: row.advance ?? row.monto_pagado ?? row.amount_paid ?? row.deposito ?? row.deposit,
+        remaining: row.remaining ?? row.saldo_restante ?? row.remaining_balance,
         status: row.status,
         paid: Boolean(row.paid),
         shirtCost: Number(row.shirt_cost) || 0,
