@@ -294,3 +294,7 @@ tr:hover { background: linear-gradient(90deg, #f8fafc, #fafafa); }
 .coupon-art-small { font-size: 12px !important; color: #444 !important; }
 .coupon-facebook { position: relative; z-index: 1; margin-top: 44px; font-size: 22px; letter-spacing: 3px; color: #fff; text-align: center; }
 @media (max-width: 768px) { .calc-grid { grid-template-columns: 1fr; } .calc-card .form-grid, .calc-card .stats-grid, .calc-card .price-display { grid-template-columns: 1fr; } .calc-summary-row { align-items: flex-start; flex-direction: column; } }
+
+.quotation-modal { max-width: 920px; }
+.quotation-modal textarea { min-height: 72px; resize: vertical; }
+.quotation-help { margin: 14px 0 0; color: var(--gray); font-size: 13px; line-height: 1.45; }
